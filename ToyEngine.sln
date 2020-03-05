@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29806.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WindowsLauncher", "WindowsLauncher\WindowsLauncher.vcxproj", "{82BE4187-8A5E-40D2-BD22-BF753D0D2E75}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1AEA9030-9442-48FD-AAA6-3C771D691989} = {1AEA9030-9442-48FD-AAA6-3C771D691989}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Engine.vcxproj", "{1AEA9030-9442-48FD-AAA6-3C771D691989}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{82BE4187-8A5E-40D2-BD22-BF753D0D2E75}.Debug|x64.ActiveCfg = Debug|x64
+		{82BE4187-8A5E-40D2-BD22-BF753D0D2E75}.Debug|x64.Build.0 = Debug|x64
+		{82BE4187-8A5E-40D2-BD22-BF753D0D2E75}.Release|x64.ActiveCfg = Release|x64
+		{82BE4187-8A5E-40D2-BD22-BF753D0D2E75}.Release|x64.Build.0 = Release|x64
+		{1AEA9030-9442-48FD-AAA6-3C771D691989}.Debug|x64.ActiveCfg = Debug|x64
+		{1AEA9030-9442-48FD-AAA6-3C771D691989}.Debug|x64.Build.0 = Debug|x64
+		{1AEA9030-9442-48FD-AAA6-3C771D691989}.Release|x64.ActiveCfg = Release|x64
+		{1AEA9030-9442-48FD-AAA6-3C771D691989}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E40046F1-F12D-4C51-9F00-4E054E7B3736}
+	EndGlobalSection
+EndGlobal
