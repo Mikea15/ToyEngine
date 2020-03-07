@@ -23,7 +23,7 @@
     <ProjectGuid>{1AEA9030-9442-48FD-AAA6-3C771D691989}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Engine</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
     <ProjectTypeGuids>{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}</ProjectTypeGuids>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -182,6 +182,7 @@
     <ClInclude Include="Mesh\Quad.h" />
     <ClInclude Include="Mesh\Sphere.h" />
     <ClInclude Include="Mesh\Torus.h" />
+    <ClInclude Include="PhysxHandler.h" />
     <ClInclude Include="Renderer\CommandBuffer.h" />
     <ClInclude Include="Renderer\DebugDraw.h" />
     <ClInclude Include="Renderer\GLStateCache.h" />
@@ -247,6 +248,7 @@
     <ClCompile Include="Mesh\Quad.cpp" />
     <ClCompile Include="Mesh\Sphere.cpp" />
     <ClCompile Include="Mesh\Torus.cpp" />
+    <ClCompile Include="PhysxHandler.cpp" />
     <ClCompile Include="Renderer\CommandBuffer.cpp" />
     <ClCompile Include="Renderer\DebugDraw.cpp" />
     <ClCompile Include="Renderer\GLStateCache.cpp" />

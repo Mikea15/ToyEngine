@@ -4,8 +4,18 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-//#define NOMINMAX
-// #include <windows.h>
+#if 0
+#define _AMD64_
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+#pragma warning(push, 0)
+#include <windows.h>
+#include <windef.h>
+#include <fileapi.h>
+#include <synchapi.h>
+#include <debugapi.h>
+#pragma warning(pop)
+#endif
 
 enum class LEVEL : int
 {

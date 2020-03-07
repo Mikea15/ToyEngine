@@ -8,6 +8,7 @@
 #include "SystemComponents/SystemComponentManager.h"
 #include "Systems/GameFrameTime.h"
 #include "Window/SDLHandler.h"
+#include "PhysxHandler.h"
 
 class State;
 class WindowParams;
@@ -23,6 +24,7 @@ public:
 
 	SDLHandler* GetSDLHandler() { return &m_sdlHandler; }
 	SimpleRenderer* GetRenderer() { return m_renderer; }
+	PhysXHandler* GetPhysX() { return &m_physxHandler; }
 
 	double GetTimeMS() const { return m_time; }
 
@@ -45,6 +47,7 @@ private:
 	// Renderer* m_renderer{};
 	State* m_gameState{};
 	SDLHandler m_sdlHandler;
+	PhysXHandler m_physxHandler;
 
 	SystemComponentManager* m_systemComponents{};
 };

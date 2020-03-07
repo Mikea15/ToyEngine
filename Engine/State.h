@@ -29,10 +29,6 @@ union SDL_Event;
 
 #include <stack>
 
-#include <physx/PxPhysicsAPI.h>
-
-using namespace physx;
-
 class State
 {
 public:
@@ -47,24 +43,6 @@ public:
 	virtual void Cleanup() = 0;
 };
 
-class PxAllocatorCallback
-{
-public:
-	virtual ~PxAllocatorCallback() {}
-	virtual void* allocate(size_t size, const char* typeName, const char* filename,
-		int line) = 0;
-	virtual void deallocate(void* ptr) = 0;
-};
-
-class UserErrorCallback : public PxErrorCallback
-{
-public:
-	virtual void reportError(PxErrorCode::Enum code, const char* message, const char* file,
-		int line)
-	{
-		// error processing implementation
-	}
-};
 
 class StubState
 	: public State
@@ -84,14 +62,6 @@ public:
 
 		// debug draw init
 		DebugDraw::Init();
-
-		static PxDefaultErrorCallback gDefaultErrorCallback;
-		static PxDefaultAllocator gDefaultAllocatorCallback;
-
-		auto mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback,
-			gDefaultErrorCallback);
-		if (!mFoundation)
-			printf("PxCreateFoundation failed!");
 
 		// basic shapes
 		// plane = new PlaneMesh(50, 50);
@@ -149,11 +119,11 @@ public:
 		m_oTree = Octree(glm::vec3(0.0f), 50.0f);
 
 		const float spacing = 7.2f;
-		for (int x = 0; x < 10; ++x)
+		for (int x = 0; x < 5; ++x)
 		{
-			for (int z = 0; z < 10; ++z)
+			for (int z = 0; z < 5; ++z)
 			{
-				for (int y = 0; y < 10; ++y)
+				for (int y = 0; y < 5; ++y)
 				{
 					glm::vec3 position = glm::vec3(0.0f, 0.5f, 0.0f) + glm::vec3(x - 5, y, z - 5) * spacing;
 
@@ -166,11 +136,16 @@ public:
 
 					m_randomNodes.push_back(node);
 
+					auto dynObject = m_game->GetPhysX()->CreateDynamic(
+						PxTransform(PxVec3(position.x, position.y, position.z)),
+						PxSphereGeometry(randomScale), PxVec3(0.0f, 3.0f * randomScale, 0.0f));
+					m_dynamicObjects.push_back(dynObject);
+
 					glm::vec3 min = { position.x + node->BoxMin.x * randomScale, position.y + node->BoxMin.y * randomScale, position.z + node->BoxMin.z * randomScale};
 					glm::vec3 max = { position.x + node->BoxMax.x * randomScale, position.y + node->BoxMax.y * randomScale, position.z + node->BoxMax.z * randomScale};
 					glm::vec4 green = { 0.0f, 1.0f, 0.0f, 1.0f };
 
-					DebugDraw::AddAABB(min, max, green);
+					// DebugDraw::AddAABB(min, max, green);
 
 					m_qTree.Insert(position);
 					m_oTree.Insert(position);
@@ -317,6 +292,20 @@ public:
 
 		glm::mat4 viewProj = m_camera.GetViewProjection();
 		DebugDraw::Update(viewProj);
+
+		// Update PhysX Objects
+		const unsigned int objectSize = m_dynamicObjects.size();
+		for (unsigned int i = 0; i < objectSize; i++)
+		{
+			PxRigidDynamic* dyn = m_dynamicObjects[i];
+
+			glm::vec3 pos = { dyn->getGlobalPose().p.x,
+				dyn->getGlobalPose().p.y,
+				dyn->getGlobalPose().p.z };
+
+			SceneNode* node = m_randomNodes[i];
+			node->SetPosition(pos);
+		}
 	};
 
 	void Render(float alpha = 1.0f) override 
@@ -410,13 +399,15 @@ private:
 
 	std::vector<SceneNode*> m_randomNodes;
 
+	std::vector<PxRigidDynamic*> m_dynamicObjects;
+
 	bool m_inputGrabMouse = false;
 	float m_inputMoveUp = 0.0f;
 	float m_inputMoveRight = 0.0f;
 	float m_inputMoveForward = 0.0f;
 	bool m_inputEnableMovementBoost = false;
 
-	bool m_drawObjects = false;
+	bool m_drawObjects = true;
 	bool m_drawQuadtree = false;
 	bool m_drawOctree = false;
 	bool m_drawBVH = false;

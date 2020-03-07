@@ -42,9 +42,14 @@ void Game::InitSystems()
 	m_systemComponents->Initialize(this);
 
 	Resources::Init();
+
+	// Physx
+	m_physxHandler.Init();
+
 	m_renderer = new SimpleRenderer();
 	m_renderer->Init();
 	m_renderer->SetRenderSize(m_sdlHandler.GetWindowParams().Width, m_sdlHandler.GetWindowParams().Height);
+
 }
 
 void Game::CleanupSystems()
@@ -54,6 +59,8 @@ void Game::CleanupSystems()
 
 	Scene::Clear();
 	Resources::Clean();
+
+	m_physxHandler.Cleanup();
 
 	m_systemComponents->Cleanup();
 
@@ -130,6 +137,9 @@ int Game::Execute()
 		// Handle Updates / Fixed Update
 		while (accumulator >= m_deltaTime)
 		{
+			// physx tick
+			m_physxHandler.Tick(m_deltaTime);
+
 			// system components
 			m_systemComponents->Update(m_deltaTime);
 
@@ -152,10 +162,10 @@ int Game::Execute()
 		m_gameState->Render(alpha);
 
 		// ui
-		// m_sdlHandler.BeginUIRender();
-		// m_systemComponents->RenderUI();
-		// m_gameState->RenderUI();
-		// m_sdlHandler.EndUIRender();
+		m_sdlHandler.BeginUIRender();
+		m_systemComponents->RenderUI();
+		m_gameState->RenderUI();
+		m_sdlHandler.EndUIRender();
 
 		m_sdlHandler.EndRender();
 	}
