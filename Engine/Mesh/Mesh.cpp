@@ -109,30 +109,30 @@ void Mesh::Finalize(bool interleaved)
 	else
 	{
 		// if any of the float arrays are empty, data won't be filled by them.
-		for (int i = 0; i < Positions.size(); ++i)
+		for (unsigned int i = 0; i < Positions.size(); ++i)
 		{
 			data.push_back(Positions[i].x);
 			data.push_back(Positions[i].y);
 			data.push_back(Positions[i].z);
 		}
-		for (int i = 0; i < UV.size(); ++i)
+		for (unsigned int i = 0; i < UV.size(); ++i)
 		{
 			data.push_back(UV[i].x);
 			data.push_back(UV[i].y);
 		}
-		for (int i = 0; i < Normals.size(); ++i)
+		for (unsigned int i = 0; i < Normals.size(); ++i)
 		{
 			data.push_back(Normals[i].x);
 			data.push_back(Normals[i].y);
 			data.push_back(Normals[i].z);
 		}
-		for (int i = 0; i < Tangents.size(); ++i)
+		for (unsigned int i = 0; i < Tangents.size(); ++i)
 		{
 			data.push_back(Tangents[i].x);
 			data.push_back(Tangents[i].y);
 			data.push_back(Tangents[i].z);
 		}
-		for (int i = 0; i < Bitangents.size(); ++i)
+		for (unsigned int i = 0; i < Bitangents.size(); ++i)
 		{
 			data.push_back(Bitangents[i].x);
 			data.push_back(Bitangents[i].y);

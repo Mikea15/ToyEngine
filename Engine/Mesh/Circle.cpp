@@ -1,7 +1,5 @@
 #include "Circle.h"
 
-
-
 Circle::Circle(unsigned int edgeSegments, unsigned int ringSegments)
 {
 	for (unsigned int y = 0; y <= ringSegments; ++y)

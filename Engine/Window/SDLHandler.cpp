@@ -84,8 +84,10 @@ void SDLHandler::HandleEvents(SDL_Event* event)
 			SDL_SetWindowSize(m_window, m_windowParams.Width, m_windowParams.Height);
 			break;
 		case SDL_WINDOWEVENT_FOCUS_GAINED:
+			LOG_INFO("Focus Gained");
 			break;
 		case SDL_WINDOWEVENT_FOCUS_LOST:
+			LOG_INFO("Focus Lost");
 			break;
 		default: break;
 		}

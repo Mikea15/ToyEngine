@@ -75,7 +75,7 @@ PBR::~PBR()
 	delete m_PBRPrefilterCapture;
 	delete m_PBRIntegrateBRDF;
 	delete m_SkyCapture;
-	for (int i = 0; i < m_CaptureProbes.size(); ++i)
+	for (unsigned int i = 0; i < m_CaptureProbes.size(); ++i)
 	{
 		delete m_CaptureProbes[i]->Irradiance;
 		delete m_CaptureProbes[i]->Prefiltered;
@@ -98,7 +98,7 @@ void PBR::AddIrradianceProbe(PBRCapture* capture, glm::vec3 position, float radi
 
 void PBR::ClearIrradianceProbes()
 {
-	for (int i = 0; i < m_CaptureProbes.size(); ++i)
+	for (unsigned int i = 0; i < m_CaptureProbes.size(); ++i)
 	{
 		delete m_CaptureProbes[i]->Irradiance;
 		delete m_CaptureProbes[i]->Prefiltered;
@@ -158,7 +158,7 @@ std::vector<PBRCapture*> PBR::GetIrradianceProbes(glm::vec3 queryPos, float quer
 {
 	// retrieve all irradiance probes in proximity to queryPos and queryRadius
 	std::vector<PBRCapture*> capturesProximity;
-	for (int i = 0; i < m_CaptureProbes.size(); ++i)
+	for (unsigned int i = 0; i < m_CaptureProbes.size(); ++i)
 	{
 		float lengthSq = glm::length2((m_CaptureProbes[i]->m_position - queryPos));
 		if (lengthSq < queryRadius * queryRadius)

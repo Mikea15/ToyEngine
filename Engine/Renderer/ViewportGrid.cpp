@@ -14,7 +14,7 @@ ViewportGrid::ViewportGrid(float width, float depth, unsigned int rows, unsigned
 
 	const glm::vec3 gridOrigin = { -halfWidth, 0.0f, -halfDepth };
 	const glm::vec3 widthDisplacement(m_width, 0.0f, 0.0f);
-	for (int y = 0; y <= m_rows; ++y)
+	for (unsigned int y = 0; y <= m_rows; ++y)
 	{
 		const glm::vec3 start = gridOrigin + glm::vec3(0.0f, 0.0f, y);
 		const glm::vec3 end = start + widthDisplacement;
@@ -22,7 +22,7 @@ ViewportGrid::ViewportGrid(float width, float depth, unsigned int rows, unsigned
 	}
 
 	const glm::vec3 depthDisplacement(0.0f, 0.0f, m_depth);
-	for (int x = 0; x <= m_cols; ++x)
+	for (unsigned int x = 0; x <= m_cols; ++x)
 	{
 		const glm::vec3 start = gridOrigin + glm::vec3(x, 0.0f, 0.0f);
 		const glm::vec3 end = start + depthDisplacement;

@@ -177,7 +177,7 @@ void SceneNode::UpdateTransform(bool updatePrevTransform)
 			m_transform = m_parent->m_transform * m_transform;
 		}
 	}
-	for (int i = 0; i < m_children.size(); ++i)
+	for (unsigned int i = 0; i < m_children.size(); ++i)
 	{
 		if (m_isDirty)
 		{
@@ -212,7 +212,7 @@ void SceneNode::ShowNode(int depth)
 
 		ImGui::NextColumn();
 
-		for (int i = 0; i < childCount; ++i)
+		for (unsigned int i = 0; i < childCount; ++i)
 		{
 			m_children[i]->ShowNode(depth++);
 		}

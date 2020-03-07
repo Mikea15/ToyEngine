@@ -58,7 +58,7 @@ public:
 
 	const glm::mat4& GetView() const { return m_view; }
 	const glm::mat4& GetProjection() const { return m_projection; }
-	const glm::mat4& GetViewProjection() const { return m_projection * m_view; }
+	glm::mat4 GetViewProjection() const { return m_projection * m_view; }
 
 	const glm::vec3& GetUp() const { return m_up; }
 	const glm::vec3& GetForward() const { return m_forward; }

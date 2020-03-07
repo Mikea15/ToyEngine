@@ -613,7 +613,7 @@ void Renderer::BakeProbes(SceneNode* scene)
 	std::vector<RenderCommand> renderCommands = commandBuffer.GetCustomRenderCommands(nullptr);
 
 	m_PBR->ClearIrradianceProbes();
-	for (int i = 0; i < m_ProbeSpatials.size(); ++i)
+	for (unsigned int i = 0; i < m_ProbeSpatials.size(); ++i)
 	{
 		TextureCube renderResult;
 		renderResult.DefaultInitialize(32, 32, GL_RGB, GL_FLOAT);
@@ -624,7 +624,7 @@ void Renderer::BakeProbes(SceneNode* scene)
 		m_PBR->AddIrradianceProbe(capture, glm::vec3(m_ProbeSpatials[i]), m_ProbeSpatials[i].w);
 	}
 
-	for (int i = 0; i < materials.size(); ++i)
+	for (unsigned int i = 0; i < materials.size(); ++i)
 	{
 		delete materials[i];
 	}
@@ -664,7 +664,7 @@ void Renderer::renderCustomCommand(RenderCommand* command, Camera* customCamera,
 	material->GetShader()->SetBool("ShadowsEnabled", Shadows);
 	if (Shadows && material->Type == MATERIAL_CUSTOM && material->ShadowReceive)
 	{
-		for (int i = 0; i < m_DirectionalLights.size(); ++i)
+		for (unsigned int i = 0; i < m_DirectionalLights.size(); ++i)
 		{
 			if (m_DirectionalLights[i]->m_shadowMatRenderTarget)
 			{
@@ -766,8 +766,8 @@ void Renderer::renderToCubemap(std::vector<RenderCommand>& renderCommands, Textu
 	};
 
 	// resize target dimensions based on mip level we're rendering.
-	float width = (float)target->FaceWidth * pow(0.5, mipLevel);
-	float height = (float)target->FaceHeight * pow(0.5, mipLevel);
+	float width = (float)target->FaceWidth * pow(0.5f, mipLevel);
+	float height = (float)target->FaceHeight * pow(0.5f, mipLevel);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_FramebufferCubemap);
 	glBindRenderbuffer(GL_RENDERBUFFER, m_CubemapDepthRBO);
@@ -851,7 +851,7 @@ void Renderer::renderDeferredAmbient()
 		m_PostProcessor->SSAOOutput->Bind(6);
 
 		m_GLCache.SetCullFace(GL_FRONT);
-		for (int i = 0; i < irradianceProbes.size(); ++i)
+		for (unsigned int i = 0; i < irradianceProbes.size(); ++i)
 		{
 			PBRCapture* probe = irradianceProbes[i];
 			// only render probe if within frustum

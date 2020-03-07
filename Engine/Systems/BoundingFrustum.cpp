@@ -39,7 +39,7 @@ bool BoundingFrustum::Intersects(const BoundingFrustum& frustum) const
 PlaneIntersectionType BoundingFrustum::Intersects(const Plane& plane) const
 {
 	PlaneIntersectionType pit = plane.Intersects(corners[0]);
-	for (int i = 1; i < corners.size(); ++i)
+	for (unsigned int i = 1; i < corners.size(); ++i)
 	{
 		if (plane.Intersects(corners[i]) != pit)
 		{

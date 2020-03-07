@@ -3,7 +3,7 @@
 #include <vector>
 #include <functional>
 
-#define GLM_SWIZZLE
+#define GLM_FORCE_SWIZZLE
 #include <glm/glm.hpp>
 
 
@@ -42,8 +42,8 @@ class Mesh
 	// NOTE(Joey): public for now for testing and easy access; will eventually be private and only visible to renderer (as a friend class)
 public:
 	unsigned int m_VAO = 0;
-	unsigned int m_VBO;
-	unsigned int m_EBO;
+	unsigned int m_VBO = 0;
+	unsigned int m_EBO = 0;
 public:
 	std::vector<glm::vec3> Positions;
 	std::vector<glm::vec2> UV;

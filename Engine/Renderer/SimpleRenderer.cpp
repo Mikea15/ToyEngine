@@ -23,7 +23,7 @@ SimpleRenderer::~SimpleRenderer()
 {
 	delete m_materialLibrary;
 	// shadows
-	for (int i = 0; i < m_ShadowRenderTargets.size(); ++i)
+	for (unsigned int i = 0; i < m_ShadowRenderTargets.size(); ++i)
 	{
 		delete m_ShadowRenderTargets[i];
 	}
@@ -182,7 +182,7 @@ void SimpleRenderer::RenderPushedCommands()
 		m_ShadowViewProjections.clear();
 
 		unsigned int shadowRtIndex = 0;
-		for (int i = 0; i < m_DirectionalLights.size(); ++i)
+		for (unsigned int i = 0; i < m_DirectionalLights.size(); ++i)
 		{
 			DirectionalLight* light = m_DirectionalLights[i];
 			if (light->m_castShadows)
@@ -198,7 +198,7 @@ void SimpleRenderer::RenderPushedCommands()
 				m_DirectionalLights[i]->m_lightSpaceViewPrrojection = lightProjection * lightView;
 				m_DirectionalLights[i]->m_shadowMatRenderTarget = m_ShadowRenderTargets[shadowRtIndex];
 
-				for (int j = 0; j < solids.size(); ++j)
+				for (unsigned int j = 0; j < solids.size(); ++j)
 				{
 					RenderShadowCastCommand(&solids[j], lightView, lightProjection);
 				}
@@ -286,7 +286,7 @@ void SimpleRenderer::RenderPushedCommands()
 		currentShader->SetBool("ShadowsEnabled", m_enableShadows);
 		if (m_enableShadows && rc.Material->Type == MATERIAL_CUSTOM && rc.Material->ShadowReceive)
 		{
-			for (int i = 0; i < m_DirectionalLights.size(); ++i)
+			for (unsigned int i = 0; i < m_DirectionalLights.size(); ++i)
 			{
 				if (m_DirectionalLights[i]->m_shadowMatRenderTarget)
 				{
