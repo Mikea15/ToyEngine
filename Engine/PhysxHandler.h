@@ -1,15 +1,36 @@
 
 #pragma once
 
+#include <glm/glm.hpp>
+
 #include <physx/PxPhysicsAPI.h>
 #include <physx/pvd/PxPvd.h>
 
 using namespace physx;
 
+// PhysX Docs
+// https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxguide/Index.html
+// https://gameworksdocs.nvidia.com/PhysX/4.1/documentation/physxapi/
+
+#define PVD_HOST "127.0.0.1"
+#define PVD_PORT 5425
+#define PVD_TIMEOUT_MS 10
+
+
+#define Vec3ToPx(v) PxVec3(v.x, v.y, v.z)
+#define PxToVec3(v) glm::vec3(v.x, v.y, v.z)
+
 class PhysXHandler
 {
 public:
 	PhysXHandler() = default;
+
+	struct Params
+	{
+		unsigned int m_threads = 2;
+		glm::vec3 m_gravity = { 0.0f, -9.81f, 0.0f };
+
+	};
 
 	void Init();
 	void Cleanup();
@@ -28,15 +49,15 @@ private:
 	PxDefaultAllocator		gAllocator;
 	PxDefaultErrorCallback	gErrorCallback;
 
-	PxFoundation* gFoundation = nullptr;
-	PxPhysics* gPhysics = nullptr;
+	PxFoundation* m_foundation = nullptr;
+	PxPhysics* m_physics = nullptr;
 
 	PxDefaultCpuDispatcher* gDispatcher = nullptr;
-	PxScene* gScene = nullptr;
+	PxScene* m_mainScene = nullptr;
 
-	PxMaterial* gMaterial = nullptr;
+	PxMaterial* m_defaultMaterial = nullptr;
 
-	PxPvd* gPvd = nullptr;
+	PxPvd* m_visualDebugger = nullptr;
 
-	PxReal stackZ = 10.0f;
+	Params m_defaults;
 };

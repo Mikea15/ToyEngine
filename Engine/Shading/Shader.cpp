@@ -6,18 +6,19 @@
 #include <string>
 
 #include "Utils/Logger.h"
+#include "Utils/Utils.h"
 
 Shader::Shader()
 {
 
 }
 
-Shader::Shader(std::string name, std::string vsCode, std::string fsCode, std::vector<std::string> defines)
+Shader::Shader(const std::string& name, std::string vsCode, std::string fsCode, std::vector<std::string> defines)
 {
 	Load(name, vsCode, fsCode, defines);
 }
 
-void Shader::Load(std::string name, std::string vsCode, std::string fsCode, std::vector<std::string> defines)
+void Shader::Load(const std::string& name, std::string vsCode, std::string fsCode, std::vector<std::string> defines)
 {
 	Name = name;
 	// compile both shaders and link them
@@ -140,6 +141,14 @@ void Shader::Load(std::string name, std::string vsCode, std::string fsCode, std:
 		Uniforms[i].Type = SHADER_TYPE_BOOL;
 
 		Uniforms[i].Location = glGetUniformLocation(ID, buffer);
+
+		Uniform uniform;
+		uniform.Name = Uniforms[i].Name;
+		uniform.Location = glGetUniformLocation(ID, buffer);
+		uniform.Type = SHADER_TYPE_BOOL;
+		uniform.Size = Uniforms[i].Size;
+
+		m_uniformMap[Utils::Hash(uniform.Name)] = uniform;
 	}
 }
 
@@ -148,8 +157,10 @@ void Shader::Use()
 	glUseProgram(ID);
 }
 
-bool Shader::HasUniform(std::string name)
+bool Shader::HasUniform(const std::string& name)
 {
+	return m_uniformMap.find(Utils::Hash(name)) != m_uniformMap.end();
+
 	for (unsigned int i = 0; i < Uniforms.size(); ++i)
 	{
 		if (Uniforms[i].Name == name)
@@ -158,49 +169,49 @@ bool Shader::HasUniform(std::string name)
 	return false;
 }
 
-void Shader::SetInt(std::string location, int value)
+void Shader::SetInt(const std::string& location, int value)
 {
 	int loc = getUniformLocation(location);
 	if (loc >= 0)
 		glUniform1i(loc, value);
 }
 
-void Shader::SetBool(std::string location, bool value)
+void Shader::SetBool(const std::string& location, bool value)
 {
 	int loc = getUniformLocation(location);
 	if (loc >= 0)
 		glUniform1i(loc, (int)value);
 }
 
-void Shader::SetFloat(std::string location, float value)
+void Shader::SetFloat(const std::string& location, float value)
 {
 	int loc = getUniformLocation(location);
 	if (loc >= 0)
 		glUniform1f(loc, value);
 }
 
-void Shader::SetVector(std::string location, glm::vec2 value)
+void Shader::SetVector(const std::string& location, glm::vec2 value)
 {
 	int loc = getUniformLocation(location);
 	if (loc >= 0)
 		glUniform2fv(loc, 1, &value[0]);
 }
 
-void Shader::SetVector(std::string location, glm::vec3 value)
+void Shader::SetVector(const std::string& location, glm::vec3 value)
 {
 	int loc = getUniformLocation(location);
 	if (loc >= 0)
 		glUniform3fv(loc, 1, &value[0]);
 }
 
-void Shader::SetVector(std::string location, glm::vec4 value)
+void Shader::SetVector(const std::string& location, glm::vec4 value)
 {
 	int loc = getUniformLocation(location);
 	if (loc >= 0)
 		glUniform4fv(loc, 1, &value[0]);
 }
 
-void Shader::SetVectorArray(std::string location, int size, const std::vector<glm::vec2>& values)
+void Shader::SetVectorArray(const std::string& location, int size, const std::vector<glm::vec2>& values)
 {
 	unsigned int loc = glGetUniformLocation(ID, location.c_str());
 	if (loc >= 0)
@@ -209,7 +220,7 @@ void Shader::SetVectorArray(std::string location, int size, const std::vector<gl
 	}
 }
 
-void Shader::SetVectorArray(std::string location, int size, const std::vector<glm::vec3>& values)
+void Shader::SetVectorArray(const std::string& location, int size, const std::vector<glm::vec3>& values)
 {
 	unsigned int loc = glGetUniformLocation(ID, location.c_str());
 	if (loc >= 0)
@@ -218,7 +229,7 @@ void Shader::SetVectorArray(std::string location, int size, const std::vector<gl
 	}
 }
 
-void Shader::SetVectorArray(std::string location, int size, const std::vector<glm::vec4>& values)
+void Shader::SetVectorArray(const std::string& location, int size, const std::vector<glm::vec4>& values)
 {
 	unsigned int loc = glGetUniformLocation(ID, location.c_str());
 	if (loc >= 0)
@@ -227,34 +238,45 @@ void Shader::SetVectorArray(std::string location, int size, const std::vector<gl
 	}
 }
 
-void Shader::SetMatrix(std::string location, glm::mat2 value)
+void Shader::SetMatrix(const std::string& location, glm::mat2 value)
 {
 	int loc = getUniformLocation(location);
 	if (loc >= 0)
 		glUniformMatrix2fv(loc, 1, GL_FALSE, &value[0][0]);
 }
 
-void Shader::SetMatrix(std::string location, glm::mat3 value)
+void Shader::SetMatrix(const std::string& location, glm::mat3 value)
 {
 	int loc = getUniformLocation(location);
 	if (loc >= 0)
 		glUniformMatrix3fv(loc, 1, GL_FALSE, &value[0][0]);
 }
 
-void Shader::SetMatrix(std::string location, glm::mat4 value)
+void Shader::SetMatrix(const std::string& location, glm::mat4 value)
 {
 	int loc = getUniformLocation(location);
 	if (loc >= 0)
 		glUniformMatrix4fv(loc, 1, GL_FALSE, &value[0][0]);
 }
 
-int Shader::getUniformLocation(std::string name)
+int Shader::getUniformLocation(const std::string& name)
 {
-	// read from uniform/attribute array as originally obtained from OpenGL
-	for (unsigned int i = 0; i < Uniforms.size(); ++i)
+	unsigned int hash = Utils::Hash(name);
+	auto find = m_uniformMap.find(hash);
+	if (find != m_uniformMap.end())
 	{
-		if (Uniforms[i].Name == name)
-			return Uniforms[i].Location;
+		return find->second.Location;
 	}
+
+	// read from uniform/attribute array as originally obtained from OpenGL
+	// for (unsigned int i = 0; i < Uniforms.size(); ++i)
+	// {
+	// 	if (Uniforms[i].Name == name) 
+	// 	{
+	// 		m_hashToUniformIndex.insert({ hash, i });
+	// 		return Uniforms[i].Location;
+	// 	}
+	// }
+
 	return -1;
 }

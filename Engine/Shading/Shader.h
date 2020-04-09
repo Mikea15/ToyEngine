@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "ShadingTypes.h"
 
@@ -24,32 +25,35 @@ public:
 
 public:
 	Shader();
-	Shader(std::string name, std::string vsCode, std::string fsCode, std::vector<std::string> defines = std::vector<std::string>());
+	Shader(const std::string& name, std::string vsCode, std::string fsCode, std::vector<std::string> defines = std::vector<std::string>());
 
-	void Load(std::string name, std::string vsCode, std::string fsCode, std::vector<std::string> defines = std::vector<std::string>());
+	void Load(const std::string& name, std::string vsCode, std::string fsCode, std::vector<std::string> defines = std::vector<std::string>());
 
 	void Use();
 
-	bool HasUniform(std::string name);
+	bool HasUniform(const std::string& name);
 
-	void SetInt(std::string location, int   value);
-	void SetBool(std::string location, bool  value);
-	void SetFloat(std::string location, float value);
-	void SetVector(std::string location, glm::vec2  value);
-	void SetVector(std::string location, glm::vec3  value);
-	void SetVector(std::string location, glm::vec4  value);
-	void SetVectorArray(std::string location, int size, const std::vector<glm::vec2>& values);
-	void SetVectorArray(std::string location, int size, const std::vector<glm::vec3>& values);
-	void SetVectorArray(std::string location, int size, const std::vector<glm::vec4>& values);
-	void SetMatrix(std::string location, glm::mat2 value);
-	void SetMatrix(std::string location, glm::mat3 value);
-	void SetMatrix(std::string location, glm::mat4 value);
-	void SetMatrixArray(std::string location, int size, glm::mat2* values);
-	void SetMatrixArray(std::string location, int size, glm::mat3* values);
-	void SetMatrixArray(std::string location, int size, glm::mat4* values);
+	void SetInt(const std::string& location, int   value);
+	void SetBool(const std::string& location, bool  value);
+	void SetFloat(const std::string& location, float value);
+	void SetVector(const std::string& location, glm::vec2  value);
+	void SetVector(const std::string& location, glm::vec3  value);
+	void SetVector(const std::string& location, glm::vec4  value);
+	void SetVectorArray(const std::string& location, int size, const std::vector<glm::vec2>& values);
+	void SetVectorArray(const std::string& location, int size, const std::vector<glm::vec3>& values);
+	void SetVectorArray(const std::string& location, int size, const std::vector<glm::vec4>& values);
+	void SetMatrix(const std::string& location, glm::mat2 value);
+	void SetMatrix(const std::string& location, glm::mat3 value);
+	void SetMatrix(const std::string& location, glm::mat4 value);
+	void SetMatrixArray(const std::string& location, int size, glm::mat2* values);
+	void SetMatrixArray(const std::string& location, int size, glm::mat3* values);
+	void SetMatrixArray(const std::string& location, int size, glm::mat4* values);
 private:
 	// retrieves uniform location from pre-stored uniform locations and reports an error if a 
 	// non-uniform is set.
-	int getUniformLocation(std::string name);
+	int getUniformLocation(const std::string& name);
+
+	std::unordered_map<unsigned int, unsigned int> m_hashToUniformIndex;
+	std::unordered_map<unsigned int, Uniform> m_uniformMap;
 };
 

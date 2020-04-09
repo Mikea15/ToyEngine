@@ -138,7 +138,7 @@ int Game::Execute()
 		while (accumulator >= m_deltaTime)
 		{
 			// physx tick
-			m_physxHandler.Tick(m_deltaTime);
+			// m_physxHandler.Tick(m_deltaTime);
 
 			// system components
 			m_systemComponents->Update(m_deltaTime);

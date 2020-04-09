@@ -143,7 +143,7 @@ SceneNode* SceneNode::GetParent()
 	return m_parent;
 }
 
-glm::mat4 SceneNode::GetTransform()
+glm::mat4& SceneNode::GetTransform()
 {
 	if (m_isDirty)
 	{
@@ -152,9 +152,14 @@ glm::mat4 SceneNode::GetTransform()
 	return m_transform;
 }
 
-glm::mat4 SceneNode::GetPrevTransform()
+glm::mat4& SceneNode::GetPrevTransform()
 {
 	return m_prevTransform;
+}
+
+void SceneNode::SetTransform(glm::mat4 transform)
+{
+	m_transform = transform;
 }
 
 void SceneNode::UpdateTransform(bool updatePrevTransform)

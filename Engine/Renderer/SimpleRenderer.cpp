@@ -31,6 +31,7 @@ SimpleRenderer::~SimpleRenderer()
 
 void SimpleRenderer::Init()
 {
+	m_renderCommands.reserve(10000);
 	m_materialLibrary = new MaterialLibrary();
 
 	// shadows
@@ -94,7 +95,7 @@ void SimpleRenderer::PushRender(Mesh* mesh, Material* material, glm::mat4 transf
 
 void SimpleRenderer::PushRender(SceneNode* node)
 {
-	node->UpdateTransform(true);
+	node->UpdateTransform(false);
 
 	std::stack<SceneNode*> nodeStack;
 	nodeStack.push(node);
@@ -162,7 +163,7 @@ void SimpleRenderer::RenderPushedCommands()
 	const glm::vec3 cameraPosition = m_camera->GetPosition();
 
 	std::vector<RenderCommand> transparents;
-	std::vector<RenderCommand> solids;
+	std::unordered_map<Material*, std::vector<RenderCommand>> solids_sorted;
 	for (auto it = m_renderCommands.rbegin(), end = m_renderCommands.rend(); it != end; ++it)
 	{
 		if (it->Material->Blend)
@@ -171,10 +172,15 @@ void SimpleRenderer::RenderPushedCommands()
 		}
 		else
 		{
-			solids.push_back(*it);
+			solids_sorted[it->Material].push_back(*it);
+			if (solids_sorted[it->Material].size() == 1)
+			{
+				solids_sorted[it->Material].reserve(m_renderCommands.size());
+			}
 		}
 	}
 	m_renderCommands.clear();
+	
 
 	if (m_enableShadows)
 	{
@@ -198,9 +204,9 @@ void SimpleRenderer::RenderPushedCommands()
 				m_DirectionalLights[i]->m_lightSpaceViewPrrojection = lightProjection * lightView;
 				m_DirectionalLights[i]->m_shadowMatRenderTarget = m_ShadowRenderTargets[shadowRtIndex];
 
-				for (unsigned int j = 0; j < solids.size(); ++j)
+				//for (unsigned int j = 0; j < solids.size(); ++j)
 				{
-					RenderShadowCastCommand(&solids[j], lightView, lightProjection);
+					//RenderShadowCastCommand(&solids[j], lightView, lightProjection);
 				}
 				++shadowRtIndex;
 			}
@@ -213,49 +219,41 @@ void SimpleRenderer::RenderPushedCommands()
 	glViewport(0, 0, m_renderTargetWidth, m_renderTargetHeight);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (RenderCommand rc : solids)
+	for (auto materialMap : solids_sorted)
 	{
+		Material* material = materialMap.first;
+		Shader* currentShader = material->GetShader();
 
-		// Frustum Culling.
-		if (m_enableFrustumCulling && !m_camera->GetFrustum().Intersect(rc.BoxMin, rc.BoxMax)) {
-			// DebugDraw::AddAABB(rc.BoxMin, rc.BoxMax, { 1.0f, 1.0f, 1.0f, 1.0f });
-			continue;
-		}
-
-		// DebugDraw::AddAABB(rc.BoxMin, rc.BoxMax, { 0.0f, 1.0f, 0.0f, 1.0f });
-
-		Shader* currentShader = rc.Material->GetShader();
-
-		if (m_enableGLCache) 
+		if (m_enableGLCache)
 		{
-			m_glState.SetBlend(rc.Material->Blend);
-			if (rc.Material->Blend)
+			m_glState.SetBlend(material->Blend);
+			if (material->Blend)
 			{
-				m_glState.SetBlendFunc(rc.Material->BlendSrc, rc.Material->BlendDst);
+				m_glState.SetBlendFunc(material->BlendSrc, material->BlendDst);
 			}
-			m_glState.SetDepthFunc(rc.Material->DepthCompare);
-			m_glState.SetDepthTest(rc.Material->DepthTest);
-			m_glState.SetCull(rc.Material->Cull);
-			m_glState.SetCullFace(rc.Material->CullFace);
+			m_glState.SetDepthFunc(material->DepthCompare);
+			m_glState.SetDepthTest(material->DepthTest);
+			m_glState.SetCull(material->Cull);
+			m_glState.SetCullFace(material->CullFace);
 
 			m_glState.SwitchShader(currentShader->ID);
 		}
-		else 
+		else
 		{
 			// Blend
-			if (rc.Material->Blend) 
-			{ 
+			if (material->Blend)
+			{
 				glEnable(GL_BLEND);
-				glBlendFunc(rc.Material->BlendSrc, rc.Material->BlendDst);
+				glBlendFunc(material->BlendSrc, material->BlendDst);
 			}
-			else 
-			{ 
-				glDisable(GL_BLEND); 
+			else
+			{
+				glDisable(GL_BLEND);
 			}
 
-			glEnable(rc.Material->Cull);
-			glDepthFunc(rc.Material->DepthCompare);
-			if (rc.Material->DepthTest)
+			glEnable(material->Cull);
+			glDepthFunc(material->DepthCompare);
+			if (material->DepthTest)
 			{
 				glEnable(GL_DEPTH_TEST);
 			}
@@ -264,7 +262,7 @@ void SimpleRenderer::RenderPushedCommands()
 				glDisable(GL_DEPTH_TEST);
 			}
 
-			if (rc.Material->Cull)
+			if (material->Cull)
 			{
 				glEnable(GL_CULL_FACE);
 			}
@@ -272,85 +270,98 @@ void SimpleRenderer::RenderPushedCommands()
 			{
 				glDisable(GL_CULL_FACE);
 			}
-			glCullFace(rc.Material->CullFace);
+			glCullFace(material->CullFace);
 			currentShader->Use();
 		}
 
+		// common stuff
 		currentShader->SetMatrix("view", view);
 		currentShader->SetMatrix("projection", projection);
 		currentShader->SetVector("CamPos", cameraPosition);
 
-		currentShader->SetMatrix("model", rc.Transform);
-		currentShader->SetMatrix("prevModel", rc.PrevTransform);
-
 		currentShader->SetBool("ShadowsEnabled", m_enableShadows);
-		if (m_enableShadows && rc.Material->Type == MATERIAL_CUSTOM && rc.Material->ShadowReceive)
+
+		for (RenderCommand rc : materialMap.second)
 		{
-			for (unsigned int i = 0; i < m_DirectionalLights.size(); ++i)
+			// Frustum Culling.
+			if (m_enableFrustumCulling && !m_camera->GetFrustum().Intersect(rc.BoxMin, rc.BoxMax)) {
+				// DebugDraw::AddAABB(rc.BoxMin, rc.BoxMax, { 1.0f, 1.0f, 1.0f, 1.0f });
+				continue;
+			}
+
+			// DebugDraw::AddAABB(rc.BoxMin, rc.BoxMax, { 0.0f, 1.0f, 0.0f, 1.0f });
+
+			currentShader->SetMatrix("model", rc.Transform);
+			currentShader->SetMatrix("prevModel", rc.PrevTransform);
+
+			if (m_enableShadows && material->Type == MATERIAL_CUSTOM && material->ShadowReceive)
 			{
-				if (m_DirectionalLights[i]->m_shadowMatRenderTarget)
+				for (unsigned int i = 0; i < m_DirectionalLights.size(); ++i)
 				{
-					currentShader->SetMatrix("lightShadowViewProjection" + std::to_string(i + 1), m_DirectionalLights[i]->m_lightSpaceViewPrrojection);
-					m_DirectionalLights[i]->m_shadowMatRenderTarget->GetDepthStencilTexture()->Bind(10 + i);
+					if (m_DirectionalLights[i]->m_shadowMatRenderTarget)
+					{
+						currentShader->SetMatrix("lightShadowViewProjection" + std::to_string(i + 1), m_DirectionalLights[i]->m_lightSpaceViewPrrojection);
+						m_DirectionalLights[i]->m_shadowMatRenderTarget->GetDepthStencilTexture()->Bind(10 + i);
+					}
 				}
 			}
-		}
 
-		std::map<std::string, UniformValueSampler>* samplers = rc.Material->GetSamplerUniforms();
-		for (auto it = samplers->begin(), end = samplers->end(); it != end; ++it)
-		{
-			if (it->second.Type == SHADER_TYPE_SAMPLERCUBE) 
+			std::map<std::string, UniformValueSampler>* samplers = material->GetSamplerUniforms();
+			for (auto it = samplers->begin(), end = samplers->end(); it != end; ++it)
 			{
-				it->second.TextureCube->Bind(it->second.Unit);
+				if (it->second.Type == SHADER_TYPE_SAMPLERCUBE)
+				{
+					it->second.TextureCube->Bind(it->second.Unit);
+				}
+				else
+				{
+					it->second.Texture->Bind(it->second.Unit);
+				}
 			}
-			else
-			{
-				it->second.Texture->Bind(it->second.Unit);
-			}
-		}
 
-		std::map<std::string, UniformValue>* uniforms = rc.Material->GetUniforms();
-		for (auto it = uniforms->begin(), end = uniforms->end(); it != end; ++it)
-		{
-			switch (it->second.Type)
+			std::map<std::string, UniformValue>* uniforms = material->GetUniforms();
+			for (auto it = uniforms->begin(), end = uniforms->end(); it != end; ++it)
 			{
-			case SHADER_TYPE_BOOL:
-				currentShader->SetBool(it->first, it->second.Bool);
-				break;
-			case SHADER_TYPE_INT:
-				currentShader->SetInt(it->first, it->second.Int);
-				break;
-			case SHADER_TYPE_FLOAT:
-				currentShader->SetFloat(it->first, it->second.Float);
-				break;
-			case SHADER_TYPE_VEC2:
-				currentShader->SetVector(it->first, it->second.Vec2);
-				break;
-			case SHADER_TYPE_VEC3:
-				currentShader->SetVector(it->first, it->second.Vec3);
-				break;
-			case SHADER_TYPE_VEC4:
-				currentShader->SetVector(it->first, it->second.Vec4);
-				break;
-			case SHADER_TYPE_MAT2:
-				currentShader->SetMatrix(it->first, it->second.Mat2);
-				break;
-			case SHADER_TYPE_MAT3:
-				currentShader->SetMatrix(it->first, it->second.Mat3);
-				break;
-			case SHADER_TYPE_MAT4:
-				currentShader->SetMatrix(it->first, it->second.Mat4);
-				break;
-			default:
-				LOG_ERROR("Unrecognized Uniform type set.");
-				break;
+				switch (it->second.Type)
+				{
+				case SHADER_TYPE_BOOL:
+					currentShader->SetBool(it->first, it->second.Bool);
+					break;
+				case SHADER_TYPE_INT:
+					currentShader->SetInt(it->first, it->second.Int);
+					break;
+				case SHADER_TYPE_FLOAT:
+					currentShader->SetFloat(it->first, it->second.Float);
+					break;
+				case SHADER_TYPE_VEC2:
+					currentShader->SetVector(it->first, it->second.Vec2);
+					break;
+				case SHADER_TYPE_VEC3:
+					currentShader->SetVector(it->first, it->second.Vec3);
+					break;
+				case SHADER_TYPE_VEC4:
+					currentShader->SetVector(it->first, it->second.Vec4);
+					break;
+				case SHADER_TYPE_MAT2:
+					currentShader->SetMatrix(it->first, it->second.Mat2);
+					break;
+				case SHADER_TYPE_MAT3:
+					currentShader->SetMatrix(it->first, it->second.Mat3);
+					break;
+				case SHADER_TYPE_MAT4:
+					currentShader->SetMatrix(it->first, it->second.Mat4);
+					break;
+				default:
+					LOG_ERROR("Unrecognized Uniform type set.");
+					break;
+				}
 			}
-		}
 
-		// Render Mesh
-		RenderMesh(rc.Mesh);
+			// Render Mesh
+			RenderMesh(rc.Mesh);
+		}
 	}
-	solids.clear();
+	//solids.clear();
 
 #if 0
 	// back to front render for transparents.

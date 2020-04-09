@@ -47,8 +47,9 @@ public:
 	SceneNode* GetChildByIndex(unsigned int index);
 	SceneNode* GetParent();
 
-	glm::mat4 GetTransform();
-	glm::mat4 GetPrevTransform();
+	glm::mat4& GetTransform();
+	glm::mat4& GetPrevTransform();
+	void SetTransform(glm::mat4 transform);
 
 	void UpdateTransform(bool updatePrevTransform = false);
 

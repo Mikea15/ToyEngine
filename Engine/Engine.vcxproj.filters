@@ -204,6 +204,27 @@
     <ClInclude Include="PhysxHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="External\ImGuizmo\imGuIZMOquat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGuizmo\vgConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGuizmo\vGizmo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGuizmo\vGizmoMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGuizmo\vgMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\Imgui\imgui_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\Imgui\imstb_textedit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -369,6 +390,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PhysxHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGuizmo\imGuIZMOquat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

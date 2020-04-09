@@ -84,12 +84,12 @@ public:
 	glm::vec3 WorldSpaceToScreenSpace(const glm::vec3& worldPosition);
 	glm::vec3 ScreenSpaceToWorldSpace(const glm::vec3& screenPosition);
 
+	glm::mat4 m_projection;
+	glm::mat4 m_view;
 private:
 	void UpdateProjection();
 
 protected:
-	glm::mat4 m_projection;
-	glm::mat4 m_view;
 
 	glm::vec3 m_position = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 m_forward = glm::vec3(0.0f, 0.0f, -1.0f);

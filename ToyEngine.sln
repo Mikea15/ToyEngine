@@ -10,6 +10,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WindowsLauncher", "WindowsL
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Engine.vcxproj", "{1AEA9030-9442-48FD-AAA6-3C771D691989}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoidSystem", "BoidSystem\BoidSystem.vcxproj", "{BBBC5268-C56D-4BD2-B523-CD3EB77515E2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1AEA9030-9442-48FD-AAA6-3C771D691989} = {1AEA9030-9442-48FD-AAA6-3C771D691989}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -34,6 +39,14 @@ Global
 		{1AEA9030-9442-48FD-AAA6-3C771D691989}.Release|Win32.Build.0 = Release|Win32
 		{1AEA9030-9442-48FD-AAA6-3C771D691989}.Release|x64.ActiveCfg = Release|x64
 		{1AEA9030-9442-48FD-AAA6-3C771D691989}.Release|x64.Build.0 = Release|x64
+		{BBBC5268-C56D-4BD2-B523-CD3EB77515E2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BBBC5268-C56D-4BD2-B523-CD3EB77515E2}.Debug|Win32.Build.0 = Debug|Win32
+		{BBBC5268-C56D-4BD2-B523-CD3EB77515E2}.Debug|x64.ActiveCfg = Debug|x64
+		{BBBC5268-C56D-4BD2-B523-CD3EB77515E2}.Debug|x64.Build.0 = Debug|x64
+		{BBBC5268-C56D-4BD2-B523-CD3EB77515E2}.Release|Win32.ActiveCfg = Release|Win32
+		{BBBC5268-C56D-4BD2-B523-CD3EB77515E2}.Release|Win32.Build.0 = Release|Win32
+		{BBBC5268-C56D-4BD2-B523-CD3EB77515E2}.Release|x64.ActiveCfg = Release|x64
+		{BBBC5268-C56D-4BD2-B523-CD3EB77515E2}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -28,6 +28,14 @@ union SDL_Event;
 #include "Systems/BVH.h"
 
 #include <stack>
+#define GLM_ENABLE_EXPERIMENTAL
+
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/compatibility.hpp>
+
+#include "External/ImGuizmo/imGuIZMOquat.h"
 
 class State
 {
@@ -367,9 +375,11 @@ public:
 			renderer->RenderUIMenu();
 			ImGui::EndMainMenuBar();
 		}
-
 		Scene::DrawSceneUI();
 	};
+
+
+
 	void Cleanup() override {
 		// free db drawing memory
 		DebugDraw::Clean();

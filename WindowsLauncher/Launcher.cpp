@@ -1,6 +1,7 @@
 
 #include "Launcher.h"
-#include "Game.h"
+#include "Engine/Game.h"
+#include "BoidSystem/BoidSystemState.h"
 
 #include <chrono>
 #include <set>
@@ -71,7 +72,7 @@ int main(int argc, char* argv[])
 	getchar();
 	return 0;
 #else
-	StubState stubState;
+	BoidSystemState stubState;
 	Game game(&stubState);
 	return game.Execute();
 #endif
