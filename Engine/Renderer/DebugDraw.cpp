@@ -16,6 +16,7 @@ namespace DebugDraw
 
 	GLint m_viewProjecLoc = -1;
 
+	size_t m_linesAdded = 0;
 	std::vector<Line> m_lines;
 	std::vector<float> m_scratchPadLineData;
 
@@ -106,14 +107,16 @@ namespace DebugDraw
 		glUseProgram(m_linesShader);
 		glUniformMatrix4fv(m_viewProjecLoc, 1, GL_FALSE, PV);
 
-		m_scratchPadLineData.reserve(MAX_APG_GL_DB_LINES * 14); // 14 floats per line.
+		m_scratchPadLineData.resize(MAX_APG_GL_DB_LINES * 14); // 14 floats per line.
+		m_lines.resize(MAX_APG_GL_DB_LINES);
 
 		return true;
 	}
 
 	void Clear()
 	{
-		m_lines.clear();
+		m_linesAdded = 0;
+		// m_lines.clear();
 	}
 
 	//
@@ -130,14 +133,17 @@ namespace DebugDraw
 	// params are 2 arrays of 3 floats
 	// return index corresponding to internal memory offset
 	int AddLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& col) {
-		if (m_lines.size() >= MAX_APG_GL_DB_LINES) 
+		if (m_linesAdded >= MAX_APG_GL_DB_LINES)
+		//if (m_lines.size() >= MAX_APG_GL_DB_LINES) 
 		{
 			// LOG_WARNING("DebugDraw: Can't add more lines to draw");
 			return -1;
 		}
 
-		m_lines.push_back({ start, end, col });
-		return static_cast<int>(m_lines.size());
+		m_lines[m_linesAdded++] = { start, end, col };
+		return m_linesAdded;
+		// m_lines.push_back({ start, end, col });
+		// return static_cast<int>(m_lines.size());
 	}
 
 	int AddNormal(const glm::vec3& n, const glm::vec3& pos, float scale, const glm::vec4& col)
@@ -350,26 +356,28 @@ namespace DebugDraw
 
 	void Draw(bool x_ray) 
 	{
-		m_scratchPadLineData.clear();
+		// m_scratchPadLineData.clear();
 
-		const unsigned int lineCount = m_lines.size();
+		unsigned int floatIndex = 0;
+		// const unsigned int lineCount = m_lines.size();
+		const unsigned int lineCount = m_linesAdded;
 		for (unsigned int i = 0; i < lineCount; ++i)
 		{
 			auto& l = m_lines[i];
-			m_scratchPadLineData.push_back(l.start.x);
-			m_scratchPadLineData.push_back(l.start.y);
-			m_scratchPadLineData.push_back(l.start.z);
-			m_scratchPadLineData.push_back(l.col.x);
-			m_scratchPadLineData.push_back(l.col.y);
-			m_scratchPadLineData.push_back(l.col.z);
-			m_scratchPadLineData.push_back(l.col.a);
-			m_scratchPadLineData.push_back(l.end.x);
-			m_scratchPadLineData.push_back(l.end.y);
-			m_scratchPadLineData.push_back(l.end.z);
-			m_scratchPadLineData.push_back(l.col.x);
-			m_scratchPadLineData.push_back(l.col.y);
-			m_scratchPadLineData.push_back(l.col.z);
-			m_scratchPadLineData.push_back(l.col.a);
+			m_scratchPadLineData[floatIndex++] = l.start.x;
+			m_scratchPadLineData[floatIndex++] = l.start.y;
+			m_scratchPadLineData[floatIndex++] = l.start.z;
+			m_scratchPadLineData[floatIndex++] = l.col.x;
+			m_scratchPadLineData[floatIndex++] = l.col.y;
+			m_scratchPadLineData[floatIndex++] = l.col.z;
+			m_scratchPadLineData[floatIndex++] = l.col.a;
+			m_scratchPadLineData[floatIndex++] = l.end.x;
+			m_scratchPadLineData[floatIndex++] = l.end.y;
+			m_scratchPadLineData[floatIndex++] = l.end.z;
+			m_scratchPadLineData[floatIndex++] = l.col.x;
+			m_scratchPadLineData[floatIndex++] = l.col.y;
+			m_scratchPadLineData[floatIndex++] = l.col.z;
+			m_scratchPadLineData[floatIndex++] = l.col.a;
 		}
 
 		GLintptr offset = sizeof(float) * m_scratchPadLineData.size() * 0;

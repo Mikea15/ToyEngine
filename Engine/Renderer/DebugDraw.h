@@ -31,6 +31,12 @@ namespace DebugDraw
 {
 	struct Line
 	{
+		Line() 
+			: start()
+			, end()
+			, col()
+		{ }
+
 		Line(const glm::vec3& start, const glm::vec3& end, const glm::vec4& col)
 			: start(start), end(end), col(col)
 		{ }
