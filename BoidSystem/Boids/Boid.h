@@ -31,9 +31,14 @@ struct Boid
 {
     struct WeightParams
     {
-        float m_alignment = 1.0f;
-        float m_cohesion = 1.0f;
-        float m_separation = 1.0f;
+        float m_wander      = 1.0f;
+        float m_seek        = 1.0f;
+        float m_flee        = 1.0f;
+        float m_arrive      = 1.0f;
+
+        float m_alignment   = 1.2f;
+        float m_cohesion    = 1.8f;
+        float m_separation  = 0.6f;
     };
 
     enum Feature : unsigned int
@@ -57,8 +62,8 @@ struct Boid
         m_position = {};
 
         m_radius = 1.0f;
-        m_maxVelocity = 5.0f;
-        m_maxAccelerationForce = 14.0f;
+        m_maxSpeed = 150.0f;
+        m_maxSteeringForce = 5.0f;
 
         m_features = eNone;
 
@@ -85,21 +90,23 @@ struct Boid
             m_fleePos = m_fleeBoid->m_position;
         }
 
-        glm::vec3 accelerationForce = {};
-        if (HasFeature(eWander)) { accelerationForce += Wander(); }
-        if (HasFeature(eSeek)) { accelerationForce += Seek(); }
-        if (HasFeature(eFlee)) { accelerationForce += Flee(); }
-        if (HasFeature(eFleeRanged)) { accelerationForce += FleeRanged(); }
-        if (HasFeature(eArrive)) { accelerationForce += Arrive(); }
+        glm::vec3 force = {};
+        if (HasFeature(eWander))        { force += m_params.m_wander * Wander(); }
+        if (HasFeature(eSeek))          { force += m_params.m_seek * Seek(); }
+        if (HasFeature(eFlee))          { force += m_params.m_flee * Flee(); }
+        if (HasFeature(eFleeRanged))    { force += m_params.m_flee * FleeRanged(); }
+        if (HasFeature(eArrive))        { force += m_params.m_arrive * Arrive(); }
 
-        if (HasFeature(eSeparation)) { accelerationForce += 0.1f * Separation(otherBoids); }
-        if (HasFeature(eCohesion)) { accelerationForce += Cohesion(otherBoids); }
-        if (HasFeature(eAlignment)) { accelerationForce += Alignment(otherBoids); }
+        if (HasFeature(eSeparation))    { force += m_params.m_separation * Separation(otherBoids); }
+        if (HasFeature(eCohesion))      { force += m_params.m_cohesion * Cohesion(otherBoids); }
+        if (HasFeature(eAlignment))     { force += m_params.m_alignment * Alignment(otherBoids); }
 
-        accelerationForce += glm::clamp(accelerationForce, -m_maxAccelerationForce, m_maxAccelerationForce);
+        force += glm::clamp(force, -m_maxSteeringForce, m_maxSteeringForce);
 
-        m_velocity += accelerationForce * deltaTime;
-        m_velocity = glm::clamp(m_velocity, -m_maxVelocity, m_maxVelocity);
+        glm::vec3 acceleration = force / m_mass;
+
+        m_velocity += acceleration * deltaTime;
+        m_velocity = glm::clamp(m_velocity, -m_maxSpeed, m_maxSpeed);
 
         m_position += m_velocity * deltaTime;
     }
@@ -113,13 +120,13 @@ struct Boid
 
     glm::vec3 Seek()
     {
-        glm::vec3 desiredVelocity = glm::normalize(m_targetPos - m_position) * m_maxVelocity;
+        glm::vec3 desiredVelocity = glm::normalize(m_targetPos - m_position) * m_maxSpeed;
         return desiredVelocity - m_velocity;
     }
 
     glm::vec3 Flee()
     {
-        glm::vec3 desiredVelocity = glm::normalize(m_position - m_fleePos) * m_maxVelocity;
+        glm::vec3 desiredVelocity = glm::normalize(m_position - m_fleePos) * m_maxSpeed;
         return desiredVelocity - m_velocity;
     }
 
@@ -129,12 +136,12 @@ struct Boid
         float distance = glm::length(desiredVelocity);
         desiredVelocity = glm::normalize(desiredVelocity);
 
-        float maxVelocity = m_maxVelocity;
+        float maxVelocity = m_maxSpeed;
         float fleeRadius = 0.8f;
         if (distance >= fleeRadius)
         {
             maxVelocity = 0.0f;
-            // maxVelocity = MathUtils::Lerp(0.0f, m_maxVelocity, 1.0f - (distance / fleeRadius));
+            // maxVelocity = MathUtils::Lerp(0.0f, m_maxSpeed, 1.0f - (distance / fleeRadius));
         }
 
         desiredVelocity *= maxVelocity;
@@ -164,7 +171,7 @@ struct Boid
         float distance = glm::length(desiredVelocity);
         desiredVelocity = glm::normalize(desiredVelocity);
 
-        float speed = m_maxVelocity;
+        float speed = m_maxSpeed;
         float arriveRadius = 4.0f;
         if (distance <= arriveRadius)
         {
@@ -242,7 +249,7 @@ struct Boid
             centerOfMass /= neighborCount;
 
             // Seek Behavior
-            glm::vec3 desired = glm::normalize(centerOfMass - m_position) * m_maxVelocity;
+            glm::vec3 desired = glm::normalize(centerOfMass - m_position) * m_maxSpeed;
             glm::vec3 steer = desired - m_velocity;
 
             avgForce = glm::normalize(steer);
@@ -264,6 +271,25 @@ struct Boid
     }
     void SetFeature(unsigned int feature) { m_features = feature; }
 
+    void DrawDebugUI()
+    {
+        ImGui::Begin("Boid Settings");
+
+        ImGui::SliderFloat("Max Speed", &m_maxSpeed, 0.0f, 50.0f);
+        ImGui::SliderFloat("Max Steering Force", &m_maxSteeringForce, 0.0f, 150.0f);
+        ImGui::SliderFloat("Vehicle Mass", &m_mass, 0.1f, 10.0f);
+
+        ImGui::SliderFloat("Params Wander", &m_params.m_wander, 0.0f, 5.0f);
+        ImGui::SliderFloat("Params Seek", &m_params.m_seek, 0.0f, 5.0f);
+        ImGui::SliderFloat("Params Flee", &m_params.m_flee, 0.0f, 5.0f);
+        ImGui::SliderFloat("Params Arrive", &m_params.m_arrive, 0.0f, 5.0f);
+        ImGui::SliderFloat("Params Alignment", &m_params.m_alignment , 0.0f, 5.0f);
+        ImGui::SliderFloat("Params Cohesion", &m_params.m_cohesion , 0.0f, 5.0f);
+        ImGui::SliderFloat("Params Separation", &m_params.m_separation , 0.0f, 5.0f);
+
+        ImGui::End();
+    }
+
     glm::vec3 m_position;
     glm::vec3 m_velocity;
 
@@ -274,11 +300,12 @@ struct Boid
     Boid* m_targetBoid;
     Boid* m_fleeBoid;
 
+    WeightParams m_params;
     unsigned int m_features;
 
-    float m_maxVelocity;
-    float m_maxAccelerationForce;
-
+    float m_maxSpeed;
+    float m_maxSteeringForce;
+    float m_mass = 2.0f;
     float m_radius;
 
     float m_neighborRange = 3.0f;

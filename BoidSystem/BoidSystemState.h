@@ -59,7 +59,7 @@ struct Path
     size_t m_currentNodeIndex;
     std::vector<glm::vec3> m_nodes;
 
-    float atGoalDistanceThreshold = 1.0f;
+    float atGoalDistanceThreshold = 2.0f;
 };
 
 class BoidSystemState
@@ -90,13 +90,16 @@ public:
 
         m_viewGrid = ViewportGrid(100, 100, 100, 100);
 
-        for (size_t i = 0; i < 15; i++)
+        int segments = 10;
+        float angleIncrement = 360.0f / segments;
+        for (size_t i = 0; i < segments; i++)
         {
-            m_randomPositions.push_back(glm::vec3(
-                MathUtils::Rand(-10.0f, 10.0f),
-                MathUtils::Rand(-10.0f, 10.0f),
-                MathUtils::Rand(-10.0f, 10.0f)
-            ));
+            float angle = static_cast<float>(i) * angleIncrement / 180 * 3.14;
+            m_randomPositions.push_back(
+                glm::normalize(
+                    glm::vec3( sin(angle), 0.0f, cos(angle) )
+                ) * 10.0f
+            );
         }
 
         m_path = m_randomPositions;
@@ -262,7 +265,11 @@ public:
         DebugDraw::Draw(x_ray);
     };
 
-    void RenderUI() {};
+    void RenderUI() 
+    {
+        m_simplePathFollower.DrawDebugUI();
+    };
+
     void Cleanup() override {};
 
 private:
