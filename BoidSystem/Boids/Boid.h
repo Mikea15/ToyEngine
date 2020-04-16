@@ -1,7 +1,11 @@
 #pragma once
 
 #include <glm/glm.hpp>
+// #include <vector>
+
 #include "BoidManager.h"
+// #include "Engine/Utils/MathUtils.h"
+// #include "Engine/Renderer/DebugDraw.h"
 
 template<typename E>
 struct EnableBitMaskOperators
@@ -27,20 +31,10 @@ struct EnableBitMaskOperators<x>     \
 	static const bool enable = true; \
 };
 
+
+
 struct Boid
 {
-    struct WeightParams
-    {
-        float m_wander      = 1.0f;
-        float m_seek        = 1.0f;
-        float m_flee        = 1.0f;
-        float m_arrive      = 1.0f;
-
-        float m_alignment   = 1.2f;
-        float m_cohesion    = 1.8f;
-        float m_separation  = 0.6f;
-    };
-
     enum Feature : unsigned int
     {
         eNone       = 0,
@@ -52,21 +46,49 @@ struct Boid
 
         eSeparation = 1 << 5,
         eCohesion   = 1 << 6,
-        eAlignment  = 1 << 7
+        eAlignment  = 1 << 7,
+
+        eWallLimits = 1 << 8
+    };
+
+    struct Properties
+    {
+        unsigned int m_features     = eWander;
+
+        float m_maxSpeed            = 5.0f;     // [m/s]
+        float m_maxForce    = 10.0f;    // 
+        float m_mass                = 2.0f;
+        float m_radius              = 1.0f;
+
+        float m_neighborRange       = 3.0f;
+
+        float m_weightWallLimits    = 1.0f;
+        float m_weightWander        = 1.0f;
+        float m_weightSeek          = 1.0f;
+        float m_weightFlee          = 1.0f;
+        float m_weightArrive        = 1.0f;
+
+        float m_weightAlignment     = 1.2f;
+        float m_weightCohesion      = 1.8f;
+        float m_weightSeparation    = 0.6f;
     };
 
     Boid()
         : m_id(++ID)
+        , m_properties(&m_defaultProperties)
     {
-        m_velocity = {};
-        m_position = {};
+        m_velocity = MathUtils::RandomInUnitSphere();
+        m_position = MathUtils::RandomInUnitSphere();
+        m_targetBoid = nullptr;
+        m_fleeBoid = nullptr;
+    }
 
-        m_radius = 1.0f;
-        m_maxSpeed = 150.0f;
-        m_maxSteeringForce = 5.0f;
-
-        m_features = eNone;
-
+    Boid(Properties* properties)
+        : m_id(++ID)
+        , m_properties(properties)
+    {
+        m_velocity = MathUtils::RandomInUnitSphere();
+        m_position = MathUtils::RandomInUnitSphere();
         m_targetBoid = nullptr;
         m_fleeBoid = nullptr;
     }
@@ -90,53 +112,64 @@ struct Boid
             m_fleePos = m_fleeBoid->m_position;
         }
 
+        // Steering Bit
         glm::vec3 force = {};
-        if (HasFeature(eWander))        { force += m_params.m_wander * Wander(); }
-        if (HasFeature(eSeek))          { force += m_params.m_seek * Seek(); }
-        if (HasFeature(eFlee))          { force += m_params.m_flee * Flee(); }
-        if (HasFeature(eFleeRanged))    { force += m_params.m_flee * FleeRanged(); }
-        if (HasFeature(eArrive))        { force += m_params.m_arrive * Arrive(); }
+        if (HasFeature(eWallLimits))    { force += m_properties->m_weightWallLimits * WallLimits(); }
+        if (HasFeature(eWander))        { force += m_properties->m_weightWander * Wander(); }
+        if (HasFeature(eSeek))          { force += m_properties->m_weightSeek * Seek(m_targetPos); }
+        if (HasFeature(eArrive))        { force += m_properties->m_weightArrive * Arrive(m_targetPos); }
+        if (HasFeature(eFlee))          { force += m_properties->m_weightFlee * Flee(m_fleePos); }
+        if (HasFeature(eFleeRanged))    { force += m_properties->m_weightFlee * FleeRanged(m_fleePos); }
 
-        if (HasFeature(eSeparation))    { force += m_params.m_separation * Separation(otherBoids); }
-        if (HasFeature(eCohesion))      { force += m_params.m_cohesion * Cohesion(otherBoids); }
-        if (HasFeature(eAlignment))     { force += m_params.m_alignment * Alignment(otherBoids); }
+        if (HasFeature(eSeparation))    { force += m_properties->m_weightSeparation * Separation(otherBoids); }
+        if (HasFeature(eCohesion))      { force += m_properties->m_weightCohesion * Cohesion(otherBoids); }
+        if (HasFeature(eAlignment))     { force += m_properties->m_weightAlignment * Alignment(otherBoids); }
 
-        force += glm::clamp(force, -m_maxSteeringForce, m_maxSteeringForce);
+        force = glm::clamp(force, -m_properties->m_maxForce, m_properties->m_maxForce);
 
-        glm::vec3 acceleration = force / m_mass;
+        // Vehicle Bit
+        glm::vec3 acceleration = force / m_properties->m_mass;
 
         m_velocity += acceleration * deltaTime;
-        m_velocity = glm::clamp(m_velocity, -m_maxSpeed, m_maxSpeed);
+        m_velocity = glm::clamp(m_velocity, -m_properties->m_maxSpeed, m_properties->m_maxSpeed);
 
         m_position += m_velocity * deltaTime;
+
+        if (glm::length(m_velocity) > 0.0001f) {
+            m_direction = glm::normalize(m_velocity);
+        }
     }
 
     void DrawDebug()
     {
-        DebugDraw::AddPosition(m_position, 0.1f, { 0.2f, 0.5f, 0.5f, 1.0f });
-        DebugDraw::AddLine(m_position, m_position + m_velocity * 0.5f, { 0.75f, 0.75f, 0.75f, 1.0f });
-        DebugDraw::AddAABB(m_position - glm::vec3(m_radius), m_position + glm::vec3(m_radius), { 0.2f, 0.5f, 0.5f, 1.0f });
+        // DebugDraw::AddPosition(m_position, 0.1f, { 0.2f, 0.5f, 0.5f, 1.0f });
+        DebugDraw::AddLine(m_position, m_position + m_velocity, { 0.75f, 0.0f, 1.0f, 1.0f });
+        DebugDraw::AddLine(m_position, m_position + m_direction, { 0.0f, 0.75f, 1.0f, 1.0f });
+        // DebugDraw::AddAABB(m_position - glm::vec3(m_properties->m_radius), m_position + glm::vec3(m_properties->m_radius), { 0.2f, 0.5f, 0.5f, 1.0f });
     }
 
-    glm::vec3 Seek()
+    glm::vec3 Seek(glm::vec3 target)
     {
-        glm::vec3 desiredVelocity = glm::normalize(m_targetPos - m_position) * m_maxSpeed;
+        glm::vec3 desiredVelocity = glm::normalize(target - m_position) * m_properties->m_maxSpeed;
         return desiredVelocity - m_velocity;
     }
 
-    glm::vec3 Flee()
+    glm::vec3 Flee(glm::vec3 target)
     {
-        glm::vec3 desiredVelocity = glm::normalize(m_position - m_fleePos) * m_maxSpeed;
+        glm::vec3 desiredVelocity = glm::normalize(m_position - target) * m_properties->m_maxSpeed;
         return desiredVelocity - m_velocity;
     }
 
-    glm::vec3 FleeRanged()
+    glm::vec3 FleeRanged(glm::vec3 target)
     {
-        glm::vec3 desiredVelocity = glm::normalize(m_position - m_fleePos);
+        glm::vec3 desiredVelocity = glm::normalize(m_position - target);
         float distance = glm::length(desiredVelocity);
-        desiredVelocity = glm::normalize(desiredVelocity);
+        if (distance > 0.0f) 
+        {
+            desiredVelocity = glm::normalize(desiredVelocity);
+        }
 
-        float maxVelocity = m_maxSpeed;
+        float maxVelocity = m_properties->m_maxSpeed;
         float fleeRadius = 0.8f;
         if (distance >= fleeRadius)
         {
@@ -148,6 +181,7 @@ struct Boid
         return desiredVelocity - m_velocity;
     }
 
+    // NOTE: WIP
     glm::vec3 Wander()
     {
         float wanderRadius = 2.0f;
@@ -159,19 +193,19 @@ struct Boid
             )) * wanderRadius;
 
         float wanderDistance = 0.0f;
-        glm::vec3 targetPosJitter = m_position + GetHeading() * wanderDistance + jitterDirection;
+        glm::vec3 targetPosJitter = m_position + glm::normalize(m_velocity) * wanderDistance + jitterDirection;
 
         glm::vec3 desiredVelocity = glm::normalize(targetPosJitter - m_position);
         return desiredVelocity - m_velocity;
     }
 
-    glm::vec3 Arrive()
+    glm::vec3 Arrive(glm::vec3 target)
     {
-        glm::vec3 desiredVelocity = m_targetPos - m_position;
+        glm::vec3 desiredVelocity = target - m_position;
         float distance = glm::length(desiredVelocity);
         desiredVelocity = glm::normalize(desiredVelocity);
 
-        float speed = m_maxSpeed;
+        float speed = m_properties->m_maxSpeed;
         float arriveRadius = 4.0f;
         if (distance <= arriveRadius)
         {
@@ -185,17 +219,23 @@ struct Boid
     glm::vec3 Separation(std::vector<Boid>& neighbors)
     {
         glm::vec3 force = {};
-        for (size_t i = 0; i < neighbors.size(); i++)
+        for (size_t i = 0; i < neighbors.size(); ++i)
         {
-            if (*this == neighbors[i] && glm::length(m_position - neighbors[i].m_position) > m_neighborRange)
+            if (*this == neighbors[i])
             {
                 continue;
             }
 
-            if (m_position != neighbors[i].m_position) 
+            glm::vec3 toAgent = m_position - neighbors[i].m_position;
+            float distanceToAgent = glm::length(toAgent);
+            if (distanceToAgent > m_properties->m_neighborRange)
             {
-                glm::vec3 toAgent = m_position - neighbors[i].m_position;
-                force += glm::normalize(toAgent) / glm::length(toAgent);
+                continue;
+            }
+
+            if (distanceToAgent > 0.0f) 
+            {
+                force += glm::normalize(toAgent) / distanceToAgent;
             }
         }
 
@@ -204,38 +244,51 @@ struct Boid
 
     glm::vec3 Alignment(std::vector<Boid>& neighbors)
     {
-        glm::vec3 avgHeading = {};
+        glm::vec3 avgDirection = {};
         size_t neighborCount = {};
-
-        for (size_t i = 0; i < neighbors.size(); i++)
+        for (size_t i = 0; i < neighbors.size(); ++i)
         {
-            if (*this == neighbors[i] && glm::length(m_position - neighbors[i].m_position) > m_neighborRange)
+            if (*this == neighbors[i])
             {
                 continue;
             }
 
-            avgHeading += neighbors[i].GetHeading();
+            glm::vec3 toAgent = m_position - neighbors[i].m_position;
+            float distanceToAgent = glm::length(toAgent);
+            if (distanceToAgent > m_properties->m_neighborRange)
+            {
+                continue;
+            }
+
+            avgDirection += neighbors[i].m_direction;
             ++neighborCount;
         }
 
         if (neighborCount > 0)
         {
-            avgHeading /= neighborCount;
-            avgHeading -= GetHeading();
+            avgDirection /= static_cast<float>(neighborCount);
+            avgDirection -= m_direction;
         }
 
-        return avgHeading;
+        return avgDirection;
     }
 
     glm::vec3 Cohesion(std::vector<Boid>& neighbors)
     {
         glm::vec3 centerOfMass = {};
-        glm::vec3 avgForce = {};
+        glm::vec3 force = {};
         size_t neighborCount = {};
 
-        for (size_t i = 0; i < neighbors.size(); i++)
+        for (size_t i = 0; i < neighbors.size(); ++i)
         {
-            if (*this == neighbors[i] && glm::length(m_position - neighbors[i].m_position) > m_neighborRange)
+            if (*this == neighbors[i])
+            {
+                continue;
+            }
+
+            glm::vec3 toAgent = m_position - neighbors[i].m_position;
+            float distanceToAgent = glm::length(toAgent);
+            if (distanceToAgent > m_properties->m_neighborRange)
             {
                 continue;
             }
@@ -246,52 +299,38 @@ struct Boid
 
         if (neighborCount > 0)
         {
-            centerOfMass /= neighborCount;
-
-            // Seek Behavior
-            glm::vec3 desired = glm::normalize(centerOfMass - m_position) * m_maxSpeed;
-            glm::vec3 steer = desired - m_velocity;
-
-            avgForce = glm::normalize(steer);
+            centerOfMass /= static_cast<float>(neighborCount);
+            force = Seek(centerOfMass);
+            
+            return glm::normalize(force);
         }
 
-        return avgForce;
+        return {};
     }
 
-    glm::vec3 GetHeading() const {
-        if (m_velocity != glm::vec3(0.0f))
-        {
-            return glm::normalize(m_velocity);
-        }
-        return glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 WallLimits(AABB limits = AABB(glm::vec3(0.0f, 25.0f, 0.0f), 50))
+    {
+        glm::vec3 force = {};
+        if (m_position.x > limits.GetMax().x) { force.x = -1; }
+        else if (m_position.x < limits.GetMin().x) { force.x = 1.0f; }
+
+        if (m_position.y > limits.GetMax().y) { force.y = -1; }
+        else if (m_position.y < limits.GetMin().y) { force.y = 1.0f; }
+
+        if (m_position.z > limits.GetMax().z) { force.x = -1; }
+        else if (m_position.z < limits.GetMin().z) { force.x = 1.0f; }
+
+        return force;
     }
 
     bool HasFeature(unsigned int feature) const {
-        return (m_features & feature) != 0;
+        return (m_properties->m_features & feature) != 0;
     }
-    void SetFeature(unsigned int feature) { m_features = feature; }
-
-    void DrawDebugUI()
-    {
-        ImGui::Begin("Boid Settings");
-
-        ImGui::SliderFloat("Max Speed", &m_maxSpeed, 0.0f, 50.0f);
-        ImGui::SliderFloat("Max Steering Force", &m_maxSteeringForce, 0.0f, 150.0f);
-        ImGui::SliderFloat("Vehicle Mass", &m_mass, 0.1f, 10.0f);
-
-        ImGui::SliderFloat("Params Wander", &m_params.m_wander, 0.0f, 5.0f);
-        ImGui::SliderFloat("Params Seek", &m_params.m_seek, 0.0f, 5.0f);
-        ImGui::SliderFloat("Params Flee", &m_params.m_flee, 0.0f, 5.0f);
-        ImGui::SliderFloat("Params Arrive", &m_params.m_arrive, 0.0f, 5.0f);
-        ImGui::SliderFloat("Params Alignment", &m_params.m_alignment , 0.0f, 5.0f);
-        ImGui::SliderFloat("Params Cohesion", &m_params.m_cohesion , 0.0f, 5.0f);
-        ImGui::SliderFloat("Params Separation", &m_params.m_separation , 0.0f, 5.0f);
-
-        ImGui::End();
-    }
+    void SetFeature(unsigned int feature) { m_properties->m_features = feature; }
 
     glm::vec3 m_position;
     glm::vec3 m_velocity;
+    glm::vec3 m_direction;
 
     glm::vec3 m_wanderTarget;
     glm::vec3 m_targetPos;
@@ -300,20 +339,42 @@ struct Boid
     Boid* m_targetBoid;
     Boid* m_fleeBoid;
 
-    WeightParams m_params;
-    unsigned int m_features;
-
-    float m_maxSpeed;
-    float m_maxSteeringForce;
-    float m_mass = 2.0f;
-    float m_radius;
-
-    float m_neighborRange = 3.0f;
+    Properties* m_properties = nullptr;
+    Properties m_defaultProperties;
 
     unsigned int m_id = -1;
     static unsigned int ID;
 };
 
 unsigned int Boid::ID = 0;
+
+namespace Debug
+{
+    void ShowPanel(Boid::Properties& properties)
+    {
+        ImGui::Begin("Boid::Properties");
+
+        ImGui::SliderFloat("Max Speed", &properties.m_maxSpeed, 0.0f, 50.0f);
+        ImGui::SliderFloat("Max Force", &properties.m_maxForce, 0.0f, 50.0f);
+        ImGui::SliderFloat("Vehicle Mass", &properties.m_mass, 0.1f, 10.0f);
+
+        ImGui::Text("Independent Behavior");
+        ImGui::SliderFloat("Wander", &properties.m_weightWander, 0.0f, 5.0f);
+        ImGui::SliderFloat("Seek", &properties.m_weightSeek, 0.0f, 5.0f);
+        ImGui::SliderFloat("Flee", &properties.m_weightFlee, 0.0f, 5.0f);
+        ImGui::SliderFloat("Arrive", &properties.m_weightArrive, 0.0f, 5.0f);
+
+        ImGui::Separator();
+        ImGui::Text("Group Behavior");
+        ImGui::SliderFloat("Alignment", &properties.m_weightAlignment, 0.0f, 5.0f);
+        ImGui::SliderFloat("Cohesion", &properties.m_weightCohesion, 0.0f, 5.0f);
+        ImGui::SliderFloat("Separation", &properties.m_weightSeparation, 0.0f, 5.0f);
+
+        ImGui::Separator();
+        ImGui::SliderFloat("Wall Limits", &properties.m_weightWallLimits, 0.0f, 5.0f);
+
+        ImGui::End();
+    }
+}
 
 // ENABLE_BITMASK_OPERATORS(Boid::Feature);

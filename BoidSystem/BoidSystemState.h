@@ -6,7 +6,11 @@
 
 class Game;
 
-#define ENTITY_COUNT 100
+#if _DEBUG
+#define ENTITY_COUNT 1500
+#else
+#define ENTITY_COUNT 1500
+#endif
 
 struct Path
 {
@@ -78,7 +82,7 @@ public:
         m_renderer = gamePtr->GetRenderer();
 
         // configure camera
-        m_camera = FlyCamera(glm::vec3(0.0f, 2.0f, 10.0f));
+        m_camera = FlyCamera(glm::vec3(0.0f, 25.0f, 25.0f));
         m_camera.SetPerspective(glm::radians(90.0f),
             static_cast<float>(m_renderer->GetRenderWidth() / m_renderer->GetRenderHeight()),
             0.01f, 200.0f);
@@ -102,19 +106,39 @@ public:
             );
         }
 
-        m_path = m_randomPositions;
+        m_path = Path({ 
+            glm::vec3(0.0f, 0.0f, 40.0f),
+            glm::vec3(13.5f, 0.0f, 25.0f),
+            glm::vec3(25.0f, 0.0f, 10.0f),
+            glm::vec3(40.0f, 0.0f, 0.0f),
+            glm::vec3(45.0f, 0.0f, -25.0f),
+            glm::vec3(25.0f, 0.0f, -45.0f),
+            glm::vec3(10.0f, 0.0f, -25.0f),
+            glm::vec3(0.0f, 0.0f, -10.0f),
+            glm::vec3(-10.0f, 0.0f, -25.0f),
+            glm::vec3(-25.0f, 0.0f, -25.0f),
+            glm::vec3(-45.0f, 0.0f, 0.0f),
+            glm::vec3(-25.0f, 0.0f, 25.0f)
+        });
 
         for (size_t i = 0; i < ENTITY_COUNT; i++)
         {
-            auto b = Boid();
-            auto features = Boid::eAlignment | Boid::eSeparation | Boid::eCohesion;
+            auto b = Boid(&m_boidProperties);
+            auto features = 
+                Boid::eSeek | 
+                //Boid::eAlignment | 
+                Boid::eSeparation | 
+                //Boid::eCohesion | 
+                Boid::eWallLimits;
+
             b.SetFeature(features);
+
             // b.m_maxAccelerationForce = MathUtils::Rand01() * 0.1f;
             // b.m_maxVelocity = MathUtils::Rand01() * 5.0f;
             b.m_position = glm::vec3(
-                MathUtils::Rand(-10.0f, 10.0f),
-                MathUtils::Rand(-10.0f, 10.0f),
-                MathUtils::Rand(-10.0f, 10.0f)
+                MathUtils::Rand(-50.0f, 50.0f),
+                MathUtils::Rand(-50.0f, 50.0f),
+                MathUtils::Rand(-50.0f, 50.0f)
             );
 
             b.SetTarget(&m_simplePathFollower);
@@ -193,7 +217,7 @@ public:
                 1.0f - sin(time) * 2.0f,
                 1.0f - cos(time) * 2.0f,
                 0.0f
-            )) * 4.0f;
+            )) * 25.0f;
         }
 
         m_constantMovingTarget = glm::normalize(glm::vec3(
@@ -215,6 +239,11 @@ public:
         // DebugDraw::AddPosition(m_constantMovingTarget, 0.5f, { 0.6f, 0.2f, 0.4f, 1.0f });
 
         m_viewGrid.Draw();
+        DebugDraw::AddAABB(glm::vec3(0.0f) - glm::vec3(50.0f, 0.0f, 50.0f),
+            glm::vec3(0.0f) + glm::vec3(50.0f, 0.0f, 50.0f));
+        
+        AABB limits = AABB(glm::vec3(0.0f, 25.0f, 0.0f), 50);
+        DebugDraw::AddAABB(limits.GetMin(), limits.GetMax());
 
         for (size_t i = 0; i < ENTITY_COUNT; i++)
         {
@@ -267,7 +296,7 @@ public:
 
     void RenderUI() 
     {
-        m_simplePathFollower.DrawDebugUI();
+        Debug::ShowPanel(m_boidProperties);
     };
 
     void Cleanup() override {};
@@ -299,6 +328,7 @@ private:
 
     std::vector<glm::vec3> m_randomPositions;
 
+    Boid::Properties m_boidProperties;
     std::vector<Boid> m_wanderers;
     Path m_path;
 };

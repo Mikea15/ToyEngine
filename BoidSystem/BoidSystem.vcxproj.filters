@@ -21,6 +21,9 @@
     <ClCompile Include="BoidSystemState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Boids\Boid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BoidSystemState.h">

@@ -172,6 +172,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BoidSystemState.cpp" />
+    <ClCompile Include="Boids\Boid.cpp" />
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>

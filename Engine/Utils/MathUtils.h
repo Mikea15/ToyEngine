@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/gtx/norm.hpp>
+
 namespace MathUtils
 {
 	static float Lerp(float a, float b, float t)
@@ -22,6 +24,42 @@ namespace MathUtils
 	static float Rand01()
 	{
 		return static_cast<float>(rand()) / static_cast <float> (RAND_MAX);
+	}
+
+	static glm::vec3 RandomInUnitSphere()
+	{
+		glm::vec3 p;
+		do {
+			p = 2.0f * glm::vec3(
+				MathUtils::Rand01(), 
+				MathUtils::Rand01(), 
+				MathUtils::Rand01()
+			) - glm::vec3(1.0f, 1.0f, 1.0f);
+		} while (glm::length2(p) >= 1.0f);
+		return p;
+	}
+
+	static glm::vec3 RandomInUnitDisk()
+	{
+		glm::vec3 p;
+		do {
+			p = 2.0f * glm::vec3(
+				MathUtils::Rand01(), 
+				MathUtils::Rand01(), 
+				0
+			) - glm::vec3(1.0f, 1.0f, 0.0f);
+		} while ( glm::dot(p, p) >= 1.0f);
+		return p;
+	}
+
+	static glm::vec3 RandomInUnitHemisphere(const glm::vec3& direction)
+	{
+		glm::vec3 p = RandomInUnitSphere();
+		if (glm::dot(p, direction) <= 0.0f)
+		{
+			p -= p;
+		}
+		return p;
 	}
 
 	static float Rand(float min, float max)

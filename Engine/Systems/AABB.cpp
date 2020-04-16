@@ -11,7 +11,6 @@ AABB::AABB()
 AABB::AABB(const glm::vec3& origin, float halfSize)
 	: m_origin(origin), m_halfSize(halfSize)
 {
-	m_points.resize(8);
 	m_points[0] = m_min = m_origin + glm::vec3(-m_halfSize, -m_halfSize, -m_halfSize);
 	m_points[3] = m_origin + glm::vec3(-m_halfSize, -m_halfSize, m_halfSize);
 	m_points[1] = m_origin + glm::vec3(-m_halfSize, m_halfSize, -m_halfSize);
@@ -26,7 +25,6 @@ AABB::AABB(const glm::vec3& min, const glm::vec3& max)
 {
 	m_origin = min + (max - min) * 0.5f;
 
-	m_points.resize(8);
 	m_points[0] = m_min = min;
 	m_points[3] = glm::vec3(min.x, min.y, max.z);
 	m_points[1] = glm::vec3(min.x, max.y, min.z);
@@ -41,7 +39,6 @@ AABB::AABB(const glm::vec3& min, const glm::vec3& max)
 
 AABB::AABB(const glm::vec3& origin, const glm::vec3& min, const glm::vec3& max)
 {
-	m_points.resize(8);
 	m_points[0] = m_min = origin + min;
 	m_points[3] = m_origin + glm::vec3(min.x, min.y, max.z);
 	m_points[1] = m_origin + glm::vec3(min.x, max.y, min.z);
@@ -56,7 +53,7 @@ AABB::AABB(const glm::vec3& origin, const glm::vec3& min, const glm::vec3& max)
 
 AABB::~AABB()
 {
-	m_points.clear();
+	
 }
 
 void AABB::SetBounds(glm::vec3 min, glm::vec3 max)
