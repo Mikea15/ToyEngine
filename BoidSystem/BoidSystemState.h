@@ -8,7 +8,7 @@
 class Game;
 
 #if _DEBUG
-#define ENTITY_COUNT 150
+#define ENTITY_COUNT 200
 #else
 #define ENTITY_COUNT 1500
 #endif
