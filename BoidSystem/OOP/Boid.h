@@ -92,9 +92,10 @@ struct Boid
         if (HasFeature(eFlee))          { force += m_properties->m_weightFlee * Flee(m_fleePos); }
         if (HasFeature(eFleeRanged))    { force += m_properties->m_weightFlee * FleeRanged(m_fleePos); }
 
-        if (HasFeature(eSeparation))    { force += m_properties->m_weightSeparation * Separation(otherBoids); }
-        if (HasFeature(eCohesion))      { force += m_properties->m_weightCohesion * Cohesion(otherBoids); }
-        if (HasFeature(eAlignment))     { force += m_properties->m_weightAlignment * Alignment(otherBoids); }
+        std::vector<Boid> neighborSubset = FindNearbyNeighbors(otherBoids);
+        if (HasFeature(eSeparation))    { force += m_properties->m_weightSeparation * Separation(neighborSubset); }
+        if (HasFeature(eCohesion))      { force += m_properties->m_weightCohesion * Cohesion(neighborSubset); }
+        if (HasFeature(eAlignment))     { force += m_properties->m_weightAlignment * Alignment(neighborSubset); }
 
         force = glm::clamp(force, -m_properties->m_maxForce, m_properties->m_maxForce);
 
@@ -185,6 +186,30 @@ struct Boid
 
         desiredVelocity *= speed;
         return desiredVelocity - m_velocity;
+    }
+
+    std::vector<Boid> FindNearbyNeighbors(std::vector<Boid>& neighbors)
+    {
+        std::vector<Boid> result = {};
+
+        for (size_t i = 0; i < neighbors.size(); ++i)
+        {
+            if (*this == neighbors[i])
+            {
+                continue;
+            }
+
+            glm::vec3 toAgent = m_position - neighbors[i].m_position;
+            float distanceToAgent = glm::length(toAgent);
+            if (distanceToAgent > m_properties->m_neighborRange)
+            {
+                continue;
+            }
+
+            result.push_back(neighbors[i]);
+        }
+
+        return result;
     }
 
     glm::vec3 Separation(std::vector<Boid>& neighbors)
