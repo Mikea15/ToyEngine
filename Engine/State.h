@@ -63,7 +63,6 @@ public:
 	void Render(float alpha = 1.0f) override {};
 	void RenderUI() override {};
 	void Cleanup() override {};
-
 };
 
 class BaseState
@@ -135,8 +134,8 @@ public:
 	};
 
 protected:
-	Game* m_game;
-	SimpleRenderer* m_renderer;
+	Game* m_game = nullptr;
+	SimpleRenderer* m_renderer = nullptr;
 	FlyCamera m_camera = FlyCamera(glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
 
 	bool m_inputGrabMouse = false;
