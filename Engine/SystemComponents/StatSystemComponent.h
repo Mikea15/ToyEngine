@@ -36,12 +36,15 @@ private:
 	float m_lastFrameTimeMS = 0.0f;
 	float m_lastDeltaTime = 0.0f;
 
-	static const int s_plotBufferSize = 240;
+	static const int s_sampleCount = 100;
+	
+	float m_sampleInterval = 0.1f; //	100 sample count * 0.1 sample interval = 10 seconds of samples.
+	float m_currentSampleInterval = 0.0f;
 
 	int m_currentMsBufferIndex = 0;
-	float m_msBuffer[s_plotBufferSize] = { 0 };
+	float m_msBuffer[s_sampleCount] = { -1.0f };
 	int m_currentFpsBufferIndex = 0;
-	float m_fpsBuffer[s_plotBufferSize] = { 0 };
+	float m_fpsBuffer[s_sampleCount] = { -1.0f };
 
 	bool show_demo_window = false;
 	bool show_another_window = false;
