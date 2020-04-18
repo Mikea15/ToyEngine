@@ -36,7 +36,7 @@ private:
 	float m_lastFrameTimeMS = 0.0f;
 	float m_lastDeltaTime = 0.0f;
 
-	static const int s_sampleCount = 100;
+	static const int s_sampleCount = 350;
 	
 	float m_sampleInterval = 0.1f; //	100 sample count * 0.1 sample interval = 10 seconds of samples.
 	float m_currentSampleInterval = 0.0f;
