@@ -4,8 +4,6 @@
 
 #include "BoidManager.h"
 
-
-
 struct Boid
 {
     enum Feature : unsigned int
@@ -29,7 +27,7 @@ struct Boid
         unsigned int m_features     = eWander;
 
         float m_maxSpeed            = 5.0f;     // [m/s]
-        float m_maxForce    = 10.0f;    // 
+        float m_maxForce            = 10.0f;
         float m_mass                = 2.0f;
         float m_radius              = 1.0f;
 

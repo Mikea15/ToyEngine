@@ -172,13 +172,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BoidSystemState.cpp" />
-    <ClCompile Include="Boids\Boid.cpp" />
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BoidSystemState.h" />
-    <ClInclude Include="Boids\Boid.h" />
-    <ClInclude Include="Boids\BoidManager.h" />
+    <ClInclude Include="OOP\Boid.h" />
+    <ClInclude Include="OOP\BoidManager.h" />
+    <ClInclude Include="Path.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">

@@ -2,84 +2,32 @@
 
 #include "Engine/State.h"
 
-#include "Boids/Boid.h"
+#include "OOP/Boid.h"
+#include "Path.h"
 
 class Game;
 
 #if _DEBUG
-#define ENTITY_COUNT 1500
+#define ENTITY_COUNT 15
 #else
 #define ENTITY_COUNT 1500
 #endif
 
-struct Path
-{
-    Path() = default;
-    Path(std::vector<glm::vec3> path)
-    {
-        m_nodes = path;
-        m_currentNodeIndex = static_cast<unsigned int>(MathUtils::Rand(0, m_nodes.size() - 1));
-    }
 
-    glm::vec3 GetCurrentGoal() const { return m_nodes[m_currentNodeIndex]; }
-    void UpdatePath( glm::vec3 position )
-    {
-        float distanceToGoal = glm::length(GetCurrentGoal() - position);
-        if (distanceToGoal <= atGoalDistanceThreshold)
-        {
-            m_currentNodeIndex++;
-            if (m_currentNodeIndex > m_nodes.size() - 1) 
-            {
-                m_currentNodeIndex = 0;
-            }
-        }
-    }
-
-    void DebugDraw()
-    {
-        if (m_nodes.empty())
-        {
-            return;
-        }
-
-        for (size_t i = 0; i < m_nodes.size(); i++)
-        {
-            if (i == m_currentNodeIndex)
-            {
-                DebugDraw::AddAABB(
-                    m_nodes[i] - glm::vec3(atGoalDistanceThreshold), 
-                    m_nodes[i] + glm::vec3(atGoalDistanceThreshold),
-                    { 0.3f, 0.6f, 0.1, 1.0f });
-            }
-
-            if (i != m_nodes.size() - 1) 
-            {
-                DebugDraw::AddLine(m_nodes[i], m_nodes[i + 1], { 0.3f, 0.6f, 0.1, 1.0f });
-            }
-        }
-        DebugDraw::AddLine(m_nodes[m_nodes.size() - 1], m_nodes[0], { 0.3f, 0.6f, 0.1, 1.0f });
-    }
-
-    size_t m_currentNodeIndex;
-    std::vector<glm::vec3> m_nodes;
-
-    float atGoalDistanceThreshold = 2.0f;
-};
 
 class BoidSystemState
-    : public State
+    : public BaseState
 {
 public:
     BoidSystemState()
-        : State()
+        : BaseState()
     {}
 
     ~BoidSystemState() override {};
 
     void Init(Game* game) override
     {
-        gamePtr = game;
-        m_renderer = gamePtr->GetRenderer();
+        BaseState::Init(game);
 
         // configure camera
         m_camera = FlyCamera(glm::vec3(0.0f, 25.0f, 25.0f));
@@ -159,47 +107,12 @@ public:
 
     void HandleInput(SDL_Event* event) override
     {
-        if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_F1)
-        {
-            m_inputGrabMouse = !m_inputGrabMouse;
-            SDL_SetRelativeMouseMode(m_inputGrabMouse ? SDL_TRUE : SDL_FALSE);
-        }
-
-        if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_w) m_inputMoveForward = 1;
-        if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_s) m_inputMoveForward = -1;
-        if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_a) m_inputMoveRight = -1;
-        if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_d) m_inputMoveRight = 1;
-        if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_e) m_inputMoveUp = 1;
-        if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_q) m_inputMoveUp = -1;
-        if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_LSHIFT) m_inputEnableMovementBoost = true;
-
-        if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_w) m_inputMoveForward = 0;
-        if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_s) m_inputMoveForward = 0;
-        if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_a) m_inputMoveRight = 0;
-        if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_d) m_inputMoveRight = 0;
-        if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_e) m_inputMoveUp = 0;
-        if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_q) m_inputMoveUp = 0;
-        if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_LSHIFT) m_inputEnableMovementBoost = false;
+        BaseState::HandleInput(event);
     };
 
     void Update(float deltaTime) override
     {
-        glm::vec3 mouseWorldPos = {};
-        if (m_inputGrabMouse) {
-            int x, y;
-            SDL_GetRelativeMouseState(&x, &y);
-            m_camera.HandleMouse(static_cast<float>(x), static_cast<float>(-y));
-
-            mouseWorldPos = m_camera.ScreenSpaceToWorldSpace(
-                glm::vec3(static_cast<float>(x), static_cast<float>(-y), 0.f)
-            );
-        }
-
-        // get camera movement input
-        glm::vec3 inputDir(m_inputMoveRight, m_inputMoveUp, m_inputMoveForward);
-        m_camera.HandleMove(deltaTime, inputDir, m_inputEnableMovementBoost);
-
-        m_camera.Update(deltaTime);
+        BaseState::Update(deltaTime);
 
         // Debug
         DebugDraw::Clear();
@@ -296,24 +209,21 @@ public:
 
     void RenderUI() 
     {
+        BaseState::RenderUI();
+
         Debug::ShowPanel(m_boidProperties);
     };
 
-    void Cleanup() override {};
+    void Cleanup() override 
+    {
+        BaseState::Cleanup();
+    };
 
 private:
-    Game* gamePtr;
-    SimpleRenderer* m_renderer;
-    FlyCamera m_camera;
     ViewportGrid m_viewGrid;
+
     // render representation
     Sphere* m_sphere;
-
-    bool m_inputGrabMouse = false;
-    float m_inputMoveUp = 0.0f;
-    float m_inputMoveRight = 0.0f;
-    float m_inputMoveForward = 0.0f;
-    bool m_inputEnableMovementBoost = false;
 
     Boid m_simpleFollower;
     Boid m_simpleArriver;

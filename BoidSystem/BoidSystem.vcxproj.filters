@@ -21,18 +21,18 @@
     <ClCompile Include="BoidSystemState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Boids\Boid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BoidSystemState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Boids\Boid.h">
+    <ClInclude Include="Path.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Boids\BoidManager.h">
+    <ClInclude Include="OOP\Boid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OOP\BoidManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

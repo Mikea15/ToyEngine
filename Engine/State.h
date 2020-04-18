@@ -51,22 +51,115 @@ public:
 	virtual void Cleanup() = 0;
 };
 
-
-class StubState
+class NullState
 	: public State
 {
 public:
+	~NullState() override {};
+
+	void Init(Game* game) override {};
+	void HandleInput(SDL_Event* event) override {};
+	void Update(float deltaTime) override {};
+	void Render(float alpha = 1.0f) override {};
+	void RenderUI() override {};
+	void Cleanup() override {};
+
+};
+
+class BaseState
+	: public State
+{
+public:
+	~BaseState() override {}
+
+	void Init(Game* game) override
+	{
+		m_game = game;
+		m_renderer = m_game->GetRenderer();
+		m_renderer->SetCamera(&m_camera);
+	}
+
+	void HandleInput(SDL_Event* event) override
+	{
+		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_F1)
+		{
+			m_inputGrabMouse = !m_inputGrabMouse;
+			SDL_SetRelativeMouseMode(m_inputGrabMouse ? SDL_TRUE : SDL_FALSE);
+		}
+
+		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_w) m_inputMoveForward = 1;
+		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_s) m_inputMoveForward = -1;
+		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_a) m_inputMoveRight = -1;
+		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_d) m_inputMoveRight = 1;
+		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_e) m_inputMoveUp = 1;
+		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_q) m_inputMoveUp = -1;
+		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_LSHIFT) m_inputEnableMovementBoost = true;
+
+		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_w) m_inputMoveForward = 0;
+		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_s) m_inputMoveForward = 0;
+		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_a) m_inputMoveRight = 0;
+		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_d) m_inputMoveRight = 0;
+		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_e) m_inputMoveUp = 0;
+		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_q) m_inputMoveUp = 0;
+		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_LSHIFT) m_inputEnableMovementBoost = false;
+	};
+
+	void Update(float deltaTime) override
+	{
+		if (m_inputGrabMouse) {
+			int x, y;
+			SDL_GetRelativeMouseState(&x, &y);
+			m_camera.HandleMouse(static_cast<float>(x), static_cast<float>(-y));
+		}
+
+		// get camera movement input
+		glm::vec3 inputDir(m_inputMoveRight, m_inputMoveUp, m_inputMoveForward);
+		m_camera.HandleMove(deltaTime, inputDir, m_inputEnableMovementBoost);
+		m_camera.Update(deltaTime);
+
+	};
+
+	void Render(float alpha = 1.0f) override
+	{
+		m_renderer->RenderPushedCommands();
+	};
+
+	void RenderUI() override
+	{
+
+	};
+
+	void Cleanup() override
+	{
+
+	};
+
+protected:
+	Game* m_game;
+	SimpleRenderer* m_renderer;
+	FlyCamera m_camera = FlyCamera(glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+
+	bool m_inputGrabMouse = false;
+	float m_inputMoveUp = 0.0f;
+	float m_inputMoveRight = 0.0f;
+	float m_inputMoveForward = 0.0f;
+	bool m_inputEnableMovementBoost = false;
+};
+
+
+class StubState
+	: public BaseState
+{
+public:
 	StubState()
-		: State()
+		: BaseState()
 	{}
 
 	~StubState() override {};
 
 	void Init(Game* game) override 
 	{
-		m_game = game;
-		renderer = m_game->GetRenderer();
-		renderer->SetCamera(&m_camera);
+		BaseState::Init(game);
 
 		// debug draw init
 		DebugDraw::Init();
@@ -79,9 +172,9 @@ public:
 		cube = new Cube();
 
 		// material setup
-		Material* matPbr = renderer->CreateMaterial("default-fwd");
+		Material* matPbr = m_renderer->CreateMaterial("default-fwd");
 		Shader* plasmaOrbShader = Resources::LoadShader("plasma orb", "shaders/custom/plasma_orb.vs", "shaders/custom/plasma_orb.fs");
-		Material* matPlasmaOrb = renderer->CreateCustomMaterial(plasmaOrbShader);
+		Material* matPlasmaOrb = m_renderer->CreateCustomMaterial(plasmaOrbShader);
 		matPlasmaOrb->Cull = false;
 		matPlasmaOrb->Blend = true;
 		matPlasmaOrb->BlendSrc = GL_ONE;
@@ -92,14 +185,14 @@ public:
 
 		// configure camera
 		m_camera.SetPerspective(glm::radians(90.0f),
-			static_cast<float>(renderer->GetRenderWidth() / renderer->GetRenderHeight()),
+			static_cast<float>(m_renderer->GetRenderWidth() / m_renderer->GetRenderHeight()),
 			0.01f, 200.0f);
 		m_camera.SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
 
 		// scene setup
 		debugShader = Resources::LoadShader("debugShader", "shaders/error.vs", "shaders/error.fs");
-		Material* defaultForwardMat = renderer->CreateMaterial("default-fwd");
-		Material* defaultForwardMatAlpha = renderer->CreateMaterial("default-fwd-alpha");
+		Material* defaultForwardMat = m_renderer->CreateMaterial("default-fwd");
+		Material* defaultForwardMatAlpha = m_renderer->CreateMaterial("default-fwd-alpha");
 		Material* debugShaderMat = new Material(debugShader);
 		mainTorus = Scene::MakeSceneNode(torus, defaultForwardMat);
 		secondTorus = Scene::MakeSceneNode(torus, defaultForwardMat);
@@ -185,7 +278,7 @@ public:
 		m_directionalLight.m_intensity = 10.0f;
 		m_directionalLight.m_color = glm::vec3(0.9f, 0.8f, 0.8f);
 
-		renderer->AddLight(&m_directionalLight);
+		m_renderer->AddLight(&m_directionalLight);
 
 		m_viewGrid = ViewportGrid(100, 100, 100, 100);
 
@@ -200,43 +293,12 @@ public:
 
 	void HandleInput(SDL_Event* event) override 
 	{
-		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_F1)
-		{
-			m_inputGrabMouse = !m_inputGrabMouse;
-			SDL_SetRelativeMouseMode(m_inputGrabMouse ? SDL_TRUE : SDL_FALSE);
-		}
-
-		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_w) m_inputMoveForward = 1;
-		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_s) m_inputMoveForward = -1;
-		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_a) m_inputMoveRight = -1;
-		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_d) m_inputMoveRight = 1;
-		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_e) m_inputMoveUp = 1;
-		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_q) m_inputMoveUp = -1;
-		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_LSHIFT) m_inputEnableMovementBoost = true;
-
-		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_w) m_inputMoveForward = 0;
-		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_s) m_inputMoveForward = 0;
-		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_a) m_inputMoveRight = 0;
-		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_d) m_inputMoveRight = 0;
-		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_e) m_inputMoveUp = 0;
-		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_q) m_inputMoveUp = 0;
-		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_LSHIFT) m_inputEnableMovementBoost = false;
-
+		BaseState::HandleInput(event);
 	};
 
 	void Update(float deltaTime) override 
 	{
-		if (m_inputGrabMouse) {
-			int x, y;
-			SDL_GetRelativeMouseState(&x, &y);
-			m_camera.HandleMouse(static_cast<float>(x), static_cast<float>(-y));
-		}
-
-		// get camera movement input
-		glm::vec3 inputDir(m_inputMoveRight, m_inputMoveUp, m_inputMoveForward);
-		m_camera.HandleMove(deltaTime, inputDir, m_inputEnableMovementBoost);
-
-		m_camera.Update(deltaTime);
+		BaseState::Update(deltaTime);
 
 		mainTorus->SetRotation(glm::vec4(glm::vec3(1.0f, 0.0f, 0.0f), m_game->GetTimeMS() * 10.0f * 2.0f));
 		secondTorus->SetRotation(glm::vec4(glm::vec3(0.0f, 1.0f, 0.0f), m_game->GetTimeMS() * 10.0f * 3.0f));
@@ -322,17 +384,17 @@ public:
 		{
 			// renderer->PushRender(planeNode);
 			// renderer->PushRender(mainTorus);
-			//renderer->PushRender(sponza);
-			//renderer->PushRender(plasmaOrb);
-			//renderer->PushRender(background);
+			// renderer->PushRender(sponza);
+			// renderer->PushRender(plasmaOrb);
+			// renderer->PushRender(background);
 
 			for (SceneNode* node : m_randomNodes)
 			{
-				renderer->PushRender(node);
+				m_renderer->PushRender(node);
 			}
 		}
 
-		renderer->RenderPushedCommands();
+		m_renderer->RenderPushedCommands();
 
 		DebugDraw::AddPosition(m_camera.WorldSpaceToScreenSpace(glm::vec3(0.0f)), 0.1f);
 
@@ -344,8 +406,9 @@ public:
 		DebugDraw::Draw(x_ray);
 	};
 
-	void RenderUI() 
+	void RenderUI() override
 	{
+		BaseState::RenderUI();
 		// Menu Bar
 		if (ImGui::BeginMainMenuBar())
 		{
@@ -372,24 +435,20 @@ public:
 				ImGui::Checkbox("Draw Grid", &m_drawGrid);
 				ImGui::EndMenu();
 			}
-			renderer->RenderUIMenu();
+			m_renderer->RenderUIMenu();
 			ImGui::EndMainMenuBar();
 		}
 		Scene::DrawSceneUI();
 	};
 
-
-
-	void Cleanup() override {
+	void Cleanup() override 
+	{
+		BaseState::Cleanup();
 		// free db drawing memory
 		DebugDraw::Clean();
 	};
 
 private:
-	Game* m_game;
-	SimpleRenderer* renderer;
-	FlyCamera m_camera = FlyCamera(glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
-	
 	PlaneMesh* plane;
 	Sphere*	sphere;
 	Sphere*	tSphere;
@@ -408,14 +467,7 @@ private:
 	DirectionalLight m_directionalLight;
 
 	std::vector<SceneNode*> m_randomNodes;
-
 	std::vector<PxRigidDynamic*> m_dynamicObjects;
-
-	bool m_inputGrabMouse = false;
-	float m_inputMoveUp = 0.0f;
-	float m_inputMoveRight = 0.0f;
-	float m_inputMoveForward = 0.0f;
-	bool m_inputEnableMovementBoost = false;
 
 	bool m_drawObjects = true;
 	bool m_drawQuadtree = false;
@@ -429,5 +481,4 @@ private:
 
 	bvh::Tree m_bvhTree;
 	// BTree<int> btree;
-	
 };
