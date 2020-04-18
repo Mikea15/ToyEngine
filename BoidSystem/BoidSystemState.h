@@ -8,7 +8,7 @@
 class Game;
 
 #if _DEBUG
-#define ENTITY_COUNT 15
+#define ENTITY_COUNT 150
 #else
 #define ENTITY_COUNT 1500
 #endif
@@ -71,12 +71,12 @@ public:
 
         for (size_t i = 0; i < ENTITY_COUNT; i++)
         {
-            auto b = Boid(&m_boidProperties);
+            auto b = Boid(&m_sharedBoidProperties);
             auto features = 
                 Boid::eSeek | 
-                //Boid::eAlignment | 
+                Boid::eAlignment | 
                 Boid::eSeparation | 
-                //Boid::eCohesion | 
+                Boid::eCohesion | 
                 Boid::eWallLimits;
 
             b.SetFeature(features);
@@ -211,7 +211,7 @@ public:
     {
         BaseState::RenderUI();
 
-        Debug::ShowPanel(m_boidProperties);
+        Debug::ShowPanel(m_sharedBoidProperties);
     };
 
     void Cleanup() override 
@@ -223,7 +223,7 @@ private:
     ViewportGrid m_viewGrid;
 
     // render representation
-    Sphere* m_sphere;
+    Sphere* m_sphere = nullptr;
 
     Boid m_simpleFollower;
     Boid m_simpleArriver;
@@ -238,7 +238,7 @@ private:
 
     std::vector<glm::vec3> m_randomPositions;
 
-    Boid::Properties m_boidProperties;
+    Boid::Properties m_sharedBoidProperties;
     std::vector<Boid> m_wanderers;
     Path m_path;
 };
