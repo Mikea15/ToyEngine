@@ -215,20 +215,11 @@ struct Boid
     glm::vec3 Separation(std::vector<Boid>& neighbors)
     {
         glm::vec3 force = {};
-        for (size_t i = 0; i < neighbors.size(); ++i)
+        size_t neighborCount = neighbors.size();
+        for (size_t i = 0; i < neighborCount; ++i)
         {
-            if (*this == neighbors[i])
-            {
-                continue;
-            }
-
             glm::vec3 toAgent = m_position - neighbors[i].m_position;
             float distanceToAgent = glm::length(toAgent);
-            if (distanceToAgent > m_properties->m_neighborRange)
-            {
-                continue;
-            }
-
             if (distanceToAgent > 0.0f) 
             {
                 force += glm::normalize(toAgent) / distanceToAgent;
@@ -241,23 +232,10 @@ struct Boid
     glm::vec3 Alignment(std::vector<Boid>& neighbors)
     {
         glm::vec3 avgDirection = {};
-        size_t neighborCount = {};
-        for (size_t i = 0; i < neighbors.size(); ++i)
+        size_t neighborCount = neighbors.size();
+        for (size_t i = 0; i < neighborCount; ++i)
         {
-            if (*this == neighbors[i])
-            {
-                continue;
-            }
-
-            glm::vec3 toAgent = m_position - neighbors[i].m_position;
-            float distanceToAgent = glm::length(toAgent);
-            if (distanceToAgent > m_properties->m_neighborRange)
-            {
-                continue;
-            }
-
             avgDirection += neighbors[i].m_direction;
-            ++neighborCount;
         }
 
         if (neighborCount > 0)
@@ -273,24 +251,11 @@ struct Boid
     {
         glm::vec3 centerOfMass = {};
         glm::vec3 force = {};
-        size_t neighborCount = {};
+        size_t neighborCount = neighbors.size();
 
-        for (size_t i = 0; i < neighbors.size(); ++i)
+        for (size_t i = 0; i < neighborCount; ++i)
         {
-            if (*this == neighbors[i])
-            {
-                continue;
-            }
-
-            glm::vec3 toAgent = m_position - neighbors[i].m_position;
-            float distanceToAgent = glm::length(toAgent);
-            if (distanceToAgent > m_properties->m_neighborRange)
-            {
-                continue;
-            }
-
             centerOfMass += neighbors[i].m_position;
-            ++neighborCount;
         }
 
         if (neighborCount > 0)
