@@ -200,8 +200,8 @@ struct Boid
             }
 
             glm::vec3 toAgent = m_position - neighbors[i].m_position;
-            float distanceToAgent = glm::length(toAgent);
-            if (distanceToAgent > m_properties->m_neighborRange)
+            float distanceSqToAgent = glm::length2(toAgent);
+            if (distanceSqToAgent > m_properties->m_neighborRange * m_properties->m_neighborRange)
             {
                 continue;
             }
