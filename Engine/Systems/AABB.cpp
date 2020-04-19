@@ -70,7 +70,7 @@ void AABB::SetBounds(glm::vec3 min, glm::vec3 max)
 	m_halfSize = GetWidth() * 0.5f;
 }
 
-ContainmentType AABB::Contains(const AABB& box) const
+ContainmentType AABB::GetContainmentType(const AABB& box) const
 {
 	if (box.m_max.x < m_min.x || box.m_min.x > m_max.x
 		|| box.m_max.y < m_min.y || box.m_min.y > m_max.y
@@ -89,7 +89,7 @@ ContainmentType AABB::Contains(const AABB& box) const
 	return ContainmentType::Intersects;
 }
 
-ContainmentType AABB::Contains(const BoundingFrustum& frustum) const
+ContainmentType AABB::GetContainmentType(const BoundingFrustum& frustum) const
 {
 	//Because question is not frustum contain box but reverse and this is not the same
 	unsigned int i;
@@ -99,7 +99,7 @@ ContainmentType AABB::Contains(const BoundingFrustum& frustum) const
 	// First we check if frustum is in box
 	for (i = 0; i < cornersSize; ++i)
 	{
-		if (Contains(corners[i]) == ContainmentType::Disjoint)
+		if (GetContainmentType(corners[i]) == ContainmentType::Disjoint)
 		{
 			break;
 		}
@@ -123,7 +123,7 @@ ContainmentType AABB::Contains(const BoundingFrustum& frustum) const
 	i++;
 	for (; i < cornersSize; ++i)
 	{
-		if (Contains(corners[i]) != ContainmentType::Disjoint)
+		if (GetContainmentType(corners[i]) != ContainmentType::Disjoint)
 		{
 			return ContainmentType::Intersects;
 		}
@@ -134,7 +134,7 @@ ContainmentType AABB::Contains(const BoundingFrustum& frustum) const
 }
 
 
-ContainmentType AABB::Contains(const glm::vec3& point) const
+ContainmentType AABB::GetContainmentType(const glm::vec3& point) const
 {
 	// first we get if point is out of box
 	if (point.x < m_min.x || point.x > m_max.x
@@ -146,14 +146,14 @@ ContainmentType AABB::Contains(const glm::vec3& point) const
 	return ContainmentType::Contains;
 }
 
-//bool AABB::Contains(const glm::vec3& point) const
-//{
-//	if (point.x < m_min.x || point.x > m_max.x) return false;
-//	if (point.y < m_min.y || point.y > m_max.y) return false;
-//	if (point.z < m_min.z || point.z > m_max.z) return false;
-//
-//	return true;
-//}
+bool AABB::Contains(const glm::vec3& point) const
+{
+	if (point.x < m_min.x || point.x > m_max.x) return false;
+	if (point.y < m_min.y || point.y > m_max.y) return false;
+	if (point.z < m_min.z || point.z > m_max.z) return false;
+
+	return true;
+}
 
 //bool AABB::Contains(const AABB& aabb) const
 //{

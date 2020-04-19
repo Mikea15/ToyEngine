@@ -21,9 +21,6 @@ Octree::Octree(const glm::vec3& position, float halfSize)
 	, m_downBackLeft(nullptr)
 	, m_downBackRight(nullptr)
 {
-	m_node.m_storePos = glm::vec3(0.0f);
-	m_node.m_storeIndex = 0;
-
 	m_bounds = AABB(m_position, halfSize);
 }
 
@@ -55,16 +52,14 @@ void Octree::Subdivide()
 
 bool Octree::Insert(const glm::vec3& position, size_t index)
 {
-	if (m_bounds.Contains(position) == ContainmentType::Disjoint)
+	if (m_bounds.GetContainmentType(position) == ContainmentType::Disjoint)
 	{
 		return false;
 	}
 
-	if (m_upFrontLeft == nullptr && m_node.m_storePos == glm::vec3(0.0f))
+	if (m_upFrontLeft == nullptr && m_nodes.size() < m_maxNodes)
 	{
-		m_node.m_storePos = position;
-		m_node.m_storeIndex = index;
-
+		m_nodes.push_back({ position, index });
 		return true;
 	}
 
@@ -87,15 +82,18 @@ bool Octree::Insert(const glm::vec3& position, size_t index)
 
 void Octree::Search(const AABB& aabb, std::vector<OcNode>& outResult)
 {
-	if (m_bounds.Contains(aabb) == ContainmentType::Disjoint)
+	if (m_bounds.GetContainmentType(aabb) == ContainmentType::Disjoint)
 	{
 		return;
 	}
 
 	// check objects at this bounds level#
-	if (aabb.Contains(m_node.m_storePos) != ContainmentType::Disjoint)
+	for (const OcNode& node : m_nodes)
 	{
-		outResult.push_back(m_node);
+		if (aabb.Contains(node.m_storePos))
+		{
+			outResult.push_back(node);
+		}
 	}
 
 	if (m_upFrontLeft == nullptr)
@@ -124,9 +122,12 @@ void Octree::Search(const BoundingFrustum& frustum, std::vector<OcNode>& outResu
 	// check objects at this bounds level#
 	// while no BoundingSphere, this BoundingBox is a Generous aproximation of the spheres.
 	// if (frustum.Contains(BoundingBox(m_storePos, 1.0f)) != ContainmentType::Disjoint)
-	if (frustum.Contains(m_node.m_storePos) != ContainmentType::Disjoint)
+	for (const OcNode& node : m_nodes)
 	{
-		outResult.push_back(m_node);
+		if (frustum.Contains(node.m_storePos) != ContainmentType::Disjoint)
+		{
+			outResult.push_back(node);
+		}
 	}
 
 	if (m_upFrontLeft == nullptr)

@@ -20,9 +20,12 @@ public:
 
 	void SetBounds(glm::vec3 min, glm::vec3 max);
 
-	ContainmentType Contains(const AABB& box) const;
-	ContainmentType Contains(const BoundingFrustum& frustum) const;
-	ContainmentType Contains(const glm::vec3& point) const;
+	ContainmentType GetContainmentType(const AABB& box) const;
+	ContainmentType GetContainmentType(const BoundingFrustum& frustum) const;
+	ContainmentType GetContainmentType(const glm::vec3& point) const;
+
+	//
+	bool Contains(const glm::vec3& point) const;
 
 	//! Intersects BoundingSphere
 	bool Intersects(const glm::vec3& point, float r) const;
