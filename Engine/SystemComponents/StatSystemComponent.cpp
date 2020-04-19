@@ -92,6 +92,9 @@ void StatSystemComponent::RenderUI()
 	if (show_demo_window)
 		ImGui::ShowDemoWindow(&show_demo_window);
 
+	const float avgFPS = GetAverageFPS();
+	const float avgMS = GetAverageMS();
+
 	const int padding = 1;
 
 	const float DISTANCE = 10.0f;
@@ -109,18 +112,19 @@ void StatSystemComponent::RenderUI()
 
 	static bool open = true;
 	ImGui::Begin("Stats", &open, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing );
+	
 	// frame time
-	std::stringstream fmt;
-	fmt << m_lastFrameTimeMS << " (ms)";
+	char bufferMS[40];
+	sprintf_s(bufferMS, "%.2f (ms) / %.2f (avg)", m_lastFrameTimeMS, avgMS);
 	ImGui::PushItemWidth(-padding);
-	ImGui::PlotLines("", m_msBuffer, IM_ARRAYSIZE(m_msBuffer), m_currentMsBufferIndex, fmt.str().c_str(), 60, -5, ImVec2(0, 50));
+	ImGui::PlotLines("", m_msBuffer, IM_ARRAYSIZE(m_msBuffer), m_currentMsBufferIndex, bufferMS, 60, -5, ImVec2(0, 50));
 	// ImGui::NextColumn();
 
 	// fps
-	std::stringstream fmtFps;
-	fmtFps << "FPS: " << m_framesPerSecond;
+	char bufferFPS[40];
+	sprintf_s(bufferFPS, "%.2f (fps) / %.2f (avg)", m_framesPerSecond, avgFPS);
 	ImGui::PushItemWidth(-padding);
-	ImGui::PlotLines("", m_fpsBuffer, IM_ARRAYSIZE(m_fpsBuffer), m_currentFpsBufferIndex, fmtFps.str().c_str(), 0, m_maxFps + 10, ImVec2(0, 50));
+	ImGui::PlotLines("", m_fpsBuffer, IM_ARRAYSIZE(m_fpsBuffer), m_currentFpsBufferIndex, bufferFPS, 0, m_maxFps + 10, ImVec2(0, 50));
 	// ImGui::NextColumn();
 	ImGui::End();
 
@@ -131,13 +135,15 @@ void StatSystemComponent::RenderUI()
 	ImGui::Text("Frame Time: %0.2f", m_lastFrameTimeMS);
 	ImGui::Text("Min: %.1f", m_minFrameTime);
 	ImGui::Text("Max: %.1f", m_maxFrameTime);
+	ImGui::Text("Avg: %.2f", avgMS);
 	ImGui::NextColumn();
 
 	ImGui::PushItemWidth(15);
 	ImVec4 color = (m_framesPerSecond < 30) ? ImVec4(0.9f, 0.7f, 0.f, 1.f) : ImVec4(0.1f, 0.75f, 0.1f, 1.0f);
-	ImGui::TextColored(color, fmtFps.str().c_str());
+	ImGui::TextColored(color, "FPS: %.2f", m_framesPerSecond);
 	ImGui::Text("Min %.1f", m_minFps);
 	ImGui::Text("Max: %.1f", m_maxFps);
+	ImGui::Text("Avg: %.2f", avgFPS);
 	ImGui::NextColumn();
 
 	ImGui::Separator();
@@ -173,4 +179,34 @@ void StatSystemComponent::RenderUI()
 void StatSystemComponent::Cleanup()
 {
 
+}
+
+float StatSystemComponent::GetAverageFPS() const
+{
+	float avg = 0.0f;
+	for (int i = 0; i < s_sampleCount - 1; ++i)
+	{
+		avg += m_fpsBuffer[i];
+	}
+
+	if (s_sampleCount > 0)
+	{
+		return avg / s_sampleCount;
+	}
+	return 0.0f;
+}
+
+float StatSystemComponent::GetAverageMS() const
+{
+	float avg = 0.0f;
+	for (int i = 0; i < s_sampleCount - 1; ++i)
+	{
+		avg += m_msBuffer[i];
+	}
+
+	if (s_sampleCount > 0)
+	{
+		return avg / s_sampleCount;
+	}
+	return 0.0f;
 }
