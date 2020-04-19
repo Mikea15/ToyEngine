@@ -390,3 +390,4 @@ MigrationBackup/
 # Other
 [Tt]emp/
 Data
+WindowsLauncher/profiler_capture.json
