@@ -14,7 +14,6 @@ class Game;
 #endif
 
 
-
 class BoidSystemState
     : public BaseState
 {
@@ -154,39 +153,69 @@ public:
         m_viewGrid.Draw();
         DebugDraw::AddAABB(glm::vec3(0.0f) - glm::vec3(50.0f, 0.0f, 50.0f),
             glm::vec3(0.0f) + glm::vec3(50.0f, 0.0f, 50.0f));
-        
+
         AABB limits = AABB(glm::vec3(0.0f, 25.0f, 0.0f), 50);
         DebugDraw::AddAABB(limits.GetMin(), limits.GetMax());
 
-        for (size_t i = 0; i < ENTITY_COUNT; i++)
+        std::vector<size_t> neighborIndices;
         {
-            m_wanderers[i].Update(deltaTime, m_wanderers);
-            m_wanderers[i].DrawDebug();
+            m_octree = Octree(glm::vec3(0.0f), 50.0f);
+            OcNode nodeData;
+            for (size_t i = 0; i < ENTITY_COUNT; i++)
+            {
+                m_octree.Insert(m_wanderers[i].m_position, i);
+            }
+
+            for (size_t i = 0; i < ENTITY_COUNT; i++)
+            {
+                AABB searchAabb = AABB(m_wanderers[i].m_position, m_wanderers[i].m_properties->m_radius);
+
+                std::vector<OcNode> neighborResult;
+                m_octree.Search(searchAabb, neighborResult);
+
+                neighborIndices.clear();
+                for (const OcNode& node : neighborResult)
+                {
+                    if (node.m_storeIndex == i) 
+                    {
+                        continue;
+                    }
+
+                    neighborIndices.push_back(node.m_storeIndex);
+                }
+
+                m_wanderers[i].Update(deltaTime, m_wanderers, neighborIndices);
+                m_wanderers[i].DrawDebug();
+            }
+
+            m_octree.DebugDraw();
         }
+        
+        neighborIndices.clear();
 
         {
             m_path.UpdatePath(m_simplePathFollower.m_position);
             m_path.DebugDraw();
 
             m_simplePathFollower.SetTarget(m_path.GetCurrentGoal());
-            m_simplePathFollower.Update(deltaTime, m_wanderers);
+            m_simplePathFollower.Update(deltaTime, m_wanderers, neighborIndices);
             m_simplePathFollower.DrawDebug();
         }
 
         {
             m_simpleFollower.SetTarget(m_constantMovingTarget);
-            m_simpleFollower.Update(deltaTime, m_wanderers);
+            m_simpleFollower.Update(deltaTime, m_wanderers, neighborIndices);
             m_simpleFollower.DrawDebug();
         }
 
         {
             m_simpleArriver.SetTarget(m_movingTarget);
-            m_simpleArriver.Update(deltaTime, m_wanderers);
+            m_simpleArriver.Update(deltaTime, m_wanderers, neighborIndices);
             m_simpleArriver.DrawDebug();
         }
 
         {
-            m_simpleFlee.Update(deltaTime, m_wanderers);
+            m_simpleFlee.Update(deltaTime, m_wanderers, neighborIndices);
             m_simpleFlee.DrawDebug();
         }
     };
@@ -241,4 +270,6 @@ private:
     Boid::Properties m_sharedBoidProperties;
     std::vector<Boid> m_wanderers;
     Path m_path;
+
+    Octree m_octree;
 };

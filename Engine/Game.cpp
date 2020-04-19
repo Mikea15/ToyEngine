@@ -11,6 +11,7 @@
 #include "SystemComponents/StatSystemComponent.h"
 
 #include "Utils/Logger.h"
+#include "Profiler.h"
 
 Game::Game(State* state)
 	: m_isRunning(true)
@@ -89,6 +90,8 @@ int Game::Execute()
 
 	while (m_isRunning)
 	{
+		PROFILE_SCOPE("UpdateLoop");
+
 		float frameTime = m_frameTime.GetFrameTime();
 		m_time += frameTime;
 
@@ -107,49 +110,55 @@ int Game::Execute()
 		// System Components PreUpdate
 		m_systemComponents->PreUpdate(frameTime);
 
-		// Handle Input
-		SDL_Event event;
-		while (SDL_PollEvent(&event))
 		{
+			PROFILE_SCOPE("HandleInput");
 			// Handle Input
-			m_sdlHandler.HandleEvents(&event);
-
-			switch (event.type)
+			SDL_Event event;
+			while (SDL_PollEvent(&event))
 			{
-			case SDL_KEYDOWN:
-				switch (event.key.keysym.sym)
+				// Handle Input
+				m_sdlHandler.HandleEvents(&event);
+
+				switch (event.type)
 				{
-				case SDLK_ESCAPE:
-					m_isRunning = false;
+				case SDL_KEYDOWN:
+					switch (event.key.keysym.sym)
+					{
+					case SDLK_ESCAPE:
+						m_isRunning = false;
+						break;
+					default: break;
+					}
 					break;
 				default: break;
 				}
-				break;
-			default: break;
+
+				// System Components Handle Input
+				m_systemComponents->HandleInput(&event);
+
+				m_gameState->HandleInput(&event);
 			}
-
-			// System Components Handle Input
-			m_systemComponents->HandleInput(&event);
-
-			m_gameState->HandleInput(&event);
 		}
 
-		// Handle Updates / Fixed Update
-		while (accumulator >= m_deltaTime)
 		{
-			// physx tick
-			// m_physxHandler.Tick(m_deltaTime);
+			PROFILE_SCOPE("Update");
+			// Handle Updates / Fixed Update
+			while (accumulator >= m_deltaTime)
+			{
+				// physx tick
+				// m_physxHandler.Tick(m_deltaTime);
 
-			// system components
-			m_systemComponents->Update(m_deltaTime);
+				// system components
+				m_systemComponents->Update(m_deltaTime);
 
-			// window Update
-			m_sdlHandler.Update(m_deltaTime);
+				// window Update
+				m_sdlHandler.Update(m_deltaTime);
 
-			// Update
-			m_gameState->Update(m_deltaTime);
+				// Update
+				m_gameState->Update(m_deltaTime);
 
-			accumulator -= m_deltaTime;
+				accumulator -= m_deltaTime;
+			}
 		}
 
 
@@ -157,17 +166,22 @@ int Game::Execute()
 		const float alpha = accumulator / m_deltaTime;
 
 		// Render
-		m_sdlHandler.BeginRender();
-		m_systemComponents->Render(alpha);
-		m_gameState->Render(alpha);
+		{
+			PROFILE_SCOPE("RenderLoop");
+			m_sdlHandler.BeginRender();
+			m_systemComponents->Render(alpha);
+			m_gameState->Render(alpha);
 
-		// ui
-		m_sdlHandler.BeginUIRender();
-		m_systemComponents->RenderUI();
-		m_gameState->RenderUI();
-		m_sdlHandler.EndUIRender();
-
-		m_sdlHandler.EndRender();
+			// ui
+			{
+				PROFILE_SCOPE("RenderUI");
+				m_sdlHandler.BeginUIRender();
+				m_systemComponents->RenderUI();
+				m_gameState->RenderUI();
+				m_sdlHandler.EndUIRender();
+				m_sdlHandler.EndRender();
+			}
+		}
 	}
 
 	CleanupSystems();

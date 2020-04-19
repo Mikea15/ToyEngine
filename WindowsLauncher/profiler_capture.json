@@ -1,0 +1,8 @@
+{ "traceEvents": [
+{ "pid":1, "tid":1, "ph":"X", "ts":0, "dur":27638, "name":"Total RenderUI", "args":{ "count":3312, "avg ms":0} },
+{ "pid":1, "tid":2, "ph":"X", "ts":0, "dur":24452, "name":"Total UpdateLoop", "args":{ "count":3312, "avg ms":0} },
+{ "pid":1, "tid":3, "ph":"X", "ts":0, "dur":21691, "name":"Total RenderLoop", "args":{ "count":3312, "avg ms":0} },
+{ "pid":1, "tid":4, "ph":"X", "ts":0, "dur":20906, "name":"Total Update", "args":{ "count":3312, "avg ms":0} },
+{ "pid":1, "tid":5, "ph":"X", "ts":0, "dur":16937, "name":"Total HandleInput", "args":{ "count":3312, "avg ms":0} },
+{ "cat":"", "pid":1, "tid":0, "ts":0, "ph":"M", "name":"process_name", "args":{ "name":"clang" } }
+] }

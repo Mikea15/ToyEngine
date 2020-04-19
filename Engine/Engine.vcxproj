@@ -190,6 +190,7 @@
     <ClInclude Include="Mesh\Sphere.h" />
     <ClInclude Include="Mesh\Torus.h" />
     <ClInclude Include="PhysxHandler.h" />
+    <ClInclude Include="Profiler.h" />
     <ClInclude Include="Renderer\CommandBuffer.h" />
     <ClInclude Include="Renderer\DebugDraw.h" />
     <ClInclude Include="Renderer\GLStateCache.h" />
