@@ -2,6 +2,8 @@
 
 #include "BoundingFrustum.h"
 
+#include "Renderer/DebugDraw.h"
+
 Octree::Octree()
 	: Octree(glm::vec3(0.0f), 0.0f)
 {
@@ -19,7 +21,9 @@ Octree::Octree(const glm::vec3& position, float halfSize)
 	, m_downBackLeft(nullptr)
 	, m_downBackRight(nullptr)
 {
-	m_storePos = glm::vec3(0.0f);
+	m_node.m_storePos = glm::vec3(0.0f);
+	m_node.m_storeIndex = 0;
+
 	m_bounds = AABB(m_position, halfSize);
 }
 
@@ -49,16 +53,18 @@ void Octree::Subdivide()
 	m_downBackRight = std::make_shared<Octree>(dbr, m_halfSize * 0.5f);
 }
 
-bool Octree::Insert(const glm::vec3& position)
+bool Octree::Insert(const glm::vec3& position, size_t index)
 {
 	if (m_bounds.Contains(position) == ContainmentType::Disjoint)
 	{
 		return false;
 	}
 
-	if (m_upFrontLeft == nullptr && m_storePos == glm::vec3(0.0f))
+	if (m_upFrontLeft == nullptr && m_node.m_storePos == glm::vec3(0.0f))
 	{
-		m_storePos = position;
+		m_node.m_storePos = position;
+		m_node.m_storeIndex = index;
+
 		return true;
 	}
 
@@ -67,19 +73,19 @@ bool Octree::Insert(const glm::vec3& position)
 		Subdivide();
 	}
 
-	if (m_upFrontLeft->Insert(position)) return true;
-	if (m_upFrontRight->Insert(position)) return true;
-	if (m_upBackLeft->Insert(position)) return true;
-	if (m_upBackRight->Insert(position)) return true;
-	if (m_downFrontLeft->Insert(position)) return true;
-	if (m_downFrontRight->Insert(position)) return true;
-	if (m_downBackLeft->Insert(position)) return true;
-	if (m_downBackRight->Insert(position)) return true;
+	if (m_upFrontLeft->Insert(position, index)) return true;
+	if (m_upFrontRight->Insert(position, index)) return true;
+	if (m_upBackLeft->Insert(position, index)) return true;
+	if (m_upBackRight->Insert(position, index)) return true;
+	if (m_downFrontLeft->Insert(position, index)) return true;
+	if (m_downFrontRight->Insert(position, index)) return true;
+	if (m_downBackLeft->Insert(position, index)) return true;
+	if (m_downBackRight->Insert(position, index)) return true;
 
 	return false;
 }
 
-void Octree::Search(const AABB& aabb, std::vector<glm::vec3>& outResult)
+void Octree::Search(const AABB& aabb, std::vector<OcNode>& outResult)
 {
 	if (m_bounds.Contains(aabb) == ContainmentType::Disjoint)
 	{
@@ -87,9 +93,9 @@ void Octree::Search(const AABB& aabb, std::vector<glm::vec3>& outResult)
 	}
 
 	// check objects at this bounds level#
-	if (aabb.Contains(m_storePos) != ContainmentType::Disjoint)
+	if (aabb.Contains(m_node.m_storePos) != ContainmentType::Disjoint)
 	{
-		outResult.push_back(m_storePos);
+		outResult.push_back(m_node);
 	}
 
 	if (m_upFrontLeft == nullptr)
@@ -108,7 +114,7 @@ void Octree::Search(const AABB& aabb, std::vector<glm::vec3>& outResult)
 	m_downBackRight->Search(aabb, outResult);
 }
 
-void Octree::Search(const BoundingFrustum& frustum, std::vector<glm::vec3>& outResult)
+void Octree::Search(const BoundingFrustum& frustum, std::vector<OcNode>& outResult)
 {
 	if (frustum.Contains(m_bounds) == ContainmentType::Disjoint)
 	{
@@ -118,9 +124,9 @@ void Octree::Search(const BoundingFrustum& frustum, std::vector<glm::vec3>& outR
 	// check objects at this bounds level#
 	// while no BoundingSphere, this BoundingBox is a Generous aproximation of the spheres.
 	// if (frustum.Contains(BoundingBox(m_storePos, 1.0f)) != ContainmentType::Disjoint)
-	if (frustum.Contains(m_storePos) != ContainmentType::Disjoint)
+	if (frustum.Contains(m_node.m_storePos) != ContainmentType::Disjoint)
 	{
-		outResult.push_back(m_storePos);
+		outResult.push_back(m_node);
 	}
 
 	if (m_upFrontLeft == nullptr)
@@ -154,4 +160,18 @@ void Octree::GetAllBoundingBoxes(std::vector<AABB>& outResult)
 	m_downFrontRight->GetAllBoundingBoxes(outResult);
 	m_downBackLeft->GetAllBoundingBoxes(outResult);
 	m_downBackRight->GetAllBoundingBoxes(outResult);
+}
+
+void Octree::DebugDraw()
+{
+	// draw octree
+	std::vector<AABB> octreeVis;
+	GetAllBoundingBoxes(octreeVis);
+	const size_t oSize = octreeVis.size();
+	for (size_t i = 0; i < oSize; ++i)
+	{
+		auto min = octreeVis[i].GetMin();
+		auto max = octreeVis[i].GetMax();
+		DebugDraw::AddAABB(min, max, { 1.0f, 1.0f, 0.0f, 0.30f });
+	}
 }

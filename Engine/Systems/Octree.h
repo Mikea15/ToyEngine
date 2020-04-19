@@ -9,6 +9,11 @@
 
 class BoundingFrustum;
 
+struct OcNode
+{
+	glm::vec3 m_storePos;
+	size_t m_storeIndex;
+};
 
 class Octree
 {
@@ -18,18 +23,20 @@ public:
 	~Octree();
 
 	void Subdivide();
-	bool Insert(const glm::vec3& pos);
-	void Search(const AABB& aabb, std::vector<glm::vec3>& outResult);
-	void Search(const BoundingFrustum& frustum, std::vector<glm::vec3>& outResult);
+	bool Insert(const glm::vec3& pos, size_t index = -1);
+	void Search(const AABB& aabb, std::vector<OcNode>& outResult);
+	void Search(const BoundingFrustum& frustum, std::vector<OcNode>& outResult);
 
 	void GetAllBoundingBoxes(std::vector<AABB>& outResult);
+
+	void DebugDraw();
 
 private:
 	glm::vec3 m_position;
 	float m_halfSize;
 	AABB m_bounds;
 
-	glm::vec3 m_storePos;
+	OcNode m_node;
 
 	std::shared_ptr<Octree> m_upFrontLeft;
 	std::shared_ptr<Octree> m_upFrontRight;
