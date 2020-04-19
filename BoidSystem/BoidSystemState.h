@@ -8,9 +8,9 @@
 class Game;
 
 #if _DEBUG
-#define ENTITY_COUNT 200
+#define ENTITY_COUNT 350
 #else
-#define ENTITY_COUNT 1500
+#define ENTITY_COUNT 2000
 #endif
 
 
@@ -53,7 +53,7 @@ public:
             );
         }
 
-        m_path = Path({ 
+        m_path = Path({
             glm::vec3(0.0f, 0.0f, 40.0f),
             glm::vec3(13.5f, 0.0f, 25.0f),
             glm::vec3(25.0f, 0.0f, 10.0f),
@@ -66,7 +66,22 @@ public:
             glm::vec3(-25.0f, 0.0f, -25.0f),
             glm::vec3(-45.0f, 0.0f, 0.0f),
             glm::vec3(-25.0f, 0.0f, 25.0f)
-        });
+            });
+
+        m_path2 = Path({
+            glm::vec3(-25.0f, 5.0f, 25.0f),
+            glm::vec3(-45.0f, 5.0f, 0.0f),
+            glm::vec3(-25.0f, 5.0f, -25.0f),
+            glm::vec3(-10.0f, 5.0f, -25.0f),
+            glm::vec3(0.0f, 5.0f, -10.0f),
+            glm::vec3(10.0f, 5.0f, -25.0f),
+            glm::vec3(25.0f, 5.0f, -45.0f),
+            glm::vec3(45.0f, 5.0f, -25.0f),
+            glm::vec3(40.0f, 5.0f, 0.0f),
+            glm::vec3(25.0f, 5.0f, 10.0f),
+            glm::vec3(13.5f, 5.0f, 25.0f),
+            glm::vec3(0.0f, 5.0f, 40.0f)
+            });
 
         for (size_t i = 0; i < ENTITY_COUNT; i++)
         {
@@ -88,13 +103,21 @@ public:
                 MathUtils::Rand(-50.0f, 50.0f)
             );
 
-            b.SetTarget(&m_simplePathFollower);
+            if (MathUtils::Rand01() > 0.5f) 
+            {
+                b.SetTarget(&m_simplePathFollower);
+            }
+            else
+            {
+                b.SetTarget(&m_simplePathFollower2);
+            }
 
             m_wanderers.push_back(b);
         }
 
         m_simpleFollower.SetFeature(Boid::eSeek);
         m_simplePathFollower.SetFeature(Boid::eSeek);
+        m_simplePathFollower2.SetFeature(Boid::eSeek);
 
         m_simpleArriver.SetFeature(Boid::eArrive);
 
@@ -159,20 +182,21 @@ public:
 
         std::vector<size_t> neighborIndices;
         {
+#if USE_OCTREE
             m_octree = Octree(glm::vec3(0.0f), 50.0f);
             OcNode nodeData;
             for (size_t i = 0; i < ENTITY_COUNT; i++)
             {
                 m_octree.Insert(m_wanderers[i].m_position, i);
             }
+#endif
 
             for (size_t i = 0; i < ENTITY_COUNT; i++)
             {
-                AABB searchAabb = AABB(m_wanderers[i].m_position, m_wanderers[i].m_properties->m_radius);
-
+#if USE_OCTREE
+                AABB searchAabb = AABB(m_wanderers[i].m_position, m_wanderers[i].m_properties->m_neighborRange);
                 std::vector<OcNode> neighborResult;
                 m_octree.Search(searchAabb, neighborResult);
-
                 neighborIndices.clear();
                 for (const OcNode& node : neighborResult)
                 {
@@ -180,15 +204,15 @@ public:
                     {
                         continue;
                     }
-
                     neighborIndices.push_back(node.m_storeIndex);
                 }
-
+#endif
                 m_wanderers[i].Update(deltaTime, m_wanderers, neighborIndices);
                 m_wanderers[i].DrawDebug();
             }
-
+#if USE_OCTREE
             m_octree.DebugDraw();
+#endif
         }
         
         neighborIndices.clear();
@@ -200,6 +224,15 @@ public:
             m_simplePathFollower.SetTarget(m_path.GetCurrentGoal());
             m_simplePathFollower.Update(deltaTime, m_wanderers, neighborIndices);
             m_simplePathFollower.DrawDebug();
+        }
+
+        {
+            m_path2.UpdatePath(m_simplePathFollower2.m_position);
+            m_path2.DebugDraw();
+
+            m_simplePathFollower2.SetTarget(m_path2.GetCurrentGoal());
+            m_simplePathFollower2.Update(deltaTime, m_wanderers, neighborIndices);
+            m_simplePathFollower2.DrawDebug();
         }
 
         {
@@ -258,6 +291,7 @@ private:
     Boid m_simpleArriver;
     Boid m_simpleFlee;
     Boid m_simplePathFollower;
+    Boid m_simplePathFollower2;
     glm::vec3 m_movingTarget = { 1.0f, 1.0f, 1.0f };
     glm::vec3 m_constantMovingTarget = { 1.0f, 1.0f, 1.0f };
 
@@ -270,6 +304,7 @@ private:
     Boid::Properties m_sharedBoidProperties;
     std::vector<Boid> m_wanderers;
     Path m_path;
+    Path m_path2;
 
     Octree m_octree;
 };

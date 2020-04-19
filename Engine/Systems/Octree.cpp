@@ -52,7 +52,7 @@ void Octree::Subdivide()
 
 bool Octree::Insert(const glm::vec3& position, size_t index)
 {
-	if (m_bounds.GetContainmentType(position) == ContainmentType::Disjoint)
+	if (!m_bounds.Contains(position))
 	{
 		return false;
 	}

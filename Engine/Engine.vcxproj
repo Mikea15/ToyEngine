@@ -171,6 +171,7 @@
     <ClInclude Include="Camera\Camera.h" />
     <ClInclude Include="Camera\CameraFrustum.h" />
     <ClInclude Include="Camera\FlyCamera.h" />
+    <ClInclude Include="Core\StackAllocator.h" />
     <ClInclude Include="External\ImGuizmo\imGuIZMOquat.h" />
     <ClInclude Include="External\ImGuizmo\vgConfig.h" />
     <ClInclude Include="External\ImGuizmo\vGizmo.h" />
