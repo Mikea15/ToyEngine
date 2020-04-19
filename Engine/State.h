@@ -324,17 +324,7 @@ public:
 
 		if (m_drawOctree) 
 		{
-			// draw octree
-			std::vector<AABB> octreeVis;
-			m_oTree.GetAllBoundingBoxes(octreeVis);
-			const unsigned int oSize = static_cast<unsigned int>(octreeVis.size());
-			for (unsigned int i = 0; i < oSize; ++i)
-			{
-				auto pos = octreeVis[i].GetPosition();
-				auto min = octreeVis[i].GetMin();
-				auto max = octreeVis[i].GetMax();
-				DebugDraw::AddAABB(min, max);
-			}
+			m_oTree.DebugDraw();
 		}
 
 		if (m_drawBVH)
