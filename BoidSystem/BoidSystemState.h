@@ -7,12 +7,28 @@
 
 class Game;
 
+#define MULTITHREAD 1
+#define NUM_THREADS 4
+
+#if MULTITHREAD
+#include <atomic>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#endif
+
 #if _DEBUG
 #define ENTITY_COUNT 200
 #else
 #define ENTITY_COUNT 2000
 #endif
 
+
+struct JobBlock
+{
+    size_t start;
+    size_t end;
+};
 
 class BoidSystemState
     : public BaseState
@@ -191,6 +207,56 @@ public:
             }
 #endif
 
+#if MULTITHREAD
+
+            std::vector<Boid> m_wanderersSnapshot(m_wanderers);
+
+            std::vector<std::thread> threads;
+
+            std::atomic<int> finishedThreads{ 0 };
+            size_t groupSize = m_wanderers.size() / NUM_THREADS;
+
+            for (size_t t = 0; t < NUM_THREADS; ++t)
+            {
+                JobBlock job;
+                job.start = t * groupSize;
+                job.end = job.start + groupSize;
+
+                std::thread thr([&]() {
+                    for (size_t i = job.start; i < job.end; i++)
+                    {
+                        m_wanderers[i].UpdateTargets();
+                        glm::vec3 force = m_wanderers[i].CalcSteeringBehavior(m_wanderersSnapshot, neighborIndices);
+                        m_wanderers[i].UpdatePosition(deltaTime, force);
+                    }
+
+                    // no more jobs.
+                    {
+                        std::lock_guard<std::mutex> lock(m_mutex);
+                        finishedThreads++;
+                        m_cvar.notify_one();
+                    }
+                    });
+                threads.push_back(std::move(thr));
+            }
+
+            {
+                std::unique_lock<std::mutex> lock(m_mutex);
+                m_cvar.wait(lock, [&finishedThreads] {
+                    return finishedThreads == NUM_THREADS;
+                    });
+            }
+
+            for (std::thread& t : threads)
+            {
+                t.join();
+            }
+
+            for (size_t i = 0; i < ENTITY_COUNT; i++)
+            {
+                m_wanderers[i].DrawDebug();
+            }
+#else
             for (size_t i = 0; i < ENTITY_COUNT; i++)
             {
 #if USE_OCTREE
@@ -206,12 +272,12 @@ public:
                     }
                     neighborIndices.push_back(node.m_storeIndex);
                 }
-#endif
+#endif // USE_OCTREE
                 // Agent Core Loop
                 {
                     m_wanderers[i].UpdateTargets();
 
-                    glm::vec3 force = m_wanderers[i].CalcSteeringBehavior(m_wanderers, neighborIndices);
+                    glm::vec3 force = m_wanderers[i].CalcSteeringBehavior(m_wanderersSnapshot, neighborIndices);
                     m_wanderers[i].UpdatePosition(deltaTime, force);
                 }
                 m_wanderers[i].DrawDebug();
@@ -219,6 +285,7 @@ public:
 #if USE_OCTREE
             m_octree.DebugDraw();
 #endif
+#endif // MULTITHREAD
         }
         
         neighborIndices.clear();
@@ -309,8 +376,14 @@ private:
 
     Boid::Properties m_sharedBoidProperties;
     std::vector<Boid> m_wanderers;
+    
     Path m_path;
     Path m_path2;
 
     Octree m_octree;
+
+#if MULTITHREAD
+    std::mutex m_mutex;
+    std::condition_variable m_cvar;
+#endif
 };
