@@ -1,52 +1,52 @@
 #pragma once
 
-#define GLM_SWIZZLE
+
 #include <glm/glm.hpp>
-#include <glm/simd/common.h>
 
 #include "BoidManager.h"
+#include "SteeringBehavior.h"
 
-#define USE_OCTREE 1
+#define USE_OCTREE 0
 #define USE_AABB 0
 
 struct Boid
 {
     enum Feature : unsigned int
     {
-        eNone       = 0,
-        eWander     = 1 << 0,
-        eSeek       = 1 << 1,
-        eFlee       = 1 << 2,
+        eNone = 0,
+        eWander = 1 << 0,
+        eSeek = 1 << 1,
+        eFlee = 1 << 2,
         eFleeRanged = 1 << 3,
-        eArrive     = 1 << 4,
+        eArrive = 1 << 4,
 
         eSeparation = 1 << 5,
-        eCohesion   = 1 << 6,
-        eAlignment  = 1 << 7,
+        eCohesion = 1 << 6,
+        eAlignment = 1 << 7,
 
         eWallLimits = 1 << 8
     };
 
     struct Properties
     {
-        unsigned int m_features     = eWander;
+        unsigned int m_features = eWander;
 
-        float m_maxSpeed            = 5.0f;     // [m/s]
-        float m_maxForce            = 10.0f;
-        float m_mass                = 2.0f;
-        float m_radius              = 1.0f;
+        float m_maxSpeed = 5.0f;     // [m/s]
+        float m_maxForce = 10.0f;
+        float m_mass = 2.0f;
+        float m_radius = 1.0f;
 
-        float m_neighborRange       = 3.0f;
+        float m_neighborRange = 3.0f;
 
-        float m_weightWallLimits    = 1.0f;
-        float m_weightWander        = 1.0f;
-        float m_weightSeek          = 1.0f;
-        float m_weightFlee          = 1.0f;
-        float m_weightArrive        = 1.0f;
+        float m_weightWallLimits = 1.0f;
+        float m_weightWander = 1.0f;
+        float m_weightSeek = 1.0f;
+        float m_weightFlee = 1.0f;
+        float m_weightArrive = 1.0f;
 
-        float m_weightAlignment     = 1.2f;
-        float m_weightCohesion      = 1.8f;
-        float m_weightSeparation    = 0.6f;
+        float m_weightAlignment = 1.2f;
+        float m_weightCohesion = 1.8f;
+        float m_weightSeparation = 0.6f;
     };
 
     Boid()
@@ -73,7 +73,15 @@ struct Boid
     void SetFlee(glm::vec3 fleePos) { m_fleePos = fleePos; }
     void SetFlee(Boid* boid) { m_fleeBoid = boid; }
 
-    void Update(float deltaTime, std::vector<Boid>& otherBoids, std::vector<size_t>& neighborIndices)
+    void FullUpdate(float deltaTime, std::vector<Boid>& otherBoids, std::vector<size_t>& neighborIndices)
+    {
+        UpdateTargets();
+
+        glm::vec3 force = CalcSteeringBehavior(otherBoids, neighborIndices);
+        UpdatePosition(deltaTime, force);
+    }
+
+    void UpdateTargets()
     {
         if (m_targetBoid)
         {
@@ -83,36 +91,42 @@ struct Boid
         {
             m_fleePos = m_fleeBoid->m_position;
         }
+    }
 
-        // Steering Bit
-        glm::vec3 force = {};
-        if (HasFeature(eWallLimits))    { force += m_properties->m_weightWallLimits * WallLimits(); }
-        if (HasFeature(eWander))        { force += m_properties->m_weightWander * Wander(); }
-        if (HasFeature(eSeek))          { force += m_properties->m_weightSeek * Seek(m_targetPos); }
-        if (HasFeature(eArrive))        { force += m_properties->m_weightArrive * Arrive(m_targetPos); }
-        if (HasFeature(eFlee))          { force += m_properties->m_weightFlee * Flee(m_fleePos); }
-        if (HasFeature(eFleeRanged))    { force += m_properties->m_weightFlee * FleeRanged(m_fleePos); }
-
-#if !USE_OCTREE
-        FindNearbyNeighbors(otherBoids);
-#endif
-        if (HasFeature(eSeparation))    { force += m_properties->m_weightSeparation * Separation(otherBoids, neighborIndices); }
-        if (HasFeature(eCohesion))      { force += m_properties->m_weightCohesion * Cohesion(otherBoids, neighborIndices); }
-        if (HasFeature(eAlignment))     { force += m_properties->m_weightAlignment * Alignment(otherBoids, neighborIndices); }
-
-        force = glm::clamp(force, -m_properties->m_maxForce, m_properties->m_maxForce);
-
-        // Vehicle Bit
-        glm::vec3 acceleration = force / m_properties->m_mass;
+    void UpdatePosition(float deltaTime, glm::vec3 force)
+    {
+        const glm::vec3 acceleration = force / m_properties->m_mass;
 
         m_velocity += acceleration * deltaTime;
         m_velocity = glm::clamp(m_velocity, -m_properties->m_maxSpeed, m_properties->m_maxSpeed);
 
-        m_position += m_velocity * deltaTime;
-
-        if (glm::length(m_velocity) > 0.0001f) {
+        if (glm::length(m_velocity) > 0.0001f) 
+        {
             m_direction = glm::normalize(m_velocity);
         }
+
+        m_position += m_velocity * deltaTime;
+    }
+
+    glm::vec3 CalcSteeringBehavior(std::vector<Boid>& otherBoids, std::vector<size_t>& neighborIndices)
+    {
+        // Steering Bit
+        glm::vec3 force = {};
+        if (HasFeature(eWallLimits)) { force += m_properties->m_weightWallLimits * WallLimits(); }
+        if (HasFeature(eWander)) { force += m_properties->m_weightWander * Wander(); }
+        if (HasFeature(eSeek)) { force += m_properties->m_weightSeek * Seek(m_targetPos); }
+        if (HasFeature(eArrive)) { force += m_properties->m_weightArrive * Arrive(m_targetPos); }
+        if (HasFeature(eFlee)) { force += m_properties->m_weightFlee * Flee(m_fleePos); }
+        if (HasFeature(eFleeRanged)) { force += m_properties->m_weightFlee * FleeRanged(m_fleePos); }
+
+#if !USE_OCTREE
+        FindNearbyNeighbors(otherBoids);
+#endif
+        if (HasFeature(eSeparation)) { force += m_properties->m_weightSeparation * Separation(otherBoids, neighborIndices); }
+        if (HasFeature(eCohesion)) { force += m_properties->m_weightCohesion * Cohesion(otherBoids, neighborIndices); }
+        if (HasFeature(eAlignment)) { force += m_properties->m_weightAlignment * Alignment(otherBoids, neighborIndices); }
+
+        return glm::clamp(force, -m_properties->m_maxForce, m_properties->m_maxForce);
     }
 
     void DrawDebug()

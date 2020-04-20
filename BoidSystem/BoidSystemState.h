@@ -8,7 +8,7 @@
 class Game;
 
 #if _DEBUG
-#define ENTITY_COUNT 350
+#define ENTITY_COUNT 200
 #else
 #define ENTITY_COUNT 2000
 #endif
@@ -207,7 +207,13 @@ public:
                     neighborIndices.push_back(node.m_storeIndex);
                 }
 #endif
-                m_wanderers[i].Update(deltaTime, m_wanderers, neighborIndices);
+                // Agent Core Loop
+                {
+                    m_wanderers[i].UpdateTargets();
+
+                    glm::vec3 force = m_wanderers[i].CalcSteeringBehavior(m_wanderers, neighborIndices);
+                    m_wanderers[i].UpdatePosition(deltaTime, force);
+                }
                 m_wanderers[i].DrawDebug();
             }
 #if USE_OCTREE
@@ -222,7 +228,7 @@ public:
             m_path.DebugDraw();
 
             m_simplePathFollower.SetTarget(m_path.GetCurrentGoal());
-            m_simplePathFollower.Update(deltaTime, m_wanderers, neighborIndices);
+            m_simplePathFollower.FullUpdate(deltaTime, m_wanderers, neighborIndices);
             m_simplePathFollower.DrawDebug();
         }
 
@@ -231,24 +237,24 @@ public:
             m_path2.DebugDraw();
 
             m_simplePathFollower2.SetTarget(m_path2.GetCurrentGoal());
-            m_simplePathFollower2.Update(deltaTime, m_wanderers, neighborIndices);
+            m_simplePathFollower2.FullUpdate(deltaTime, m_wanderers, neighborIndices);
             m_simplePathFollower2.DrawDebug();
         }
 
         {
             m_simpleFollower.SetTarget(m_constantMovingTarget);
-            m_simpleFollower.Update(deltaTime, m_wanderers, neighborIndices);
+            m_simpleFollower.FullUpdate(deltaTime, m_wanderers, neighborIndices);
             m_simpleFollower.DrawDebug();
         }
 
         {
             m_simpleArriver.SetTarget(m_movingTarget);
-            m_simpleArriver.Update(deltaTime, m_wanderers, neighborIndices);
+            m_simpleArriver.FullUpdate(deltaTime, m_wanderers, neighborIndices);
             m_simpleArriver.DrawDebug();
         }
 
         {
-            m_simpleFlee.Update(deltaTime, m_wanderers, neighborIndices);
+            m_simpleFlee.FullUpdate(deltaTime, m_wanderers, neighborIndices);
             m_simpleFlee.DrawDebug();
         }
     };
