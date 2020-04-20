@@ -191,7 +191,7 @@
     <ClInclude Include="Mesh\Sphere.h" />
     <ClInclude Include="Mesh\Torus.h" />
     <ClInclude Include="PhysxHandler.h" />
-    <ClInclude Include="Profiler.h" />
+    <ClInclude Include="Core\Profiler.h" />
     <ClInclude Include="Renderer\CommandBuffer.h" />
     <ClInclude Include="Renderer\DebugDraw.h" />
     <ClInclude Include="Renderer\GLStateCache.h" />
@@ -232,6 +232,7 @@
     <ClInclude Include="Systems\Plane.h" />
     <ClInclude Include="Systems\QuadTree.h" />
     <ClInclude Include="Systems\Rect.h" />
+    <ClInclude Include="Systems\Terrain.h" />
     <ClInclude Include="Utils\FileIO.h" />
     <ClInclude Include="Utils\Logger.h" />
     <ClInclude Include="Utils\MathUtils.h" />
@@ -294,6 +295,7 @@
     <ClCompile Include="Systems\Plane.cpp" />
     <ClCompile Include="Systems\QuadTree.cpp" />
     <ClCompile Include="Systems\Rect.cpp" />
+    <ClCompile Include="Systems\Terrain.cpp" />
     <ClCompile Include="Utils\Serializer.cpp" />
     <ClCompile Include="Window\IMGUIHandler.cpp" />
     <ClCompile Include="Window\SDLHandler.cpp" />

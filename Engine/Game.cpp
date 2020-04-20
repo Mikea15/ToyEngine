@@ -11,7 +11,7 @@
 #include "SystemComponents/StatSystemComponent.h"
 
 #include "Utils/Logger.h"
-#include "Profiler.h"
+#include "Core/Profiler.h"
 
 Game::Game(State* state)
 	: m_isRunning(true)

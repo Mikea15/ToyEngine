@@ -225,10 +225,13 @@
     <ClInclude Include="External\Imgui\imstb_textedit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Profiler.h">
+    <ClInclude Include="Core\StackAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Core\StackAllocator.h">
+    <ClInclude Include="Core\Profiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Systems\Terrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -399,6 +402,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="External\ImGuizmo\imGuIZMOquat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Systems\Terrain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
