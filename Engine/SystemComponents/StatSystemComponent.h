@@ -22,6 +22,8 @@ public:
 	float GetAverageFPS() const;
 	float GetAverageMS() const;
 
+	void WriteInfo(std::stringstream& stringStream);
+
 private:
 	float m_totalTime = 0.0f;
 	float m_renderCount = 0.0f;

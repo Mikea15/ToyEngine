@@ -2,6 +2,8 @@
 
 #include "Game.h"
 
+#include "Utils/FileIO.h"
+
 CLASS_DEFINITION(SystemComponent, StatSystemComponent)
 
 StatSystemComponent::StatSystemComponent()
@@ -10,6 +12,9 @@ StatSystemComponent::StatSystemComponent()
 
 StatSystemComponent::~StatSystemComponent()
 {
+	std::stringstream stream;
+	WriteInfo(stream);
+	FileIO::SaveTextFile("debug_info.txt", stream.str());
 }
 
 void StatSystemComponent::Initialize(Game* game)
@@ -209,4 +214,22 @@ float StatSystemComponent::GetAverageMS() const
 		return avg / s_sampleCount;
 	}
 	return 0.0f;
+}
+
+void StatSystemComponent::WriteInfo(std::stringstream& stringStream)
+{
+	stringStream << "------------------\n";
+	stringStream << "   Runtime Stats  \n";
+	stringStream << "------------------\n";
+	stringStream << "Elapsed Time: " << m_totalTime << "\n";
+
+	stringStream << "\nFPS\n";
+	stringStream << "Avg: " << GetAverageFPS() << "\n";
+	stringStream << "Min: " << m_minFps << "\n";
+	stringStream << "Max: " << m_maxFps << "\n";
+
+	stringStream << "\nMS\n";
+	stringStream << "Avg: " << GetAverageMS() << "\n";
+	stringStream << "Min: " << m_minFrameTime << "\n";
+	stringStream << "Max: " << m_maxFrameTime << "\n";
 }
