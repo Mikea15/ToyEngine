@@ -175,10 +175,12 @@
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Agent.h" />
     <ClInclude Include="BoidSystemState.h" />
     <ClInclude Include="OOP\Boid.h" />
     <ClInclude Include="OOP\BoidManager.h" />
     <ClInclude Include="Path.h" />
+    <ClInclude Include="SteeringBehavior.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">
