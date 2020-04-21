@@ -2,23 +2,23 @@
 
 #include <glm/glm.hpp>
 
-class Boid;
+class AgentComposition;
 
 class ISteeringBehaviour
 {
 public:
-    ISteeringBehaviour(Boid* boid)
-        : actor(boid)
+    ISteeringBehaviour(AgentComposition* agent)
+        : m_agent(agent)
     { }
 
     virtual ~ISteeringBehaviour()
     {
-        actor = nullptr;
+        m_agent = nullptr;
     };
 
     virtual glm::vec3 Calculate() = 0;
 
 protected:
-    Boid* actor = nullptr;
+    AgentComposition* m_agent = nullptr;
 };
 

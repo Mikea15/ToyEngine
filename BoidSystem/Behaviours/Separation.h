@@ -2,14 +2,14 @@
 
 #include "IBehaviorProvider.h"
 
-#include "../OOP/Boid.h"
+#include "Composition/AgentComposition.h"
 #include "Engine/Utils/MathUtils.h"
 
 class SeparationBehaviour
     : private ISteeringBehaviour
 {
 public:
-    SeparationBehaviour(Boid* actor)
+    SeparationBehaviour(AgentComposition* actor)
         : ISteeringBehaviour(actor)
     { }
 

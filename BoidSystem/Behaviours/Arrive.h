@@ -2,14 +2,14 @@
 
 #include "IBehaviorProvider.h"
 
-#include "../OOP/Boid.h"
+#include "Composition/AgentComposition.h"
 #include "Engine/Utils/MathUtils.h"
 
 class ArriveBehaviour
     : private ISteeringBehaviour
 {
 public:
-    ArriveBehaviour(Boid* actor)
+    ArriveBehaviour(AgentComposition* actor)
         : ISteeringBehaviour(actor)
     { }
 
@@ -17,11 +17,11 @@ public:
 
     glm::vec3 Calculate() override
     {
-        glm::vec3 desiredVelocity = actor->m_targetPos - actor->m_position;
+        glm::vec3 desiredVelocity = m_agent->m_targetPos - m_agent->m_position;
         float distance = glm::length(desiredVelocity);
         desiredVelocity = glm::normalize(desiredVelocity);
 
-        float speed = actor->m_properties->m_maxSpeed;
+        float speed = m_agent->m_properties->m_maxSpeed;
         float arriveRadius = 4.0f;
         if (distance <= arriveRadius)
         {
@@ -29,7 +29,7 @@ public:
         }
 
         desiredVelocity *= speed;
-        return desiredVelocity - actor->m_velocity;
+        return desiredVelocity - m_agent->m_velocity;
     }
 
 private:

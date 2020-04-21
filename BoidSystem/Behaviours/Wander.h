@@ -2,14 +2,14 @@
 
 #include "IBehaviorProvider.h"
 
-#include "../OOP/Boid.h"
+#include "Composition/AgentComposition.h"
 #include "Engine/Utils/MathUtils.h"
 
 class WanderBehaviour
     : private ISteeringBehaviour
 {
 public:
-    WanderBehaviour(Boid* actor)
+    WanderBehaviour(AgentComposition* actor)
         : ISteeringBehaviour(actor)
     { }
 
@@ -27,10 +27,10 @@ public:
             )) * wanderRadius;
 
         float wanderDistance = 0.0f;
-        glm::vec3 targetPosJitter = actor->m_position + glm::normalize(actor->m_velocity) * wanderDistance + jitterDirection;
+        glm::vec3 targetPosJitter = m_agent->m_position + glm::normalize(m_agent->m_velocity) * wanderDistance + jitterDirection;
 
-        glm::vec3 desiredVelocity = glm::normalize(targetPosJitter - actor->m_position);
-        return desiredVelocity - actor->m_velocity;
+        glm::vec3 desiredVelocity = glm::normalize(targetPosJitter - m_agent->m_position);
+        return desiredVelocity - m_agent->m_velocity;
     }
 
 private:

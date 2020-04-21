@@ -2,14 +2,14 @@
 
 #include "IBehaviorProvider.h"
 
-#include "../OOP/Boid.h"
+#include "Composition/AgentComposition.h"
 #include "Engine/Utils/MathUtils.h"
 
 class AlignmentBehaviour
     : private ISteeringBehaviour
 {
 public:
-    AlignmentBehaviour(Boid* actor)
+    AlignmentBehaviour(AgentComposition* actor)
         : ISteeringBehaviour(actor)
     { }
 

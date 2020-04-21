@@ -2,13 +2,13 @@
 
 #include "IBehaviorProvider.h"
 
-#include "../OOP/Boid.h"
+#include "Composition/AgentComposition.h"
 
 class SeekBehaviour
     : private ISteeringBehaviour
 {
 public:
-    SeekBehaviour(Boid* actor)
+    SeekBehaviour(AgentComposition* actor)
         : ISteeringBehaviour(actor)
     { }
 
@@ -16,8 +16,8 @@ public:
 
     glm::vec3 Calculate() override
     {
-        glm::vec3 desiredVelocity = glm::normalize(actor->m_targetPos - actor->m_position) * actor->m_properties->m_maxSpeed;
-        return desiredVelocity - actor->m_velocity;
+        glm::vec3 desiredVelocity = glm::normalize(m_agent->m_targetPos - m_agent->m_position) * m_agent->m_properties->m_maxSpeed;
+        return desiredVelocity - m_agent->m_velocity;
     }
 
 private:

@@ -2,14 +2,14 @@
 
 #include "IBehaviorProvider.h"
 
-#include "../OOP/Boid.h"
+#include "Composition/AgentComposition.h"
 #include "Engine/Utils/MathUtils.h"
 
 class CohesionBehaviour
     : private ISteeringBehaviour
 {
 public:
-    CohesionBehaviour(Boid* actor)
+    CohesionBehaviour(AgentComposition* actor)
         : ISteeringBehaviour(actor)
     { }
 
