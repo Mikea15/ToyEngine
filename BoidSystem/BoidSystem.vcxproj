@@ -74,25 +74,25 @@
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(SolutionDir)temp\inter\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)temp\bin\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</OutDir>
-    <IncludePath>E:\Work-2020\ToyEngine;$(IncludePath)</IncludePath>
+    <IncludePath>E:\Work-2020\ToyEngine;E:\Work-2020\ToyEngine\Engine;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(SolutionDir)temp\inter\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)temp\bin\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</OutDir>
-    <IncludePath>E:\Work-2020\ToyEngine;$(IncludePath)</IncludePath>
+    <IncludePath>E:\Work-2020\ToyEngine;E:\Work-2020\ToyEngine\Engine;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(SolutionDir)temp\inter\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)temp\bin\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</OutDir>
-    <IncludePath>E:\Work-2020\ToyEngine;$(IncludePath)</IncludePath>
+    <IncludePath>E:\Work-2020\ToyEngine;E:\Work-2020\ToyEngine\Engine;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(SolutionDir)temp\inter\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)temp\bin\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</OutDir>
-    <IncludePath>E:\Work-2020\ToyEngine;$(IncludePath)</IncludePath>
+    <IncludePath>E:\Work-2020\ToyEngine;E:\Work-2020\ToyEngine\Engine;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -176,6 +176,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Agent.h" />
+    <ClInclude Include="Behaviours\Alignment.h" />
+    <ClInclude Include="Behaviours\Arrive.h" />
+    <ClInclude Include="Behaviours\Cohesion.h" />
+    <ClInclude Include="Behaviours\Flee.h" />
+    <ClInclude Include="Behaviours\IBehaviorProvider.h" />
+    <ClInclude Include="Behaviours\Seek.h" />
+    <ClInclude Include="Behaviours\Separation.h" />
+    <ClInclude Include="Behaviours\Wander.h" />
     <ClInclude Include="BoidSystemState.h" />
     <ClInclude Include="OOP\Boid.h" />
     <ClInclude Include="OOP\BoidManager.h" />
