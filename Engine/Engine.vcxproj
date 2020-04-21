@@ -75,23 +75,23 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)temp\bin\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)temp\inter\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</IntDir>
-    <IncludePath>E:\Work-2020\ToyEngine;E:\Work-2020\ToyEngine\Engine;$(IncludePath)</IncludePath>
+    <IncludePath>E:\Work-2020\ToyEngine\Engine;$(SolutionDir);$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)temp\bin\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)temp\inter\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</IntDir>
-    <IncludePath>E:\Work-2020\ToyEngine;E:\Work-2020\ToyEngine\Engine;$(IncludePath)</IncludePath>
+    <IncludePath>E:\Work-2020\ToyEngine\Engine;$(SolutionDir);$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>E:\Work-2020\ToyEngine;E:\Work-2020\ToyEngine\Engine;$(IncludePath)</IncludePath>
+    <IncludePath>E:\Work-2020\ToyEngine\Engine;$(SolutionDir);$(ProjectDir);$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)temp\bin\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)temp\inter\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>E:\Work-2020\ToyEngine;E:\Work-2020\ToyEngine\Engine;$(IncludePath)</IncludePath>
+    <IncludePath>E:\Work-2020\ToyEngine\Engine;$(SolutionDir);$(ProjectDir);$(IncludePath)</IncludePath>
     <IntDir>$(SolutionDir)temp\inter\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)temp\bin\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</OutDir>
   </PropertyGroup>
@@ -171,7 +171,9 @@
     <ClInclude Include="Camera\Camera.h" />
     <ClInclude Include="Camera\CameraFrustum.h" />
     <ClInclude Include="Camera\FlyCamera.h" />
+    <ClInclude Include="Core\exp_Octree.h" />
     <ClInclude Include="Core\StackAllocator.h" />
+    <ClInclude Include="Core\VectorContainer.h" />
     <ClInclude Include="External\ImGuizmo\imGuIZMOquat.h" />
     <ClInclude Include="External\ImGuizmo\vgConfig.h" />
     <ClInclude Include="External\ImGuizmo\vGizmo.h" />

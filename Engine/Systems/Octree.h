@@ -36,18 +36,16 @@ private:
 	float m_halfSize;
 	AABB m_bounds;
 
-	size_t m_maxNodes = 128;
+	size_t m_maxNodes = 64;
 	std::vector<OcNode> m_nodes;
 
-	
-
-	std::shared_ptr<Octree> m_upFrontLeft;
-	std::shared_ptr<Octree> m_upFrontRight;
-	std::shared_ptr<Octree> m_upBackLeft;
-	std::shared_ptr<Octree> m_upBackRight;
-	std::shared_ptr<Octree> m_downFrontLeft;
-	std::shared_ptr<Octree> m_downFrontRight;
-	std::shared_ptr<Octree> m_downBackLeft;
-	std::shared_ptr<Octree> m_downBackRight;
+	Octree* m_upFrontLeft = nullptr;
+	Octree* m_upFrontRight = nullptr;
+	Octree* m_upBackLeft = nullptr;
+	Octree* m_upBackRight = nullptr;
+	Octree* m_downFrontLeft = nullptr;
+	Octree* m_downFrontRight = nullptr;
+	Octree* m_downBackLeft = nullptr;
+	Octree* m_downBackRight = nullptr;
 };
 

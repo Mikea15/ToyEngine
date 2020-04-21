@@ -7,12 +7,10 @@
 
 class Game;
 
-#if MULTITHREAD
 #include <atomic>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
-#endif
 
 #if _DEBUG
 #define ENTITY_COUNT 400
@@ -26,15 +24,15 @@ struct JobBlock
     size_t end;
 };
 
-class BoidSystemState
+class ThreadedState
     : public BaseState
 {
 public:
-    BoidSystemState()
+    ThreadedState()
         : BaseState()
     {}
 
-    ~BoidSystemState() override {};
+    ~ThreadedState() override {};
 
     void Init(Game* game) override
     {
@@ -83,24 +81,22 @@ public:
         for (size_t i = 0; i < ENTITY_COUNT; i++)
         {
             auto b = Boid(&m_sharedBoidProperties);
-            auto features = 
-               eSeek | 
-               eAlignment | 
-               eSeparation | 
-               eCohesion | 
-               eWallLimits;
+            auto features =
+                eSeek |
+                eAlignment |
+                eSeparation |
+                eCohesion |
+                eWallLimits;
 
             b.SetFeature(features);
 
-            // b.m_maxAccelerationForce = MathUtils::Rand01() * 0.1f;
-            // b.m_maxVelocity = MathUtils::Rand01() * 5.0f;
             b.m_position = glm::vec3(
                 MathUtils::Rand(-50.0f, 50.0f),
                 MathUtils::Rand(-50.0f, 50.0f),
                 MathUtils::Rand(-50.0f, 50.0f)
             );
 
-            if (MathUtils::Rand01() > 0.5f) 
+            if (MathUtils::Rand01() > 0.5f)
             {
                 b.SetTarget(&m_simplePathFollower);
             }
@@ -142,19 +138,8 @@ public:
         AABB limits = AABB(glm::vec3(0.0f, 25.0f, 0.0f), 50);
         DebugDraw::AddAABB(limits.GetMin(), limits.GetMax());
 
-        
+
         {
-#if USE_OCTREE
-            m_octree = Octree(glm::vec3(0.0f), 50.0f);
-            OcNode nodeData;
-            for (size_t i = 0; i < ENTITY_COUNT; i++)
-            {
-                m_octree.Insert(m_wanderers[i].m_position, i);
-            }
-#endif
-
-#if MULTITHREAD
-
             std::vector<Boid> m_wanderersSnapshot(m_wanderers);
 
             std::vector<std::thread> threads;
@@ -202,39 +187,8 @@ public:
             {
                 m_wanderers[i].DrawDebug();
             }
-#else
-            for (size_t i = 0; i < ENTITY_COUNT; i++)
-            {
-#if USE_OCTREE
-                AABB searchAabb = AABB(m_wanderers[i].m_position, m_wanderers[i].m_properties->m_neighborRange);
-                neighborResult.clear();
-
-                m_octree.Search(searchAabb, neighborResult);
-                neighborIndices.clear();
-                for (const OcNode& node : neighborResult)
-                {
-                    if (node.m_storeIndex == i) 
-                    {
-                        continue;
-                    }
-                    neighborIndices.insert(node.m_storeIndex);
-                }
-#endif // USE_OCTREE
-                // Agent Core Loop
-                {
-                    m_wanderers[i].UpdateTargets();
-
-                    glm::vec3 force = m_wanderers[i].CalcSteeringBehavior(m_wanderers, neighborIndices);
-                    m_wanderers[i].UpdatePosition(deltaTime, force);
-                }
-                m_wanderers[i].DrawDebug();
-            }
-#if USE_OCTREE
-            m_octree.DebugDraw();
-#endif
-#endif // MULTITHREAD
         }
-        
+
         neighborIndices.clear();
 
         {
@@ -258,12 +212,6 @@ public:
 
     void Render(float alpha = 1.0f) override
     {
-#if 0
-        for (SceneNode* node : m_sceneNodes)
-        {
-            m_renderer->PushRender(node);
-        }
-#endif
         m_renderer->RenderPushedCommands();
 
         DebugDraw::AddPosition(glm::vec3(0.0f), 0.5f);
@@ -272,14 +220,14 @@ public:
         DebugDraw::Draw(x_ray);
     };
 
-    void RenderUI() 
+    void RenderUI()
     {
         BaseState::RenderUI();
 
         Debug::ShowPanel(m_sharedBoidProperties);
     };
 
-    void Cleanup() override 
+    void Cleanup() override
     {
         BaseState::Cleanup();
     };
@@ -292,7 +240,7 @@ private:
 
     Properties m_sharedBoidProperties;
     std::vector<Boid> m_wanderers;
-    
+
     Path m_path;
     Path m_path2;
 
@@ -300,8 +248,6 @@ private:
     std::vector<OcNode> neighborResult;
     VectorContainer<size_t> neighborIndices;
 
-#if MULTITHREAD
     std::mutex m_mutex;
     std::condition_variable m_cvar;
-#endif
 };

@@ -14,7 +14,7 @@ StatSystemComponent::~StatSystemComponent()
 {
 	std::stringstream stream;
 	WriteInfo(stream);
-	FileIO::SaveTextFile("debug_info.txt", stream.str());
+	FileIO::SaveTextFile("debug_info.txt", stream.str(), std::fstream::out | std::fstream::app);
 }
 
 void StatSystemComponent::Initialize(Game* game)
@@ -218,18 +218,10 @@ float StatSystemComponent::GetAverageMS() const
 
 void StatSystemComponent::WriteInfo(std::stringstream& stringStream)
 {
-	stringStream << "------------------\n";
-	stringStream << "   Runtime Stats  \n";
-	stringStream << "------------------\n";
-	stringStream << "Elapsed Time: " << m_totalTime << "\n";
+	char buffer[150];
+	sprintf_s(buffer, "Time: %d - FPS Avg: %d [Min: %d, Max: %d] - MS Avg: %d [Min: %d, Max: %d]\n",
+		(int)GetAverageFPS(), (int)m_minFps, (int)m_maxFps, 
+		(int)GetAverageMS(), (int)m_minFrameTime, (int)m_maxFrameTime);
 
-	stringStream << "\nFPS\n";
-	stringStream << "Avg: " << GetAverageFPS() << "\n";
-	stringStream << "Min: " << m_minFps << "\n";
-	stringStream << "Max: " << m_maxFps << "\n";
-
-	stringStream << "\nMS\n";
-	stringStream << "Avg: " << GetAverageMS() << "\n";
-	stringStream << "Min: " << m_minFrameTime << "\n";
-	stringStream << "Max: " << m_maxFrameTime << "\n";
+	stringStream << buffer ;
 }

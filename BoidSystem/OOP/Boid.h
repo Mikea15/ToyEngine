@@ -1,54 +1,16 @@
 #pragma once
 
-
 #include <glm/glm.hpp>
 
-#include "BoidManager.h"
 #include "SteeringBehavior.h"
 
-#define USE_OCTREE 0
-#define USE_AABB 0
+#include "Engine/Core/VectorContainer.h"
+
+#include "Definitions.h"
+#include "Engine/Utils/MathUtils.h"
 
 struct Boid
 {
-    enum Feature : unsigned int
-    {
-        eNone = 0,
-        eWander = 1 << 0,
-        eSeek = 1 << 1,
-        eFlee = 1 << 2,
-        eFleeRanged = 1 << 3,
-        eArrive = 1 << 4,
-
-        eSeparation = 1 << 5,
-        eCohesion = 1 << 6,
-        eAlignment = 1 << 7,
-
-        eWallLimits = 1 << 8
-    };
-
-    struct Properties
-    {
-        unsigned int m_features = eWander;
-
-        float m_maxSpeed = 5.0f;     // [m/s]
-        float m_maxForce = 10.0f;
-        float m_mass = 2.0f;
-        float m_radius = 1.0f;
-
-        float m_neighborRange = 3.0f;
-
-        float m_weightWallLimits = 1.0f;
-        float m_weightWander = 1.0f;
-        float m_weightSeek = 1.0f;
-        float m_weightFlee = 1.0f;
-        float m_weightArrive = 1.0f;
-
-        float m_weightAlignment = 1.2f;
-        float m_weightCohesion = 1.8f;
-        float m_weightSeparation = 0.6f;
-    };
-
     Boid()
         : Boid(&m_defaultProperties)
     {
@@ -73,7 +35,7 @@ struct Boid
     void SetFlee(glm::vec3 fleePos) { m_fleePos = fleePos; }
     void SetFlee(Boid* boid) { m_fleeBoid = boid; }
 
-    void FullUpdate(float deltaTime, std::vector<Boid>& otherBoids, std::vector<size_t>& neighborIndices)
+    void FullUpdate(float deltaTime, std::vector<Boid>& otherBoids, VectorContainer<size_t>& neighborIndices)
     {
         UpdateTargets();
 
@@ -108,7 +70,7 @@ struct Boid
         m_position += m_velocity * deltaTime;
     }
 
-    glm::vec3 CalcSteeringBehavior(std::vector<Boid>& otherBoids, std::vector<size_t>& neighborIndices)
+    glm::vec3 CalcSteeringBehavior(std::vector<Boid>& otherBoids, VectorContainer<size_t>& neighborIndices)
     {
         // Steering Bit
         glm::vec3 force = {};
@@ -246,7 +208,7 @@ struct Boid
         }
     }
 
-    glm::vec3 Separation(std::vector<Boid>& neighbors, std::vector<size_t>& indices)
+    glm::vec3 Separation(std::vector<Boid>& neighbors, VectorContainer<size_t>& indices)
     {
         glm::vec3 force = {};
 #if !USE_OCTREE
@@ -259,7 +221,7 @@ struct Boid
 #if !USE_OCTREE
             glm::vec3 toAgent = m_position - neighbors[*(m_neighborIndices+i)].m_position;
 #else
-            glm::vec3 toAgent = m_position - neighbors[indices[i]].m_position;
+            glm::vec3 toAgent = m_position - neighbors[indices.get(i)].m_position;
 #endif
             float distanceToAgent = glm::length(toAgent);
             if (distanceToAgent > 0.0f) 
@@ -271,7 +233,7 @@ struct Boid
         return force;
     }
 
-    glm::vec3 Alignment(std::vector<Boid>& neighbors, std::vector<size_t>& indices)
+    glm::vec3 Alignment(std::vector<Boid>& neighbors, VectorContainer<size_t>& indices)
     {
         glm::vec3 avgDirection = {};
 #if !USE_OCTREE
@@ -284,7 +246,7 @@ struct Boid
 #if !USE_OCTREE
             avgDirection += neighbors[*(m_neighborIndices + i)].m_direction;
 #else
-            avgDirection += neighbors[indices[i]].m_direction;
+            avgDirection += neighbors[indices.get(i)].m_direction;
 #endif
         }
 
@@ -297,7 +259,7 @@ struct Boid
         return avgDirection;
     }
 
-    glm::vec3 Cohesion(std::vector<Boid>& neighbors, std::vector<size_t>& indices)
+    glm::vec3 Cohesion(std::vector<Boid>& neighbors, VectorContainer<size_t>& indices)
     {
         glm::vec3 centerOfMass = {};
         glm::vec3 force = {};
@@ -311,7 +273,7 @@ struct Boid
 #if !USE_OCTREE
             centerOfMass += neighbors[*(m_neighborIndices + i)].m_position;
 #else
-            centerOfMass += neighbors[indices[i]].m_position;
+            centerOfMass += neighbors[indices.get(i)].m_position;
 #endif
         }
 
@@ -382,7 +344,7 @@ unsigned int Boid::ID = 0;
 
 namespace Debug
 {
-    void ShowPanel(Boid::Properties& properties)
+    void ShowPanel(Properties& properties)
     {
         ImGui::Begin("Boid::Properties");
 

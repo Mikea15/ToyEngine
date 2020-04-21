@@ -60,10 +60,10 @@ public:
 		return stream.str();
 	}
 
-	static void SaveTextFile(const std::string& path, const std::string& content)
+	static void SaveTextFile(const std::string& path, const std::string& content, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
 	{
 		std::ofstream file;
-		file.open(path, std::fstream::out);
+		file.open(path, mode);
 		if (file.is_open())
 		{
 			file << content;

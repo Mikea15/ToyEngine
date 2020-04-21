@@ -2,39 +2,20 @@
 
 #include "Engine/State.h"
 
-#include "OOP/Boid.h"
+#include "Definitions.h"
+
+#include "Composition/AgentComposition.h"
 #include "Path.h"
 
-class Game;
-
-#if MULTITHREAD
-#include <atomic>
-#include <thread>
-#include <mutex>
-#include <condition_variable>
-#endif
-
-#if _DEBUG
-#define ENTITY_COUNT 400
-#else
-#define ENTITY_COUNT 2000
-#endif
-
-struct JobBlock
-{
-    size_t start;
-    size_t end;
-};
-
-class BoidSystemState
+class CompositionState
     : public BaseState
 {
 public:
-    BoidSystemState()
+    CompositionState()
         : BaseState()
     {}
 
-    ~BoidSystemState() override {};
+    ~CompositionState() override {};
 
     void Init(Game* game) override
     {
@@ -82,13 +63,13 @@ public:
 
         for (size_t i = 0; i < ENTITY_COUNT; i++)
         {
-            auto b = Boid(&m_sharedBoidProperties);
-            auto features = 
-               eSeek | 
-               eAlignment | 
-               eSeparation | 
-               eCohesion | 
-               eWallLimits;
+            auto b = AgentComposition(&m_sharedBoidProperties);
+            auto features =
+                eSeek |
+                eAlignment |
+                eSeparation |
+                eCohesion |
+                eWallLimits;
 
             b.SetFeature(features);
 
@@ -100,7 +81,7 @@ public:
                 MathUtils::Rand(-50.0f, 50.0f)
             );
 
-            if (MathUtils::Rand01() > 0.5f) 
+            if (MathUtils::Rand01() > 0.5f)
             {
                 b.SetTarget(&m_simplePathFollower);
             }
@@ -142,7 +123,7 @@ public:
         AABB limits = AABB(glm::vec3(0.0f, 25.0f, 0.0f), 50);
         DebugDraw::AddAABB(limits.GetMin(), limits.GetMax());
 
-        
+
         {
 #if USE_OCTREE
             m_octree = Octree(glm::vec3(0.0f), 50.0f);
@@ -152,57 +133,6 @@ public:
                 m_octree.Insert(m_wanderers[i].m_position, i);
             }
 #endif
-
-#if MULTITHREAD
-
-            std::vector<Boid> m_wanderersSnapshot(m_wanderers);
-
-            std::vector<std::thread> threads;
-
-            std::atomic<int> finishedThreads{ 0 };
-            size_t groupSize = m_wanderers.size() / NUM_THREADS;
-
-            for (size_t t = 0; t < NUM_THREADS; ++t)
-            {
-                JobBlock job;
-                job.start = t * groupSize;
-                job.end = job.start + groupSize;
-
-                std::thread thr([&]() {
-                    for (size_t i = job.start; i < job.end; i++)
-                    {
-                        m_wanderers[i].UpdateTargets();
-                        glm::vec3 force = m_wanderers[i].CalcSteeringBehavior(m_wanderersSnapshot, neighborIndices);
-                        m_wanderers[i].UpdatePosition(deltaTime, force);
-                    }
-
-                    // no more jobs.
-                    {
-                        std::lock_guard<std::mutex> lock(m_mutex);
-                        finishedThreads++;
-                        m_cvar.notify_one();
-                    }
-                    });
-                threads.push_back(std::move(thr));
-            }
-
-            {
-                std::unique_lock<std::mutex> lock(m_mutex);
-                m_cvar.wait(lock, [&finishedThreads] {
-                    return finishedThreads == NUM_THREADS;
-                    });
-            }
-
-            for (std::thread& t : threads)
-            {
-                t.join();
-            }
-
-            for (size_t i = 0; i < ENTITY_COUNT; i++)
-            {
-                m_wanderers[i].DrawDebug();
-            }
-#else
             for (size_t i = 0; i < ENTITY_COUNT; i++)
             {
 #if USE_OCTREE
@@ -213,7 +143,7 @@ public:
                 neighborIndices.clear();
                 for (const OcNode& node : neighborResult)
                 {
-                    if (node.m_storeIndex == i) 
+                    if (node.m_storeIndex == i)
                     {
                         continue;
                     }
@@ -223,8 +153,7 @@ public:
                 // Agent Core Loop
                 {
                     m_wanderers[i].UpdateTargets();
-
-                    glm::vec3 force = m_wanderers[i].CalcSteeringBehavior(m_wanderers, neighborIndices);
+                    glm::vec3 force = m_wanderers[i].CalcSteeringBehavior();
                     m_wanderers[i].UpdatePosition(deltaTime, force);
                 }
                 m_wanderers[i].DrawDebug();
@@ -232,9 +161,8 @@ public:
 #if USE_OCTREE
             m_octree.DebugDraw();
 #endif
-#endif // MULTITHREAD
         }
-        
+
         neighborIndices.clear();
 
         {
@@ -242,7 +170,7 @@ public:
             m_path.DebugDraw();
 
             m_simplePathFollower.SetTarget(m_path.GetCurrentGoal());
-            m_simplePathFollower.FullUpdate(deltaTime, m_wanderers, neighborIndices);
+            m_simplePathFollower.Update(deltaTime);
             m_simplePathFollower.DrawDebug();
         }
 
@@ -251,7 +179,7 @@ public:
             m_path2.DebugDraw();
 
             m_simplePathFollower2.SetTarget(m_path2.GetCurrentGoal());
-            m_simplePathFollower2.FullUpdate(deltaTime, m_wanderers, neighborIndices);
+            m_simplePathFollower2.Update(deltaTime);
             m_simplePathFollower2.DrawDebug();
         }
     };
@@ -272,14 +200,13 @@ public:
         DebugDraw::Draw(x_ray);
     };
 
-    void RenderUI() 
+    void RenderUI()
     {
         BaseState::RenderUI();
-
         Debug::ShowPanel(m_sharedBoidProperties);
     };
 
-    void Cleanup() override 
+    void Cleanup() override
     {
         BaseState::Cleanup();
     };
@@ -287,21 +214,14 @@ public:
 private:
     ViewportGrid m_viewGrid;
 
-    Boid m_simplePathFollower;
-    Boid m_simplePathFollower2;
+    AgentComposition m_simplePathFollower;
+    AgentComposition m_simplePathFollower2;
 
     Properties m_sharedBoidProperties;
-    std::vector<Boid> m_wanderers;
-    
+    std::vector<AgentComposition> m_wanderers;
+
     Path m_path;
     Path m_path2;
 
-    Octree m_octree;
-    std::vector<OcNode> neighborResult;
     VectorContainer<size_t> neighborIndices;
-
-#if MULTITHREAD
-    std::mutex m_mutex;
-    std::condition_variable m_cvar;
-#endif
 };

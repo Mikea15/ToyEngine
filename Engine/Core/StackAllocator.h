@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Utils/Logger.h"
+
 enum class DefaultSize : size_t
 {
     OneByte = 1,
