@@ -6,7 +6,6 @@
 #define USE_OCTREE 0
 #define USE_AABB 0
 
-
 #if _DEBUG
 #define ENTITY_COUNT 400
 #else

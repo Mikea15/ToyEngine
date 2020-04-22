@@ -4,7 +4,8 @@
 
 #include "Definitions.h"
 
-#include "Composition/AgentComposition.h"
+#include "Agent.h"
+#include "OOP/Boid.h"
 #include "Path.h"
 
 class CompositionState
@@ -63,40 +64,26 @@ public:
 
         for (size_t i = 0; i < ENTITY_COUNT; i++)
         {
-            auto b = AgentComposition(&m_sharedBoidProperties);
-            auto features =
+            auto a = Agent();
+            a.m_properties = &m_sharedBoidProperties;
+            a.m_features =
                 eSeek |
                 eAlignment |
                 eSeparation |
                 eCohesion |
                 eWallLimits;
 
-            b.SetFeature(features);
-
-            // b.m_maxAccelerationForce = MathUtils::Rand01() * 0.1f;
-            // b.m_maxVelocity = MathUtils::Rand01() * 5.0f;
-            b.m_position = glm::vec3(
+            a.m_position = glm::vec3(
                 MathUtils::Rand(-50.0f, 50.0f),
                 MathUtils::Rand(-50.0f, 50.0f),
                 MathUtils::Rand(-50.0f, 50.0f)
             );
 
-            if (MathUtils::Rand01() > 0.5f)
-            {
-                b.SetTarget(&m_simplePathFollower);
-            }
-            else
-            {
-                b.SetTarget(&m_simplePathFollower2);
-            }
-
-            m_wanderers.push_back(b);
+            m_wanderers.push_back(a);
         }
 
         m_simplePathFollower.SetFeature(eSeek);
         m_simplePathFollower2.SetFeature(eSeek);
-
-        neighborIndices = VectorContainer<size_t>(ENTITY_COUNT);
 
         DebugDraw::Init();
     };
@@ -152,11 +139,11 @@ public:
 #endif // USE_OCTREE
                 // Agent Core Loop
                 {
-                    m_wanderers[i].UpdateTargets();
-                    glm::vec3 force = m_wanderers[i].CalcSteeringBehavior();
-                    m_wanderers[i].UpdatePosition(deltaTime, force);
+                    //m_wanderers[i].UpdateTargets();
+                    //glm::vec3 force = m_wanderers[i].CalcSteeringBehavior();
+                    //m_wanderers[i].UpdatePosition(deltaTime, force);
                 }
-                m_wanderers[i].DrawDebug();
+                // m_wanderers[i].DrawDebug();
             }
 #if USE_OCTREE
             m_octree.DebugDraw();
@@ -170,7 +157,7 @@ public:
             m_path.DebugDraw();
 
             m_simplePathFollower.SetTarget(m_path.GetCurrentGoal());
-            m_simplePathFollower.Update(deltaTime);
+            // m_simplePathFollower.Update(deltaTime);
             m_simplePathFollower.DrawDebug();
         }
 
@@ -179,7 +166,7 @@ public:
             m_path2.DebugDraw();
 
             m_simplePathFollower2.SetTarget(m_path2.GetCurrentGoal());
-            m_simplePathFollower2.Update(deltaTime);
+            // m_simplePathFollower2.Update(deltaTime);
             m_simplePathFollower2.DrawDebug();
         }
     };
@@ -203,7 +190,7 @@ public:
     void RenderUI()
     {
         BaseState::RenderUI();
-        Debug::ShowPanel(m_sharedBoidProperties);
+        // Debug::ShowPanel(m_sharedBoidProperties);
     };
 
     void Cleanup() override
@@ -214,14 +201,14 @@ public:
 private:
     ViewportGrid m_viewGrid;
 
-    AgentComposition m_simplePathFollower;
-    AgentComposition m_simplePathFollower2;
+    Boid m_simplePathFollower;
+    Boid m_simplePathFollower2;
 
     Properties m_sharedBoidProperties;
-    std::vector<AgentComposition> m_wanderers;
+    std::vector<Agent> m_wanderers;
 
     Path m_path;
     Path m_path2;
 
-    VectorContainer<size_t> neighborIndices;
+    std::vector<size_t> neighborIndices;
 };

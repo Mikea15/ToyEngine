@@ -2,13 +2,9 @@
 
 #include <glm/glm.hpp>
 
-#include "Composition/SteeringBehaviourComposed.h"
-
-#include "Engine/Core/VectorContainer.h"
-
-#include "Definitions.h"
-
 #include "Engine/Renderer/DebugDraw.h"
+#include "Engine/Systems/AABB.h"
+#include "Engine/Utils/MathUtils.h"
 
 struct AgentComposition
 {
@@ -51,9 +47,9 @@ struct AgentComposition
     void Update(float deltaTime)
     {
         UpdateTargets();
-        const glm::vec3 force = steeringBehaviour.CalculateWeighedSum();
+        // const glm::vec3 force = steeringBehaviour.CalculateWeighedSum();
 
-        UpdatePosition(deltaTime, force);
+        // UpdatePosition(deltaTime, force);
     }
 
     void UpdatePosition(float deltaTime, glm::vec3 force)
@@ -73,7 +69,7 @@ struct AgentComposition
 
     glm::vec3 CalcSteeringBehavior()
     {
-        return steeringBehaviour.CalculateWeighedSum();
+        return {};
     }
 
     void DrawDebug()
@@ -91,17 +87,16 @@ struct AgentComposition
     glm::vec3 m_velocity;
     glm::vec3 m_direction;
 
-    glm::vec3 m_wanderTarget;
     glm::vec3 m_targetPos;
     glm::vec3 m_fleePos;
 
     AgentComposition* m_targetBoid;
     AgentComposition* m_fleeBoid;
 
+    AABB m_limits;
+
     Properties* m_properties = nullptr;
     Properties m_defaultProperties;
-
-    SteeringBehaviourComposed steeringBehaviour;
 
     int* m_neighborIndices = nullptr;
     size_t m_neighborIndicesCount = 0u;

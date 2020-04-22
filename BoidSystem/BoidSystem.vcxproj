@@ -175,19 +175,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Agent.h" />
-    <ClInclude Include="Behaviours\Alignment.h" />
-    <ClInclude Include="Behaviours\Arrive.h" />
-    <ClInclude Include="Behaviours\Cohesion.h" />
-    <ClInclude Include="Behaviours\WorldBounds.h" />
     <ClInclude Include="CompositionState.h" />
     <ClInclude Include="Composition\AgentComposition.h" />
-    <ClInclude Include="Composition\SteeringBehaviourComposed.h" />
     <ClInclude Include="Definitions.h" />
-    <ClInclude Include="Behaviours\Flee.h" />
-    <ClInclude Include="Behaviours\IBehaviorProvider.h" />
-    <ClInclude Include="Behaviours\Seek.h" />
-    <ClInclude Include="Behaviours\Separation.h" />
-    <ClInclude Include="Behaviours\Wander.h" />
+    <ClInclude Include="Behaviours\IBehavior.h" />
     <ClInclude Include="BoidSystemState.h" />
     <ClInclude Include="OOP\Boid.h" />
     <ClInclude Include="Path.h" />
