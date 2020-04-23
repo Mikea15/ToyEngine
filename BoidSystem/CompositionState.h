@@ -5,6 +5,8 @@
 #include "Definitions.h"
 
 #include "Agent.h"
+#include "Behaviours/IBehavior.h"
+
 #include "OOP/Boid.h"
 #include "Path.h"
 
@@ -62,16 +64,38 @@ public:
             glm::vec3(0.0f, 5.0f, 40.0f)
             });
 
+        m_simplePathFollower = Agent::CreateAgent();
+        m_simplePathFollower.m_features = eFollowPath;
+        m_simplePathFollower.m_properties = &m_sharedBoidProperties;
+        m_simplePathFollower.m_path = &m_path;
+
+        m_simplePathFollower2 = Agent::CreateAgent();
+        m_simplePathFollower2.m_features = eFollowPath;
+        m_simplePathFollower2.m_properties = &m_sharedBoidProperties;
+        m_simplePathFollower2.m_path = &m_path2;
+
         for (size_t i = 0; i < ENTITY_COUNT; i++)
         {
-            auto a = Agent();
+            auto a = Agent::CreateAgent();
             a.m_properties = &m_sharedBoidProperties;
             a.m_features =
                 eSeek |
+                eFlee |
                 eAlignment |
                 eSeparation |
                 eCohesion |
                 eWallLimits;
+
+            if (MathUtils::Rand01() > 0.5f)
+            {
+                a.target = &m_simplePathFollower;
+                a.flee = &m_simplePathFollower2;
+            }
+            else
+            {
+                a.target = &m_simplePathFollower2;
+                a.flee = &m_simplePathFollower;
+            }
 
             a.m_position = glm::vec3(
                 MathUtils::Rand(-50.0f, 50.0f),
@@ -82,8 +106,9 @@ public:
             m_wanderers.push_back(a);
         }
 
-        m_simplePathFollower.SetFeature(eSeek);
-        m_simplePathFollower2.SetFeature(eSeek);
+        m_world.neighbors = &m_wanderers;
+        m_world.neighborIndices.resize(ENTITY_COUNT);
+        m_world.limits = AABB(glm::vec3(0.0f, 25.0f, 0.0f), 50);
 
         DebugDraw::Init();
     };
@@ -110,6 +135,7 @@ public:
         AABB limits = AABB(glm::vec3(0.0f, 25.0f, 0.0f), 50);
         DebugDraw::AddAABB(limits.GetMin(), limits.GetMax());
 
+        
 
         {
 #if USE_OCTREE
@@ -120,6 +146,7 @@ public:
                 m_octree.Insert(m_wanderers[i].m_position, i);
             }
 #endif
+
             for (size_t i = 0; i < ENTITY_COUNT; i++)
             {
 #if USE_OCTREE
@@ -139,35 +166,78 @@ public:
 #endif // USE_OCTREE
                 // Agent Core Loop
                 {
-                    //m_wanderers[i].UpdateTargets();
-                    //glm::vec3 force = m_wanderers[i].CalcSteeringBehavior();
-                    //m_wanderers[i].UpdatePosition(deltaTime, force);
+                    Agent* agent = &m_wanderers[i];
+
+                    m_world.agent = agent;
+                    NeighborSearch::FindNeighbors(agent, m_world);
+
+                    const glm::vec3 force = m_steeringBehavior.CalculateWeighted(&m_world);
+                    const glm::vec3 acceleration = force / agent->m_properties->m_mass;
+
+                    agent->m_velocity += acceleration * deltaTime;
+                    agent->m_velocity = glm::clamp(agent->m_velocity,
+                        -agent->m_properties->m_maxSpeed,
+                        agent->m_properties->m_maxSpeed);
+
+                    if (glm::length(agent->m_velocity) > 0.0001f)
+                    {
+                        agent->m_heading = glm::normalize(agent->m_velocity);
+                    }
+                    agent->m_position += agent->m_velocity * deltaTime;
+                
+                    DebugDraw::AddLine(agent->m_position, agent->m_position + agent->m_velocity, { 0.75f, 0.0f, 1.0f, 1.0f });
+                    DebugDraw::AddLine(agent->m_position, agent->m_position + agent->m_heading, { 0.0f, 0.75f, 1.0f, 1.0f });
                 }
-                // m_wanderers[i].DrawDebug();
             }
 #if USE_OCTREE
             m_octree.DebugDraw();
 #endif
         }
 
-        neighborIndices.clear();
-
         {
-            m_path.UpdatePath(m_simplePathFollower.m_position);
             m_path.DebugDraw();
 
-            m_simplePathFollower.SetTarget(m_path.GetCurrentGoal());
-            // m_simplePathFollower.Update(deltaTime);
-            m_simplePathFollower.DrawDebug();
+            m_world.agent = &m_simplePathFollower;
+
+            const glm::vec3 force = m_steeringBehavior.CalculateWeighted(&m_world);
+            const glm::vec3 acceleration = force / m_simplePathFollower.m_properties->m_mass;
+
+            m_simplePathFollower.m_velocity += acceleration * deltaTime;
+            m_simplePathFollower.m_velocity = glm::clamp(m_simplePathFollower.m_velocity,
+                -m_simplePathFollower.m_properties->m_maxSpeed,
+                m_simplePathFollower.m_properties->m_maxSpeed);
+
+            if (glm::length(m_simplePathFollower.m_velocity) > 0.0001f)
+            {
+                m_simplePathFollower.m_heading = glm::normalize(m_simplePathFollower.m_velocity);
+            }
+            m_simplePathFollower.m_position += m_simplePathFollower.m_velocity * deltaTime;
+
+            DebugDraw::AddLine(m_simplePathFollower.m_position, m_simplePathFollower.m_position + m_simplePathFollower.m_velocity, { 0.75f, 0.0f, 1.0f, 1.0f });
+            DebugDraw::AddLine(m_simplePathFollower.m_position, m_simplePathFollower.m_position + m_simplePathFollower.m_heading, { 0.0f, 0.75f, 1.0f, 1.0f });
         }
 
         {
-            m_path2.UpdatePath(m_simplePathFollower2.m_position);
             m_path2.DebugDraw();
 
-            m_simplePathFollower2.SetTarget(m_path2.GetCurrentGoal());
-            // m_simplePathFollower2.Update(deltaTime);
-            m_simplePathFollower2.DrawDebug();
+            m_world.agent = &m_simplePathFollower2;
+
+            const glm::vec3 force = m_steeringBehavior.CalculateWeighted(&m_world);
+            const glm::vec3 acceleration = force / m_simplePathFollower2.m_properties->m_mass;
+
+            m_simplePathFollower2.m_velocity += acceleration * deltaTime;
+            m_simplePathFollower2.m_velocity = glm::clamp(m_simplePathFollower2.m_velocity,
+                -m_simplePathFollower2.m_properties->m_maxSpeed,
+                m_simplePathFollower2.m_properties->m_maxSpeed);
+
+            if (glm::length(m_simplePathFollower2.m_velocity) > 0.0001f)
+            {
+                m_simplePathFollower2.m_heading = glm::normalize(m_simplePathFollower2.m_velocity);
+            }
+            m_simplePathFollower2.m_position += m_simplePathFollower2.m_velocity * deltaTime;
+
+            DebugDraw::AddLine(m_simplePathFollower2.m_position, m_simplePathFollower2.m_position + m_simplePathFollower2.m_velocity, { 0.75f, 0.0f, 1.0f, 1.0f });
+            DebugDraw::AddLine(m_simplePathFollower2.m_position, m_simplePathFollower2.m_position + m_simplePathFollower2.m_heading, { 0.0f, 0.75f, 1.0f, 1.0f });
         }
     };
 
@@ -190,7 +260,7 @@ public:
     void RenderUI()
     {
         BaseState::RenderUI();
-        // Debug::ShowPanel(m_sharedBoidProperties);
+        Debug::ShowPanel(m_sharedBoidProperties);
     };
 
     void Cleanup() override
@@ -201,14 +271,15 @@ public:
 private:
     ViewportGrid m_viewGrid;
 
-    Boid m_simplePathFollower;
-    Boid m_simplePathFollower2;
+    AgentWorld m_world;
+    Agent m_simplePathFollower;
+    Agent m_simplePathFollower2;
 
     Properties m_sharedBoidProperties;
     std::vector<Agent> m_wanderers;
 
+    SteeringBehavior m_steeringBehavior;
+
     Path m_path;
     Path m_path2;
-
-    std::vector<size_t> neighborIndices;
 };

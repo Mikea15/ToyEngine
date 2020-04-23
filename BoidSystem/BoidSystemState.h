@@ -14,12 +14,6 @@ class Game;
 #include <condition_variable>
 #endif
 
-#if _DEBUG
-#define ENTITY_COUNT 400
-#else
-#define ENTITY_COUNT 2000
-#endif
-
 struct JobBlock
 {
     size_t start;
@@ -92,8 +86,6 @@ public:
 
             b.SetFeature(features);
 
-            // b.m_maxAccelerationForce = MathUtils::Rand01() * 0.1f;
-            // b.m_maxVelocity = MathUtils::Rand01() * 5.0f;
             b.m_position = glm::vec3(
                 MathUtils::Rand(-50.0f, 50.0f),
                 MathUtils::Rand(-50.0f, 50.0f),

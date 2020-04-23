@@ -342,33 +342,6 @@ struct Boid
 
 unsigned int Boid::ID = 0;
 
-namespace Debug
-{
-    void ShowPanel(Properties& properties)
-    {
-        ImGui::Begin("Boid::Properties");
 
-        ImGui::SliderFloat("Max Speed", &properties.m_maxSpeed, 0.0f, 50.0f);
-        ImGui::SliderFloat("Max Force", &properties.m_maxForce, 0.0f, 50.0f);
-        ImGui::SliderFloat("Vehicle Mass", &properties.m_mass, 0.1f, 10.0f);
-
-        ImGui::Text("Independent Behavior");
-        ImGui::SliderFloat("Wander", &properties.m_weightWander, 0.0f, 5.0f);
-        ImGui::SliderFloat("Seek", &properties.m_weightSeek, 0.0f, 5.0f);
-        ImGui::SliderFloat("Flee", &properties.m_weightFlee, 0.0f, 5.0f);
-        ImGui::SliderFloat("Arrive", &properties.m_weightArrive, 0.0f, 5.0f);
-
-        ImGui::Separator();
-        ImGui::Text("Group Behavior");
-        ImGui::SliderFloat("Alignment", &properties.m_weightAlignment, 0.0f, 5.0f);
-        ImGui::SliderFloat("Cohesion", &properties.m_weightCohesion, 0.0f, 5.0f);
-        ImGui::SliderFloat("Separation", &properties.m_weightSeparation, 0.0f, 5.0f);
-
-        ImGui::Separator();
-        ImGui::SliderFloat("Wall Limits", &properties.m_weightWallLimits, 0.0f, 5.0f);
-
-        ImGui::End();
-    }
-}
 
 // ENABLE_BITMASK_OPERATORS(Boid::Feature);
