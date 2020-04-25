@@ -18,6 +18,7 @@ struct JobBlock
 {
     size_t start;
     size_t end;
+    std::vector<Boid> boids;
 };
 
 class BoidSystemState
@@ -152,26 +153,38 @@ public:
             std::vector<std::thread> threads;
 
             std::atomic<int> finishedThreads{ 0 };
-            size_t groupSize = m_wanderers.size() / NUM_THREADS;
+            const size_t groupSize = m_wanderers.size() / NUM_THREADS;
+
+            std::vector<JobBlock> job;
+            job.resize(NUM_THREADS);
 
             for (size_t t = 0; t < NUM_THREADS; ++t)
             {
-                JobBlock job;
-                job.start = t * groupSize;
-                job.end = job.start + groupSize;
+                auto& tJob = job[t];
+
+                tJob.start = t * groupSize;
+                tJob.end = tJob.start + groupSize;
+                tJob.boids = std::vector<Boid>(m_wanderers.begin() + (groupSize * t), m_wanderers.begin() + (groupSize * t) + groupSize);
+
 
                 std::thread thr([&]() {
-                    for (size_t i = job.start; i < job.end; i++)
+                    for (size_t i = 0; i < tJob.boids.size(); i++)
                     {
-                        m_wanderers[i].UpdateTargets();
-                        glm::vec3 force = m_wanderers[i].CalcSteeringBehavior(m_wanderersSnapshot, neighborIndices);
-                        m_wanderers[i].UpdatePosition(deltaTime, force);
+                        tJob.boids[i].UpdateTargets();
+                        glm::vec3 force = tJob.boids[i].CalcSteeringBehavior(m_wanderersSnapshot, neighborIndices);
+                        tJob.boids[i].UpdatePosition(deltaTime, force);
                     }
 
                     // no more jobs.
                     {
                         std::lock_guard<std::mutex> lock(m_mutex);
                         finishedThreads++;
+
+                        for (size_t i = tJob.start; i < tJob.end; i++)
+                        {
+                            m_wanderers[i] = tJob.boids[i - tJob.start];
+                        }
+
                         m_cvar.notify_one();
                     }
                     });

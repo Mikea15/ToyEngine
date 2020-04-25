@@ -1,15 +1,15 @@
 #pragma once
 
-#define MULTITHREAD 0
-#define NUM_THREADS 4
+#define MULTITHREAD 1
+#define NUM_THREADS 8
 
 #define USE_OCTREE 0
-#define USE_AABB 0
+#define USE_AABB 1
 
 #if _DEBUG
-#define ENTITY_COUNT 200
+#define ENTITY_COUNT 800
 #else
-#define ENTITY_COUNT 2000
+#define ENTITY_COUNT 3500
 #endif
 
 enum Feature : unsigned int
