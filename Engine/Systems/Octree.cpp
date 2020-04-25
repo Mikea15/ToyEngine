@@ -9,93 +9,83 @@ Octree::Octree()
 {
 }
 
-
 Octree::Octree(const glm::vec3& position, float halfSize)
-    : m_position(position), m_halfSize(halfSize)
-    , m_upFrontLeft(nullptr)
-    , m_upFrontRight(nullptr)
-    , m_upBackLeft(nullptr)
-    , m_upBackRight(nullptr)
-    , m_downFrontLeft(nullptr)
-    , m_downFrontRight(nullptr)
-    , m_downBackLeft(nullptr)
-    , m_downBackRight(nullptr)
-{
-    m_bounds = AABB(m_position, halfSize);
-}
+    : m_bounds(position, halfSize)
+    , m_ufl(nullptr)
+    , m_ufr(nullptr)
+    , m_ubl(nullptr)
+    , m_ubr(nullptr)
+    , m_dfl(nullptr)
+    , m_dfr(nullptr)
+    , m_dbl(nullptr)
+    , m_dbr(nullptr)
+{ }
 
 Octree::~Octree()
 {
-    delete m_upFrontLeft;
-    delete m_upFrontRight;
-    delete m_upBackLeft;
-    delete m_upBackRight;
-    delete m_downFrontLeft;
-    delete m_downFrontRight;
-    delete m_downBackLeft;
-    delete m_downBackRight;
+    delete m_ufl;
+    delete m_ufr;
+    delete m_ubl;
+    delete m_ubr;
+    delete m_dfl;
+    delete m_dfr;
+    delete m_dbl;
+    delete m_dbr;
 }
 
 void Octree::Subdivide()
 {
-    const glm::vec3 ufl = (m_position + (m_position + glm::vec3(-1, 1, 1)   * m_halfSize)) * 0.5f;
-    const glm::vec3 ufr = (m_position + (m_position + glm::vec3(1, 1, 1)    * m_halfSize)) * 0.5f;
-    const glm::vec3 ubl = (m_position + (m_position + glm::vec3(-1, 1, -1)  * m_halfSize)) * 0.5f;
-    const glm::vec3 ubr = (m_position + (m_position + glm::vec3(1, 1, -1)   * m_halfSize)) * 0.5f;
-    const glm::vec3 dfl = (m_position + (m_position + glm::vec3(-1, -1, 1)  * m_halfSize)) * 0.5f;
-    const glm::vec3 dfr = (m_position + (m_position + glm::vec3(1, -1, 1)   * m_halfSize)) * 0.5f;
-    const glm::vec3 dbl = (m_position + (m_position + glm::vec3(-1, -1, -1) * m_halfSize)) * 0.5f;
-    const glm::vec3 dbr = (m_position + (m_position + glm::vec3(1, -1, -1)  * m_halfSize)) * 0.5f;
+    auto center = m_bounds.GetPosition();
+    auto halfSize = m_bounds.GetHalfSize() * 0.5f;
 
-    const float size = m_halfSize * 0.5f;
-    m_upFrontLeft = new Octree(ufl, size);
-    m_upFrontRight = new Octree(ufr, size);
-    m_upBackLeft = new Octree(ubl, size);
-    m_upBackRight = new Octree(ubr, size);
-    m_downFrontLeft = new Octree(dfl, size);
-    m_downFrontRight = new Octree(dfr, size);
-    m_downBackLeft = new Octree(dbl, size);
-    m_downBackRight = new Octree(dbr, size);
+    const glm::vec3 ufl = center + glm::vec3(-1, 1, 1)   * halfSize;
+    const glm::vec3 ufr = center + glm::vec3(1, 1, 1)    * halfSize;
+    const glm::vec3 ubl = center + glm::vec3(-1, 1, -1)  * halfSize;
+    const glm::vec3 ubr = center + glm::vec3(1, 1, -1)   * halfSize;
+
+    const glm::vec3 dfl = center + glm::vec3(-1, -1, 1)  * halfSize;
+    const glm::vec3 dfr = center + glm::vec3(1, -1, 1)   * halfSize;
+    const glm::vec3 dbl = center + glm::vec3(-1, -1, -1) * halfSize;
+    const glm::vec3 dbr = center + glm::vec3(1, -1, -1)  * halfSize;
+
+    m_ufl = new Octree(ufl, halfSize);
+    m_ufr = new Octree(ufr, halfSize);
+    m_ubl = new Octree(ubl, halfSize);
+    m_ubr = new Octree(ubr, halfSize);
+    m_dfl = new Octree(dfl, halfSize);
+    m_dfr = new Octree(dfr, halfSize);
+    m_dbl = new Octree(dbl, halfSize);
+    m_dbr = new Octree(dbr, halfSize);
 }
 
 bool Octree::Insert(const glm::vec3& position, size_t index)
 {
-    if (!m_bounds.Contains(position))
-    {
-        return false;
-    }
+    if (!m_bounds.Contains(position)) { return false; }
 
-    if (m_upFrontLeft == nullptr && m_nodes.size() < m_maxNodes)
+    if (m_ufl == nullptr && m_nodes.size() < m_maxNodes)
     {
         m_nodes.push_back({ position, index });
         return true;
     }
 
-    if (m_upFrontLeft == nullptr)
-    {
-        Subdivide();
-    }
+    if (m_ufl == nullptr) { Subdivide(); }
 
-    if (m_upFrontLeft->Insert(position, index)) return true;
-    if (m_upFrontRight->Insert(position, index)) return true;
-    if (m_upBackLeft->Insert(position, index)) return true;
-    if (m_upBackRight->Insert(position, index)) return true;
-    if (m_downFrontLeft->Insert(position, index)) return true;
-    if (m_downFrontRight->Insert(position, index)) return true;
-    if (m_downBackLeft->Insert(position, index)) return true;
-    if (m_downBackRight->Insert(position, index)) return true;
+    if (m_ufl->Insert(position, index)) return true;
+    if (m_ufr->Insert(position, index)) return true;
+    if (m_ubl->Insert(position, index)) return true;
+    if (m_ubr->Insert(position, index)) return true;
+    if (m_dfl->Insert(position, index)) return true;
+    if (m_dfr->Insert(position, index)) return true;
+    if (m_dbl->Insert(position, index)) return true;
+    if (m_dbr->Insert(position, index)) return true;
 
     return false;
 }
 
 void Octree::Search(const AABB& aabb, std::vector<OcNode>& outResult)
 {
-    if (m_bounds.GetContainmentType(aabb) == ContainmentType::Disjoint)
-    {
-        return;
-    }
+    if (!m_bounds.Contains(aabb)) { return; }
 
-    // check objects at this bounds level#
     for (const OcNode& node : m_nodes)
     {
         if (aabb.Contains(node.m_storePos))
@@ -104,20 +94,17 @@ void Octree::Search(const AABB& aabb, std::vector<OcNode>& outResult)
         }
     }
 
-    if (m_upFrontLeft == nullptr)
-    {
-        return;
-    }
+    if (m_ufl == nullptr) { return; }
 
-    m_upFrontLeft->Search(aabb, outResult);
-    m_upFrontRight->Search(aabb, outResult);
-    m_upBackLeft->Search(aabb, outResult);
-    m_upBackRight->Search(aabb, outResult);
+    m_ufl->Search(aabb, outResult);
+    m_ufr->Search(aabb, outResult);
+    m_ubl->Search(aabb, outResult);
+    m_ubr->Search(aabb, outResult);
 
-    m_downFrontLeft->Search(aabb, outResult);
-    m_downFrontRight->Search(aabb, outResult);
-    m_downBackLeft->Search(aabb, outResult);
-    m_downBackRight->Search(aabb, outResult);
+    m_dfl->Search(aabb, outResult);
+    m_dfr->Search(aabb, outResult);
+    m_dbl->Search(aabb, outResult);
+    m_dbr->Search(aabb, outResult);
 }
 
 void Octree::Search(const BoundingFrustum& frustum, std::vector<OcNode>& outResult)
@@ -138,37 +125,39 @@ void Octree::Search(const BoundingFrustum& frustum, std::vector<OcNode>& outResu
         }
     }
 
-    if (m_upFrontLeft == nullptr)
+    if (m_ufl == nullptr)
     {
         return;
     }
 
-    m_upFrontLeft->Search(frustum, outResult);
-    m_upFrontRight->Search(frustum, outResult);
-    m_upBackLeft->Search(frustum, outResult);
-    m_upBackRight->Search(frustum, outResult);
+    m_ufl->Search(frustum, outResult);
+    m_ufr->Search(frustum, outResult);
+    m_ubl->Search(frustum, outResult);
+    m_ubr->Search(frustum, outResult);
 
-    m_downFrontLeft->Search(frustum, outResult);
-    m_downFrontRight->Search(frustum, outResult);
-    m_downBackLeft->Search(frustum, outResult);
-    m_downBackRight->Search(frustum, outResult);
+    m_dfl->Search(frustum, outResult);
+    m_dfr->Search(frustum, outResult);
+    m_dbl->Search(frustum, outResult);
+    m_dbr->Search(frustum, outResult);
 }
 
 void Octree::GetAllBoundingBoxes(std::vector<AABB>& outResult)
 {
-    outResult.push_back(m_bounds);
+    if( !m_nodes.empty() ) {
+        outResult.push_back(m_bounds);
+    }
 
-    if (m_upFrontLeft == nullptr) return;
+    if (m_ufl == nullptr) return;
 
-    m_upFrontLeft->GetAllBoundingBoxes(outResult);
-    m_upFrontRight->GetAllBoundingBoxes(outResult);
-    m_upBackLeft->GetAllBoundingBoxes(outResult);
-    m_upBackRight->GetAllBoundingBoxes(outResult);
+    m_ufl->GetAllBoundingBoxes(outResult);
+    m_ufr->GetAllBoundingBoxes(outResult);
+    m_ubl->GetAllBoundingBoxes(outResult);
+    m_ubr->GetAllBoundingBoxes(outResult);
 
-    m_downFrontLeft->GetAllBoundingBoxes(outResult);
-    m_downFrontRight->GetAllBoundingBoxes(outResult);
-    m_downBackLeft->GetAllBoundingBoxes(outResult);
-    m_downBackRight->GetAllBoundingBoxes(outResult);
+    m_dfl->GetAllBoundingBoxes(outResult);
+    m_dfr->GetAllBoundingBoxes(outResult);
+    m_dbl->GetAllBoundingBoxes(outResult);
+    m_dbr->GetAllBoundingBoxes(outResult);
 }
 
 void Octree::DebugDraw()

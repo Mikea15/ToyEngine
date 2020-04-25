@@ -15,10 +15,6 @@ public:
 	AABB();
 	AABB(const glm::vec3& origin, float halfSize);
 	AABB(const glm::vec3& min, const glm::vec3& max);
-	AABB(const glm::vec3& origin, const glm::vec3& min, const glm::vec3& max);
-	~AABB();
-
-	void SetBounds(glm::vec3 min, glm::vec3 max);
 
 	ContainmentType GetContainmentType(const AABB& box) const;
 	ContainmentType GetContainmentType(const BoundingFrustum& frustum) const;
@@ -26,6 +22,7 @@ public:
 
 	//
 	bool Contains(const glm::vec3& point) const;
+	bool Contains(const AABB& aabb) const;
 
 	//! Intersects BoundingSphere
 	bool Intersects(const glm::vec3& point, float r) const;
@@ -34,7 +31,7 @@ public:
 	PlaneIntersectionType Intersects(const Plane& plane) const;
 
 	const glm::vec3& GetPosition() const { return m_origin; }
-	const float GetSize() const { return m_halfSize; }
+	const float GetHalfSize() const { return m_halfSize; }
 	const float GetWidth() const { return fabsf(m_max.x - m_min.x); }
 
 	const glm::vec3 GetMin() const { return m_min; }
@@ -67,6 +64,4 @@ private:
 	glm::vec3 m_origin;
 	glm::vec3 m_min;
 	glm::vec3 m_max;
-
-	glm::vec3 m_points[8];
 };

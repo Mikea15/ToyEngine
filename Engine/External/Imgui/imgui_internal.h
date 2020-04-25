@@ -383,7 +383,7 @@ struct IMGUI_API ImPool
     void        Remove(ImGuiID key, const T* p) { Remove(key, GetIndex(p)); }
     void        Remove(ImGuiID key, ImPoolIdx idx) { Buf[idx].~T(); *(int*)&Buf[idx] = FreeIdx; FreeIdx = idx; Map.SetInt(key, -1); }
     void        Reserve(int capacity) { Buf.reserve(capacity); Map.Data.reserve(capacity); }
-    int         GetSize() const { return Buf.Size; }
+    int         GetHalfSize() const { return Buf.Size; }
 };
 
 // Helper: ImChunkStream<>
@@ -670,7 +670,7 @@ struct IMGUI_API ImRect
     ImRect(float x1, float y1, float x2, float y2) : Min(x1, y1), Max(x2, y2) {}
 
     ImVec2      GetCenter() const { return ImVec2((Min.x + Max.x) * 0.5f, (Min.y + Max.y) * 0.5f); }
-    ImVec2      GetSize() const { return ImVec2(Max.x - Min.x, Max.y - Min.y); }
+    ImVec2      GetHalfSize() const { return ImVec2(Max.x - Min.x, Max.y - Min.y); }
     float       GetWidth() const { return Max.x - Min.x; }
     float       GetHeight() const { return Max.y - Min.y; }
     ImVec2      GetTL() const { return Min; }                   // Top-left

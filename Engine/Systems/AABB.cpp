@@ -9,63 +9,19 @@ AABB::AABB()
 }
 
 AABB::AABB(const glm::vec3& origin, float halfSize)
-	: m_origin(origin), m_halfSize(halfSize)
+	: m_origin(origin)
+	, m_halfSize(halfSize)
 {
-	m_points[0] = m_min = m_origin + glm::vec3(-m_halfSize, -m_halfSize, -m_halfSize);
-	m_points[3] = m_origin + glm::vec3(-m_halfSize, -m_halfSize, m_halfSize);
-	m_points[1] = m_origin + glm::vec3(-m_halfSize, m_halfSize, -m_halfSize);
-	m_points[2] = m_origin + glm::vec3(-m_halfSize, m_halfSize, m_halfSize);
-	m_points[5] = m_origin + glm::vec3(m_halfSize, -m_halfSize, -m_halfSize);
-	m_points[6] = m_origin + glm::vec3(m_halfSize, -m_halfSize, m_halfSize);
-	m_points[4] = m_origin + glm::vec3(m_halfSize, m_halfSize, -m_halfSize);
-	m_points[7] = m_max = m_origin + glm::vec3(m_halfSize, m_halfSize, m_halfSize);
+	m_min = m_origin + glm::vec3(-m_halfSize, -m_halfSize, -m_halfSize);
+	m_max = m_origin + glm::vec3(m_halfSize, m_halfSize, m_halfSize);
 }
 
 AABB::AABB(const glm::vec3& min, const glm::vec3& max)
 {
 	m_origin = min + (max - min) * 0.5f;
 
-	m_points[0] = m_min = min;
-	m_points[3] = glm::vec3(min.x, min.y, max.z);
-	m_points[1] = glm::vec3(min.x, max.y, min.z);
-	m_points[2] = glm::vec3(min.x, max.y, max.z);
-	m_points[5] = glm::vec3(max.x, min.y, min.z);
-	m_points[6] = glm::vec3(max.x, min.y, max.z);
-	m_points[4] = glm::vec3(max.x, max.y, min.z);
-	m_points[7] = m_max = max;
-
-	m_halfSize = GetWidth() * 0.5f;
-}
-
-AABB::AABB(const glm::vec3& origin, const glm::vec3& min, const glm::vec3& max)
-{
-	m_points[0] = m_min = origin + min;
-	m_points[3] = m_origin + glm::vec3(min.x, min.y, max.z);
-	m_points[1] = m_origin + glm::vec3(min.x, max.y, min.z);
-	m_points[2] = m_origin + glm::vec3(min.x, max.y, max.z);
-	m_points[5] = m_origin + glm::vec3(max.x, min.y, min.z);
-	m_points[6] = m_origin + glm::vec3(max.x, min.y, max.z);
-	m_points[4] = m_origin + glm::vec3(max.x, max.y, min.z);
-	m_points[7] = m_max = origin + max;
-
-	m_halfSize = GetWidth() * 0.5f;
-}
-
-AABB::~AABB()
-{
-	
-}
-
-void AABB::SetBounds(glm::vec3 min, glm::vec3 max)
-{
-	m_points[0] = m_min = m_origin + min;
-	m_points[3] = m_origin + glm::vec3(min.x, min.y, max.z);
-	m_points[1] = m_origin + glm::vec3(min.x, max.y, min.z);
-	m_points[2] = m_origin + glm::vec3(min.x, max.y, max.z);
-	m_points[5] = m_origin + glm::vec3(max.x, min.y, min.z);
-	m_points[6] = m_origin + glm::vec3(max.x, min.y, max.z);
-	m_points[4] = m_origin + glm::vec3(max.x, max.y, min.z);
-	m_points[7] = m_max = m_origin + max;
+	m_min = min;
+	m_max = max;
 
 	m_halfSize = GetWidth() * 0.5f;
 }
@@ -133,7 +89,6 @@ ContainmentType AABB::GetContainmentType(const BoundingFrustum& frustum) const
 	return ContainmentType::Contains;
 }
 
-
 ContainmentType AABB::GetContainmentType(const glm::vec3& point) const
 {
 	// first we get if point is out of box
@@ -155,14 +110,14 @@ bool AABB::Contains(const glm::vec3& point) const
 	return true;
 }
 
-//bool AABB::Contains(const AABB& aabb) const
-//{
-//	if (aabb.m_max.x < m_min.x || aabb.m_min.x > m_max.x) return false;
-//	if (aabb.m_max.y < m_min.y || aabb.m_min.y > m_max.y) return false;
-//	if (aabb.m_max.z < m_min.z || aabb.m_min.z > m_max.z) return false;
-//
-//	return true;
-//}
+bool AABB::Contains(const AABB& aabb) const
+{
+	if (aabb.m_max.x < m_min.x || aabb.m_min.x > m_max.x) return false;
+	if (aabb.m_max.y < m_min.y || aabb.m_min.y > m_max.y) return false;
+	if (aabb.m_max.z < m_min.z || aabb.m_min.z > m_max.z) return false;
+
+	return true;
+}
 
 bool AABB::Intersects(const glm::vec3& point, float r) const
 {

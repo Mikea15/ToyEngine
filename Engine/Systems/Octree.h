@@ -32,20 +32,18 @@ public:
 	void DebugDraw();
 
 private:
-	glm::vec3 m_position;
-	float m_halfSize;
 	AABB m_bounds;
 
-	size_t m_maxNodes = 64;
+	size_t m_maxNodes = 16;
 	std::vector<OcNode> m_nodes;
 
-	Octree* m_upFrontLeft = nullptr;
-	Octree* m_upFrontRight = nullptr;
-	Octree* m_upBackLeft = nullptr;
-	Octree* m_upBackRight = nullptr;
-	Octree* m_downFrontLeft = nullptr;
-	Octree* m_downFrontRight = nullptr;
-	Octree* m_downBackLeft = nullptr;
-	Octree* m_downBackRight = nullptr;
+	Octree* m_ufl = nullptr;
+	Octree* m_ufr = nullptr;
+	Octree* m_ubl = nullptr;
+	Octree* m_ubr = nullptr;
+	Octree* m_dfl = nullptr;
+	Octree* m_dfr = nullptr;
+	Octree* m_dbl = nullptr;
+	Octree* m_dbr = nullptr;
 };
 

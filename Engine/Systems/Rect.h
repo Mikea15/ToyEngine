@@ -13,7 +13,7 @@ public:
 	bool Intersect(const Rect& rect) const;
 
 	const glm::vec2& GetPosition() const { return m_origin; }
-	const float GetSize() const { return m_halfSize; }
+	const float GetHalfSize() const { return m_halfSize; }
 	const float GetExtent() const { return fabsf(m_max.x - m_min.x); }
 
 	const glm::vec2& GetMin() const { return m_min; }
