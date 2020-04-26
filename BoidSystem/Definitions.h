@@ -1,16 +1,20 @@
 #pragma once
 
-#define MULTITHREAD 1
+#define MULTITHREAD 0
 #define NUM_THREADS 8
 
 #define USE_OCTREE 0
-#define USE_AABB 1
+#define USE_OCTREE_PRUNE_BY_DIST 1
+#define USE_AABB 0
+#define USE_AABB_PRUNE_BY_DIST 1
 
 #if _DEBUG
-#define ENTITY_COUNT 800
+#define ENTITY_COUNT 200
 #else
 #define ENTITY_COUNT 3500
 #endif
+
+#include <imgui.h>
 
 enum Feature : unsigned int
 {

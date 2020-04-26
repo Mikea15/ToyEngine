@@ -139,37 +139,37 @@ public:
 
         {
 #if USE_OCTREE
-            m_octree = Octree(glm::vec3(0.0f), 50.0f);
-            OcNode nodeData;
-            for (size_t i = 0; i < ENTITY_COUNT; i++)
-            {
-                m_octree.Insert(m_wanderers[i].m_position, i);
-            }
+            //m_octree = Octree(glm::vec3(0.0f), 50.0f);
+            //OcNode nodeData;
+            //for (size_t i = 0; i < ENTITY_COUNT; i++)
+            //{
+            //    m_octree.Insert(m_wanderers[i].m_position, i);
+            //}
 #endif
 
             for (size_t i = 0; i < ENTITY_COUNT; i++)
             {
 #if USE_OCTREE
-                AABB searchAabb = AABB(m_wanderers[i].m_position, m_wanderers[i].m_properties->m_neighborRange);
-                neighborResult.clear();
+                //AABB searchAabb = AABB(m_wanderers[i].m_position, m_wanderers[i].m_properties->m_neighborRange);
+                //neighborResult.clear();
 
-                m_octree.Search(searchAabb, neighborResult);
-                neighborIndices.clear();
-                for (const OcNode& node : neighborResult)
-                {
-                    if (node.m_storeIndex == i)
-                    {
-                        continue;
-                    }
-                    neighborIndices.insert(node.m_storeIndex);
-                }
+                //m_octree.Search(searchAabb, neighborResult);
+                //neighborIndices.clear();
+                //for (const OcNode& node : neighborResult)
+                //{
+                //    if (node.m_storeIndex == i)
+                //    {
+                //        continue;
+                //    }
+                //    neighborIndices.insert(node.m_storeIndex);
+                //}
 #endif // USE_OCTREE
                 // Agent Core Loop
                 {
                     Agent* agent = &m_wanderers[i];
 
                     m_world.agent = agent;
-                    NeighborSearch::FindNeighbors(agent, m_world);
+                    NeighborSearch::Search(agent, m_world);
 
                     const glm::vec3 force = m_steeringBehavior.CalculateWeighted(&m_world);
                     const glm::vec3 acceleration = force / agent->m_properties->m_mass;
@@ -190,7 +190,7 @@ public:
                 }
             }
 #if USE_OCTREE
-            m_octree.DebugDraw();
+            // m_octree.DebugDraw();
 #endif
         }
 

@@ -2,12 +2,11 @@
 
 #include <glm/glm.hpp>
 
-#include "SteeringBehavior.h"
-
 #include "Engine/Core/VectorContainer.h"
 
 #include "Definitions.h"
 #include "Engine/Utils/MathUtils.h"
+#include "Search.h"
 
 struct Boid
 {
@@ -35,7 +34,7 @@ struct Boid
     void SetFlee(glm::vec3 fleePos) { m_fleePos = fleePos; }
     void SetFlee(Boid* boid) { m_fleeBoid = boid; }
 
-    void FullUpdate(float deltaTime, std::vector<Boid>& otherBoids, VectorContainer<size_t>& neighborIndices)
+    void FullUpdate(float deltaTime, std::vector<Boid>& otherBoids, std::vector<size_t>& neighborIndices)
     {
         UpdateTargets();
 
@@ -70,7 +69,7 @@ struct Boid
         m_position += m_velocity * deltaTime;
     }
 
-    glm::vec3 CalcSteeringBehavior(std::vector<Boid>& otherBoids, VectorContainer<size_t>& neighborIndices)
+    glm::vec3 CalcSteeringBehavior(std::vector<Boid>& otherBoids, std::vector<size_t>& neighborIndices)
     {
         // Steering Bit
         glm::vec3 force = {};
@@ -82,7 +81,7 @@ struct Boid
         if (HasFeature(eFleeRanged)) { force += m_properties->m_weightFlee * FleeRanged(m_fleePos); }
 
 #if !USE_OCTREE
-        FindNearbyNeighbors(otherBoids);
+        NeighborSearch::Search(this, otherBoids, m_neighborIndices, m_currentNeighborCount);
 #endif
         if (HasFeature(eSeparation)) { force += m_properties->m_weightSeparation * Separation(otherBoids, neighborIndices); }
         if (HasFeature(eCohesion)) { force += m_properties->m_weightCohesion * Cohesion(otherBoids, neighborIndices); }
@@ -167,62 +166,14 @@ struct Boid
         return desiredVelocity - m_velocity;
     }
 
-    void FindNearbyNeighbors(std::vector<Boid>& neighbors)
-    {
-        // NOTE (MA): One time allocation of the max neighbors size.
-        if (m_neighborIndices == nullptr)
-        {
-            m_neighborIndices = AllocNeighborIndices(neighbors.size());
-        }
-
-        assert(m_neighborIndices != nullptr);
-
-        m_currentNeighborCount = 0;
-
-#if USE_AABB
-        AABB aabb = AABB(m_position, m_properties->m_neighborRange);
-#endif
-
-        size_t neighborSize = neighbors.size();
-        for (size_t i = 0; i < neighborSize; ++i)
-        {
-            auto& n = neighbors[i];
-            if (*this == n)
-            {
-                continue;
-            }
-#if USE_AABB
-            if (!aabb.Contains(n.m_position)) 
-            {
-                continue;
-            }
-#else
-            glm::vec3 toAgent = m_position - n.m_position;
-            float distanceSqToAgent = glm::length2(toAgent);
-            if (distanceSqToAgent > m_properties->m_neighborRange * m_properties->m_neighborRange)
-            {
-                continue;
-            }
-#endif
-            *(m_neighborIndices + m_currentNeighborCount++) = i;
-        }
-    }
-
-    glm::vec3 Separation(std::vector<Boid>& neighbors, VectorContainer<size_t>& indices)
+    glm::vec3 Separation(std::vector<Boid>& neighbors, std::vector<size_t>& neighborIndices)
     {
         glm::vec3 force = {};
-#if !USE_OCTREE
+
         size_t neighborCount = m_currentNeighborCount;
-#else
-        size_t neighborCount = indices.size();
-#endif
         for (size_t i = 0; i < neighborCount; ++i)
         {
-#if !USE_OCTREE
-            glm::vec3 toAgent = m_position - neighbors[*(m_neighborIndices+i)].m_position;
-#else
-            glm::vec3 toAgent = m_position - neighbors[indices.get(i)].m_position;
-#endif
+            glm::vec3 toAgent = m_position - neighbors[neighborIndices[i]].m_position;
             float distanceToAgent = glm::length(toAgent);
             if (distanceToAgent > 0.0f) 
             {
@@ -233,21 +184,14 @@ struct Boid
         return force;
     }
 
-    glm::vec3 Alignment(std::vector<Boid>& neighbors, VectorContainer<size_t>& indices)
+    glm::vec3 Alignment(std::vector<Boid>& neighbors, std::vector<size_t>& neighborIndices)
     {
         glm::vec3 avgDirection = {};
-#if !USE_OCTREE
+
         size_t neighborCount = m_currentNeighborCount;
-#else
-        size_t neighborCount = indices.size();
-#endif
         for (size_t i = 0; i < neighborCount; ++i)
         {
-#if !USE_OCTREE
-            avgDirection += neighbors[*(m_neighborIndices + i)].m_direction;
-#else
-            avgDirection += neighbors[indices.get(i)].m_direction;
-#endif
+            avgDirection += neighbors[neighborIndices[i]].m_direction;
         }
 
         if (neighborCount > 0)
@@ -259,22 +203,15 @@ struct Boid
         return avgDirection;
     }
 
-    glm::vec3 Cohesion(std::vector<Boid>& neighbors, VectorContainer<size_t>& indices)
+    glm::vec3 Cohesion(std::vector<Boid>& neighbors, std::vector<size_t>& neighborIndices)
     {
         glm::vec3 centerOfMass = {};
         glm::vec3 force = {};
-#if !USE_OCTREE
+
         size_t neighborCount = m_currentNeighborCount;
-#else
-        size_t neighborCount = indices.size();
-#endif
         for (size_t i = 0; i < neighborCount; ++i)
         {
-#if !USE_OCTREE
-            centerOfMass += neighbors[*(m_neighborIndices + i)].m_position;
-#else
-            centerOfMass += neighbors[indices.get(i)].m_position;
-#endif
+            centerOfMass += neighbors[neighborIndices[i]].m_position;
         }
 
         if (neighborCount > 0)
@@ -332,8 +269,7 @@ struct Boid
     Properties* m_properties = nullptr;
     Properties m_defaultProperties;
 
-    int* m_neighborIndices = nullptr;
-    size_t m_neighborIndicesCount = 0u;
+    std::vector<size_t> m_neighborIndices;
     size_t m_currentNeighborCount = 0u;
 
     unsigned int m_id = -1;

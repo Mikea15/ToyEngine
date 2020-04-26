@@ -108,8 +108,6 @@ public:
         m_simplePathFollower.SetFeature(eSeek);
         m_simplePathFollower2.SetFeature(eSeek);
 
-        neighborIndices = VectorContainer<size_t>(ENTITY_COUNT);
-
         DebugDraw::Init();
     };
 
@@ -137,21 +135,15 @@ public:
 
         
         {
+
 #if USE_OCTREE
-            m_octree = Octree(glm::vec3(0.0f), 50.0f);
-            OcNode nodeData;
-            for (size_t i = 0; i < ENTITY_COUNT; i++)
-            {
-                m_octree.Insert(m_wanderers[i].m_position, i);
-            }
+            PopulateOctree();
 #endif
 
 #if MULTITHREAD
 
             std::vector<Boid> m_wanderersSnapshot(m_wanderers);
-
             std::vector<std::thread> threads;
-
             std::atomic<int> finishedThreads{ 0 };
             const size_t groupSize = m_wanderers.size() / NUM_THREADS;
 
@@ -211,19 +203,7 @@ public:
             for (size_t i = 0; i < ENTITY_COUNT; i++)
             {
 #if USE_OCTREE
-                AABB searchAabb = AABB(m_wanderers[i].m_position, m_wanderers[i].m_properties->m_neighborRange);
-                neighborResult.clear();
-
-                m_octree.Search(searchAabb, neighborResult);
-                neighborIndices.clear();
-                for (const OcNode& node : neighborResult)
-                {
-                    if (node.m_storeIndex == i) 
-                    {
-                        continue;
-                    }
-                    neighborIndices.insert(node.m_storeIndex);
-                }
+                QueryOctree(m_wanderers[i].m_position, m_wanderers[i].m_properties->m_neighborRange, i);
 #endif // USE_OCTREE
                 // Agent Core Loop
                 {
@@ -259,7 +239,37 @@ public:
             m_simplePathFollower2.FullUpdate(deltaTime, m_wanderers, neighborIndices);
             m_simplePathFollower2.DrawDebug();
         }
-    };
+    }
+
+    void PopulateOctree()
+    {
+        m_octree = Octree(glm::vec3(0.0f), 50.0f);
+        for (size_t i = 0; i < ENTITY_COUNT; i++)
+        {
+            m_octree.Insert(m_wanderers[i].m_position, i);
+        }
+    }
+
+    void QueryOctree(glm::vec3 pos, float range, size_t agentIndex)
+    {
+        AABB searchAabb = AABB(pos, range);
+        
+        neighborResult.clear();
+        m_octree.Search(searchAabb, neighborResult);
+
+#if USE_OCTREE_PRUNE_BY_DIST
+        std::remove_if(neighborResult.begin(), neighborResult.end(), [&](const OcNode& n) {
+            return glm::length2(pos - m_wanderers[n.m_storeIndex].m_position) > range * range;
+            });
+#endif
+
+        neighborIndices.clear();
+        for (const OcNode& node : neighborResult)
+        {
+            if (node.m_storeIndex == agentIndex) { continue; }
+            neighborIndices.emplace_back(node.m_storeIndex);
+        }
+    }
 
     void Render(float alpha = 1.0f) override
     {
@@ -303,7 +313,7 @@ private:
 
     Octree m_octree;
     std::vector<OcNode> neighborResult;
-    VectorContainer<size_t> neighborIndices;
+    std::vector<size_t> neighborIndices;
 
 #if MULTITHREAD
     std::mutex m_mutex;

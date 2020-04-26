@@ -2,6 +2,8 @@
 
 #include "Agent.h"
 
+#pragma warning(disable:6011)
+
 class IBehavior
 {
 public:
@@ -199,38 +201,6 @@ public:
         }
 
         return force;
-    }
-};
-
-struct NeighborSearch
-{
-    static void FindNeighbors(Agent* agent, AgentWorld& world, size_t maxNeighbors = 0)
-    {
-        world.neighborIndiceCount = 0;
-
-        size_t neighborSize = world.neighbors->size();
-        for (size_t i = 0; i < neighborSize; ++i)
-        {
-            auto& n = world.neighbors->at(i);
-            if (*agent == n)
-            {
-                continue;
-            }
-
-            glm::vec3 toAgent = agent->m_position - n.m_position;
-            float distanceSqToAgent = glm::length2(toAgent);
-            if (distanceSqToAgent > agent->m_properties->m_neighborRange * agent->m_properties->m_neighborRange)
-            {
-                continue;
-            }
-
-            if (maxNeighbors != 0 && world.neighborIndiceCount >= maxNeighbors) 
-            { 
-                break; 
-            }
-
-            world.neighborIndices[world.neighborIndiceCount++] = i;
-        }
     }
 };
 

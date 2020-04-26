@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Engine/Renderer/DebugDraw.h"
+#include "Engine/Utils/MathUtils.h"
+
 struct Path
 {
     Path() = default;
