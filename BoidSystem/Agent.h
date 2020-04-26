@@ -65,3 +65,37 @@ struct AgentWorld
 };
 
 unsigned int Agent::ID = 0;
+
+void Search(Agent* agent, AgentWorld& world, size_t maxNeighbors = 0)
+{
+#if USE_AABB
+    AABB aabb = AABB(agent->m_position, agent->m_properties->m_neighborRange);
+#endif
+
+    world.neighborIndiceCount = 0;
+    size_t neighborSize = world.neighbors->size();
+    for (size_t i = 0; i < neighborSize; ++i)
+    {
+        auto& n = world.neighbors->at(i);
+        if (*agent == n) { continue; }
+
+#if USE_AABB
+        if (!aabb.Contains(n.m_position)) { continue; }
+#endif
+#if !USE_AABB || (USE_AABB && USE_AABB_PRUNE_BY_DIST)
+        glm::vec3 toAgent = agent->m_position - n.m_position;
+        float distanceSqToAgent = glm::length2(toAgent);
+        if (distanceSqToAgent > agent->m_properties->m_neighborRange * agent->m_properties->m_neighborRange)
+        {
+            continue;
+        }
+#endif
+        if (maxNeighbors > 0 && world.neighborIndiceCount >= maxNeighbors)
+        {
+            break;
+        }
+
+        assert(world.neighborIndices.size() > world.neighborIndiceCount);
+        world.neighborIndices[world.neighborIndiceCount++] = i;
+    }
+}

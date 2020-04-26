@@ -169,7 +169,7 @@ public:
                     Agent* agent = &m_wanderers[i];
 
                     m_world.agent = agent;
-                    NeighborSearch::Search(agent, m_world);
+                    Search(agent, m_world);
 
                     const glm::vec3 force = m_steeringBehavior.CalculateWeighted(&m_world);
                     const glm::vec3 acceleration = force / agent->m_properties->m_mass;
@@ -282,4 +282,5 @@ private:
 
     Path m_path;
     Path m_path2;
+
 };

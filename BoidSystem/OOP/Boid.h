@@ -1,12 +1,12 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/ext/vector_float3.hpp>
 
 #include "Engine/Core/VectorContainer.h"
 
 #include "Definitions.h"
 #include "Engine/Utils/MathUtils.h"
-#include "Search.h"
 
 struct Boid
 {
@@ -24,6 +24,8 @@ struct Boid
         m_position = MathUtils::RandomInUnitSphere();
         m_targetBoid = nullptr;
         m_fleeBoid = nullptr;
+
+        m_neighborIndices.resize(ENTITY_COUNT);
     }
 
     bool operator==(const Boid& rhs) const { return m_id == rhs.m_id; }
@@ -80,12 +82,16 @@ struct Boid
         if (HasFeature(eFlee)) { force += m_properties->m_weightFlee * Flee(m_fleePos); }
         if (HasFeature(eFleeRanged)) { force += m_properties->m_weightFlee * FleeRanged(m_fleePos); }
 
-#if !USE_OCTREE
-        NeighborSearch::Search(this, otherBoids, m_neighborIndices, m_currentNeighborCount);
+#if USE_OCTREE
+        m_currentNeighborCount = neighborIndices.size();
+#else
+        Search(this, otherBoids, m_neighborIndices, m_currentNeighborCount);
+        neighborIndices = m_neighborIndices;
 #endif
-        if (HasFeature(eSeparation)) { force += m_properties->m_weightSeparation * Separation(otherBoids, neighborIndices); }
-        if (HasFeature(eCohesion)) { force += m_properties->m_weightCohesion * Cohesion(otherBoids, neighborIndices); }
-        if (HasFeature(eAlignment)) { force += m_properties->m_weightAlignment * Alignment(otherBoids, neighborIndices); }
+        assert(!glm::all(glm::isnan(force)));
+        if (HasFeature(eSeparation)) { force += m_properties->m_weightSeparation * Separation(otherBoids, neighborIndices); } assert(!glm::all(glm::isnan(force)));
+        if (HasFeature(eCohesion)) { force += m_properties->m_weightCohesion * Cohesion(otherBoids, neighborIndices); } assert(!glm::all(glm::isnan(force)));
+        if (HasFeature(eAlignment)) { force += m_properties->m_weightAlignment * Alignment(otherBoids, neighborIndices); } assert(!glm::all(glm::isnan(force)));
 
         return glm::clamp(force, -m_properties->m_maxForce, m_properties->m_maxForce);
     }
@@ -186,21 +192,21 @@ struct Boid
 
     glm::vec3 Alignment(std::vector<Boid>& neighbors, std::vector<size_t>& neighborIndices)
     {
-        glm::vec3 avgDirection = {};
+        glm::vec3 force = {};
 
         size_t neighborCount = m_currentNeighborCount;
         for (size_t i = 0; i < neighborCount; ++i)
         {
-            avgDirection += neighbors[neighborIndices[i]].m_direction;
+            force += neighbors[neighborIndices[i]].m_direction;
         }
 
         if (neighborCount > 0)
         {
-            avgDirection /= static_cast<float>(neighborCount);
-            avgDirection -= m_direction;
+            force /= static_cast<float>(neighborCount);
+            force -= m_direction;
         }
-
-        return avgDirection;
+        
+        return force;
     }
 
     glm::vec3 Cohesion(std::vector<Boid>& neighbors, std::vector<size_t>& neighborIndices)
@@ -253,6 +259,40 @@ struct Boid
     void DeallocNeighborIndices(int* memoryBlock)
     {
         free(memoryBlock);
+    }
+
+    void Search(Boid* agent, std::vector<Boid>& neighbors, std::vector<size_t>& result, size_t& outResultCount, size_t maxNeighbors = 0)
+    {
+#if USE_AABB
+        AABB aabb = AABB(agent->m_position, agent->m_properties->m_neighborRange);
+#endif
+
+        outResultCount = 0;
+        size_t neighborSize = neighbors.size();
+        for (size_t i = 0; i < neighborSize; ++i)
+        {
+            auto& n = neighbors[i];
+            if (*agent == n) { continue; }
+
+#if USE_AABB
+            if (!aabb.Contains(n.m_position)) { continue; }
+#endif
+#if !USE_AABB || (USE_AABB && USE_AABB_PRUNE_BY_DIST)
+            glm::vec3 toAgent = agent->m_position - n.m_position;
+            float distanceSqToAgent = glm::length2(toAgent);
+            if (distanceSqToAgent > agent->m_properties->m_neighborRange * agent->m_properties->m_neighborRange)
+            {
+                continue;
+            }
+#endif
+            if (maxNeighbors > 0 && outResultCount >= maxNeighbors)
+            {
+                break;
+            }
+
+            assert(result.size() > outResultCount);
+            result[outResultCount++] = i;
+        }
     }
 
     glm::vec3 m_position;

@@ -5,6 +5,8 @@
 #include "OOP/Boid.h"
 #include "Path.h"
 
+#include "Engine/Systems/KDTree.h"
+
 class Game;
 
 #if MULTITHREAD
@@ -108,6 +110,13 @@ public:
         m_simplePathFollower.SetFeature(eSeek);
         m_simplePathFollower2.SetFeature(eSeek);
 
+        for (size_t i = 0; i < 30; i++)
+        {
+            randomPoints.push_back(
+                MathUtils::RandomInUnitSphere() * 10.0f
+            );
+        }
+
         DebugDraw::Init();
     };
 
@@ -133,22 +142,25 @@ public:
         AABB limits = AABB(glm::vec3(0.0f, 25.0f, 0.0f), 50);
         DebugDraw::AddAABB(limits.GetMin(), limits.GetMax());
 
-        
         {
 
 #if USE_OCTREE
             PopulateOctree();
+#elif USE_KDTREE
+            PopulateKDTree();
 #endif
 
 #if MULTITHREAD
-
             std::vector<Boid> m_wanderersSnapshot(m_wanderers);
             std::vector<std::thread> threads;
             std::atomic<int> finishedThreads{ 0 };
             const size_t groupSize = m_wanderers.size() / NUM_THREADS;
+            size_t rest = m_wanderers.size() % NUM_THREADS;
 
             std::vector<JobBlock> job;
             job.resize(NUM_THREADS);
+
+            size_t groupIndex = 0;
 
             for (size_t t = 0; t < NUM_THREADS; ++t)
             {
@@ -157,7 +169,6 @@ public:
                 tJob.start = t * groupSize;
                 tJob.end = tJob.start + groupSize;
                 tJob.boids = std::vector<Boid>(m_wanderers.begin() + (groupSize * t), m_wanderers.begin() + (groupSize * t) + groupSize);
-
 
                 std::thread thr([&]() {
                     for (size_t i = 0; i < tJob.boids.size(); i++)
@@ -204,6 +215,8 @@ public:
             {
 #if USE_OCTREE
                 QueryOctree(m_wanderers[i].m_position, m_wanderers[i].m_properties->m_neighborRange, i);
+#elif USE_KDTREE
+                QueryKDTree(m_wanderers[i].m_position, m_wanderers[i].m_properties->m_neighborRange, i);
 #endif // USE_OCTREE
                 // Agent Core Loop
                 {
@@ -216,6 +229,8 @@ public:
             }
 #if USE_OCTREE
             m_octree.DebugDraw();
+#elif USE_KDTREE
+            m_kdtree.DebugDraw();
 #endif
 #endif // MULTITHREAD
         }
@@ -239,6 +254,8 @@ public:
             m_simplePathFollower2.FullUpdate(deltaTime, m_wanderers, neighborIndices);
             m_simplePathFollower2.DrawDebug();
         }
+
+
     }
 
     void PopulateOctree()
@@ -268,6 +285,28 @@ public:
         {
             if (node.m_storeIndex == agentIndex) { continue; }
             neighborIndices.emplace_back(node.m_storeIndex);
+        }
+    }
+
+    void PopulateKDTree()
+    {
+        std::vector<kdtree::NodeContent> content;
+        for (size_t i = 0; i < ENTITY_COUNT; i++)
+        {
+            content.push_back({ m_wanderers[i].m_position, i });
+        }
+
+        m_kdtree = kdtree(content);
+    }
+
+    void QueryKDTree(glm::vec3 pos, float range, size_t agentIndex)
+    {
+        auto result = m_kdtree.nearest(pos, range);
+        neighborIndices.clear();
+        for (const kdtree::NodeContent& node : result)
+        {
+            if (node.second == agentIndex) continue;
+            neighborIndices.emplace_back(node.second);
         }
     }
 
@@ -314,6 +353,9 @@ private:
     Octree m_octree;
     std::vector<OcNode> neighborResult;
     std::vector<size_t> neighborIndices;
+    
+    kdtree m_kdtree;
+    std::vector<glm::vec3> randomPoints;
 
 #if MULTITHREAD
     std::mutex m_mutex;

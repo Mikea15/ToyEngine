@@ -26,6 +26,8 @@ struct Path
         }
     }
 
+    std::vector<glm::vec3> GetNodes() const { return m_nodes; }
+
     void DebugDraw()
     {
         if (m_nodes.empty())
