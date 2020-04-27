@@ -28,6 +28,20 @@ struct Boid
         m_neighborIndices.resize(ENTITY_COUNT);
     }
 
+    Boid(const Boid& other)
+        : m_id(other.m_id)
+        , m_properties(other.m_properties)
+    {
+        m_velocity = other.m_velocity;
+        m_position = other.m_position;
+        m_direction = other.m_direction;
+
+        m_targetBoid = other.m_targetBoid;
+        m_fleeBoid = other.m_fleeBoid;
+
+        m_neighborIndices.resize(ENTITY_COUNT);
+    }
+
     bool operator==(const Boid& rhs) const { return m_id == rhs.m_id; }
     bool operator!=(const Boid& rhs) const { return m_id != rhs.m_id; }
 

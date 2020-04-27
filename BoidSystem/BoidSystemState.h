@@ -14,6 +14,7 @@ class Game;
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <future>
 #endif
 
 struct JobBlock
@@ -21,6 +22,12 @@ struct JobBlock
     size_t start;
     size_t end;
     std::vector<Boid> boids;
+};
+
+struct AsyncJob
+{
+    size_t index;
+    Boid copy;
 };
 
 class BoidSystemState
@@ -149,6 +156,7 @@ public:
 #endif
 
 #if MULTITHREAD
+#if USE_THREAD
         std::vector<std::thread> threads;
         std::atomic<int> finishedThreads{ 0 };
         const size_t groupSize = m_wanderers.size() / NUM_THREADS;
@@ -208,12 +216,46 @@ public:
                 m_wanderers[i] = job[t].boids[i - job[t].start];
             }
         }
+#elif USE_ASYNC
+        std::vector<std::future<AsyncJob>> futures;
 
         for (size_t i = 0; i < ENTITY_COUNT; i++)
         {
-            m_wanderers[i].DrawDebug();
+            auto future = std::async(std::launch::async, [deltaTime, i, this]() {
+                m_wanderers[i].UpdateTargets();
+                glm::vec3 force = m_wanderers[i].CalcSteeringBehavior(m_wanderers, neighborIndices);
+                m_wanderers[i].UpdatePosition(deltaTime, force);
+
+                AsyncJob aj;
+                aj.index = i;
+                aj.copy = m_wanderers[i];
+                return aj;
+            });
+
+            {
+                std::lock_guard<std::mutex> lock(m_mutex);
+                futures.push_back(std::move(future));
+            }
         }
 
+        {
+            std::unique_lock<std::mutex> lock(m_mutex);
+            m_cvar.wait(lock, [&futures] {
+                return futures.size() == ENTITY_COUNT;
+                });
+        }
+
+        for (std::future<AsyncJob>& aj : futures)
+        {
+            //aj.wait();
+
+            AsyncJob result = aj.get();
+            m_wanderers[result.index] = result.copy;
+        }
+
+#elif USE_THREAD_JOBS
+
+#endif
 #else
         for (size_t i = 0; i < ENTITY_COUNT; i++)
         {
@@ -238,6 +280,11 @@ public:
 #endif
 #endif // MULTITHREAD
 
+        for (size_t i = 0; i < ENTITY_COUNT; i++)
+        {
+            m_wanderers[i].DrawDebug();
+        }
+
         neighborIndices.clear();
 
         {
@@ -257,7 +304,6 @@ public:
             m_simplePathFollower2.FullUpdate(deltaTime, m_wanderers, neighborIndices);
             m_simplePathFollower2.DrawDebug();
         }
-
 
     }
 
