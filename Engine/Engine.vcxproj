@@ -230,6 +230,7 @@
     <ClInclude Include="Systems\BVH.h" />
     <ClInclude Include="Systems\GameFrameTime.h" />
     <ClInclude Include="Systems\GeomDefines.h" />
+    <ClInclude Include="Systems\KDTree.h" />
     <ClInclude Include="Systems\Octree.h" />
     <ClInclude Include="Systems\Plane.h" />
     <ClInclude Include="Systems\QuadTree.h" />
