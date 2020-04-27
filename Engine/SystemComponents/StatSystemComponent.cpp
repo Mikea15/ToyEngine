@@ -219,9 +219,9 @@ float StatSystemComponent::GetAverageMS() const
 void StatSystemComponent::WriteInfo(std::stringstream& stringStream)
 {
 	char buffer[150];
-	sprintf_s(buffer, "Time: %d - FPS Avg: %d [Min: %d, Max: %d] - MS Avg: %d [Min: %d, Max: %d]\n",
-		(int)GetAverageFPS(), (int)m_minFps, (int)m_maxFps, 
-		(int)GetAverageMS(), (int)m_minFrameTime, (int)m_maxFrameTime);
+	sprintf_s(buffer, "Time: %0.1f - FPS Avg: %0.1f [Min: %0.1f, Max: %0.1f] - MS Avg: %0.1f [Min: %0.1f, Max: %0.1f]\n",
+		m_totalTime, GetAverageFPS(), m_minFps, m_maxFps, 
+		GetAverageMS(), m_minFrameTime, m_maxFrameTime);
 
-	stringStream << buffer ;
+	stringStream << buffer;
 }
