@@ -56,6 +56,7 @@ namespace DebugDraw
 	int AddNormal(const glm::vec3& n, const glm::vec3& pos, float scale = 1.0f, const glm::vec4& col = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 	int AddPosition(const glm::vec3& pos, float scale = 1.0f, const glm::vec4& col = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	int AddRect(const glm::vec2& min, const glm::vec2& max, const glm::vec4& col = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	int AddRect(const glm::vec3& pos, float extent, const glm::vec3& dir = glm::vec3(0.0f, 1.0f, 0.0f), const glm::vec4& col = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	int AddAABB(const glm::vec3& min, const glm::vec3& max, const glm::vec4& col = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
 	int AddFrustrum(const glm::vec3& ftl, const glm::vec3& ftr, const glm::vec3& fbl, const glm::vec3& fbr,
 		const glm::vec3& ntl, const glm::vec3& ntr, const glm::vec3& nbl, const glm::vec3& nbr, const glm::vec4& col = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));

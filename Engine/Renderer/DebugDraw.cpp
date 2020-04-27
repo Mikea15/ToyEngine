@@ -8,6 +8,13 @@
 
 #include <vector>
 
+#define GLM_ENABLE_EXPERIMENTAL
+
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/compatibility.hpp>
+
 namespace DebugDraw
 {
 	GLuint m_linesVAO;
@@ -175,6 +182,42 @@ namespace DebugDraw
 				 AddLine( { bbl.x, 0.0f, bbl.y }, { bbr.x, 0.0f, bbr.y }, col);
 				 AddLine( { bfl.x, 0.0f, bfl.y }, { bbl.x, 0.0f, bbl.y }, col);
 				 AddLine( { bfr.x, 0.0f, bfr.y }, { bbr.x, 0.0f, bbr.y }, col);
+
+		return id;
+	}
+
+	int AddRect(const glm::vec3& pos, float extent, const glm::vec3& dir, const glm::vec4& col)
+	{
+		// Calculate change-of-basis matrix
+		glm::mat3 transform(1.0f);
+		if (dir.x == 0 && dir.z == 0)
+		{
+			if (dir.y < 0) { // rotate 180 degrees
+				transform = glm::mat3(glm::vec3(-1.0f, 0.0f, 0.0f),
+					glm::vec3(0.0f, -1.0f, 0.0f),
+					glm::vec3(0.0f, 0.0f, 1.0f));
+			}
+			// else if direction.y >= 0, leave transform as the identity matrix.
+		}
+		else
+		{
+			const glm::vec3 worldUp = { 0.0f, 1.0f, 0.0f };
+			glm::vec3 new_y = glm::normalize(dir);
+			glm::vec3 new_z = glm::normalize(glm::cross(new_y, worldUp));
+			glm::vec3 new_x = glm::normalize(glm::cross(new_y, new_z));
+
+			transform = glm::mat3(new_x, new_y, new_z);
+		}
+
+		const glm::vec3 bfl = transform * (pos + glm::vec3(-1.0f, 0.0f, -1.0f) * extent);
+		const glm::vec3 bfr = transform * (pos + glm::vec3(1.0f, 0.0f, -1.0f) * extent);
+		const glm::vec3 bbl = transform * (pos + glm::vec3(-1.0f, 0.0f, 1.0f) * extent);
+		const glm::vec3 bbr = transform * (pos + glm::vec3(1.0f, 0.0f, 1.0f) * extent);
+
+		int id = AddLine(bfl, bfr, col);
+				 AddLine(bbl, bbr, col);
+				 AddLine(bfl, bbl, col);
+				 AddLine(bfr, bbr, col);
 
 		return id;
 	}
