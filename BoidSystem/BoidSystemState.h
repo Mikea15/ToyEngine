@@ -80,12 +80,12 @@ public:
         for (size_t i = 0; i < ENTITY_COUNT; i++)
         {
             auto b = Boid(&m_sharedBoidProperties);
-            auto features = 
-               eSeek | 
-               eAlignment | 
-               eSeparation | 
-               eCohesion | 
-               eWallLimits;
+            auto features =
+                eSeek |
+                eAlignment |
+                eSeparation |
+                eCohesion |
+                eWallLimits;
 
             b.SetFeature(features);
 
@@ -95,7 +95,7 @@ public:
                 MathUtils::Rand(-50.0f, 50.0f)
             );
 
-            if (MathUtils::Rand01() > 0.5f) 
+            if (MathUtils::Rand01() > 0.5f)
             {
                 b.SetTarget(&m_simplePathFollower);
             }
@@ -142,99 +142,102 @@ public:
         AABB limits = AABB(glm::vec3(0.0f, 25.0f, 0.0f), 50);
         DebugDraw::AddAABB(limits.GetMin(), limits.GetMax());
 
-        {
-
 #if USE_OCTREE
-            PopulateOctree();
+        PopulateOctree();
 #elif USE_KDTREE
-            PopulateKDTree();
+        PopulateKDTree();
 #endif
 
 #if MULTITHREAD
-            std::vector<Boid> m_wanderersSnapshot(m_wanderers);
-            std::vector<std::thread> threads;
-            std::atomic<int> finishedThreads{ 0 };
-            const size_t groupSize = m_wanderers.size() / NUM_THREADS;
-            size_t rest = m_wanderers.size() % NUM_THREADS;
+        std::vector<std::thread> threads;
+        std::atomic<int> finishedThreads{ 0 };
+        const size_t groupSize = m_wanderers.size() / NUM_THREADS;
+        size_t rest = m_wanderers.size() % NUM_THREADS;
 
-            std::vector<JobBlock> job;
-            job.resize(NUM_THREADS);
+        std::vector<JobBlock> job;
+        job.resize(NUM_THREADS);
 
-            size_t groupIndex = 0;
+        size_t groupIndex = 0;
 
-            for (size_t t = 0; t < NUM_THREADS; ++t)
-            {
-                auto& tJob = job[t];
+        for (size_t t = 0; t < NUM_THREADS; ++t)
+        {
+            auto& tJob = job[t];
 
-                tJob.start = t * groupSize;
-                tJob.end = tJob.start + groupSize;
-                tJob.boids = std::vector<Boid>(m_wanderers.begin() + (groupSize * t), m_wanderers.begin() + (groupSize * t) + groupSize);
-
-                std::thread thr([&]() {
-                    for (size_t i = 0; i < tJob.boids.size(); i++)
-                    {
-                        tJob.boids[i].UpdateTargets();
-                        glm::vec3 force = tJob.boids[i].CalcSteeringBehavior(m_wanderersSnapshot, neighborIndices);
-                        tJob.boids[i].UpdatePosition(deltaTime, force);
-                    }
-
-                    // no more jobs.
-                    {
-                        std::lock_guard<std::mutex> lock(m_mutex);
-                        finishedThreads++;
-
-                        for (size_t i = tJob.start; i < tJob.end; i++)
-                        {
-                            m_wanderers[i] = tJob.boids[i - tJob.start];
-                        }
-
-                        m_cvar.notify_one();
-                    }
-                    });
-                threads.push_back(std::move(thr));
+            tJob.start = t * groupSize;
+            tJob.end = tJob.start + groupSize;
+            if (t == NUM_THREADS - 1) {
+                tJob.end += rest;
             }
+            tJob.boids = std::vector<Boid>(m_wanderers.begin() + (tJob.start), m_wanderers.begin() + tJob.end);
 
-            {
-                std::unique_lock<std::mutex> lock(m_mutex);
-                m_cvar.wait(lock, [&finishedThreads] {
-                    return finishedThreads == NUM_THREADS;
-                    });
-            }
-
-            for (std::thread& t : threads)
-            {
-                t.join();
-            }
-
-            for (size_t i = 0; i < ENTITY_COUNT; i++)
-            {
-                m_wanderers[i].DrawDebug();
-            }
-#else
-            for (size_t i = 0; i < ENTITY_COUNT; i++)
-            {
-#if USE_OCTREE
-                QueryOctree(m_wanderers[i].m_position, m_wanderers[i].m_properties->m_neighborRange, i);
-#elif USE_KDTREE
-                QueryKDTree(m_wanderers[i].m_position, m_wanderers[i].m_properties->m_neighborRange, i);
-#endif // USE_OCTREE
-                // Agent Core Loop
+            std::thread thr([&]() {
+                size_t boidsize = tJob.boids.size();
+                for (size_t i = 0; i < boidsize; i++)
                 {
-                    m_wanderers[i].UpdateTargets();
-
-                    glm::vec3 force = m_wanderers[i].CalcSteeringBehavior(m_wanderers, neighborIndices);
-                    m_wanderers[i].UpdatePosition(deltaTime, force);
+                    tJob.boids[i].UpdateTargets();
+                    glm::vec3 force = tJob.boids[i].CalcSteeringBehavior(m_wanderers, neighborIndices);
+                    tJob.boids[i].UpdatePosition(deltaTime, force);
                 }
-                m_wanderers[i].DrawDebug();
+
+                // no more jobs.
+                {
+                    std::lock_guard<std::mutex> lock(m_mutex);
+                    finishedThreads++;
+                    m_cvar.notify_one();
+                }
+                });
+            threads.push_back(std::move(thr));
+        }
+
+        {
+            std::unique_lock<std::mutex> lock(m_mutex);
+            m_cvar.wait(lock, [&finishedThreads] {
+                return finishedThreads == NUM_THREADS;
+                });
+        }
+
+        for (std::thread& t : threads)
+        {
+            t.join();
+        }
+
+        for (size_t t = 0; t < NUM_THREADS; t++)
+        {
+            for (size_t i = job[t].start; i < job[t].end; i++)
+            {
+                m_wanderers[i] = job[t].boids[i - job[t].start];
             }
+        }
+
+        for (size_t i = 0; i < ENTITY_COUNT; i++)
+        {
+            m_wanderers[i].DrawDebug();
+        }
+
+#else
+        for (size_t i = 0; i < ENTITY_COUNT; i++)
+        {
 #if USE_OCTREE
-            m_octree.DebugDraw();
+            QueryOctree(m_wanderers[i].m_position, m_wanderers[i].m_properties->m_neighborRange, i);
 #elif USE_KDTREE
-            m_kdtree.DebugDraw();
+            QueryKDTree(m_wanderers[i].m_position, m_wanderers[i].m_properties->m_neighborRange, i);
+#endif // USE_OCTREE
+            // Agent Core Loop
+            {
+                m_wanderers[i].UpdateTargets();
+
+                glm::vec3 force = m_wanderers[i].CalcSteeringBehavior(m_wanderers, neighborIndices);
+                m_wanderers[i].UpdatePosition(deltaTime, force);
+            }
+            m_wanderers[i].DrawDebug();
+        }
+#if USE_OCTREE
+        m_octree.DebugDraw();
+#elif USE_KDTREE
+        m_kdtree.DebugDraw();
 #endif
 #endif // MULTITHREAD
-        }
-        
+
         neighborIndices.clear();
 
         {
@@ -270,7 +273,7 @@ public:
     void QueryOctree(glm::vec3 pos, float range, size_t agentIndex)
     {
         AABB searchAabb = AABB(pos, range);
-        
+
         neighborResult.clear();
         m_octree.Search(searchAabb, neighborResult);
 
@@ -326,14 +329,14 @@ public:
         DebugDraw::Draw(x_ray);
     };
 
-    void RenderUI() 
+    void RenderUI()
     {
         BaseState::RenderUI();
 
         Debug::ShowPanel(m_sharedBoidProperties);
     };
 
-    void Cleanup() override 
+    void Cleanup() override
     {
         BaseState::Cleanup();
     };
@@ -346,14 +349,14 @@ private:
 
     Properties m_sharedBoidProperties;
     std::vector<Boid> m_wanderers;
-    
+
     Path m_path;
     Path m_path2;
 
     Octree m_octree;
     std::vector<OcNode> neighborResult;
     std::vector<size_t> neighborIndices;
-    
+
     kdtree m_kdtree;
     std::vector<glm::vec3> randomPoints;
 

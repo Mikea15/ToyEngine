@@ -1,7 +1,7 @@
 #pragma once
 
 #define MULTITHREAD 1
-#define NUM_THREADS 2
+#define NUM_THREADS 8
 
 #define USE_OCTREE 0
 #define USE_OCTREE_PRUNE_BY_DIST 1
@@ -9,7 +9,7 @@
 #define USE_AABB_PRUNE_BY_DIST 1
 
 #if _DEBUG
-#define ENTITY_COUNT 200
+#define ENTITY_COUNT 250
 #else
 #define ENTITY_COUNT 3500
 #endif

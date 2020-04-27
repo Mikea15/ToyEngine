@@ -63,7 +63,7 @@ struct Boid
         m_velocity += acceleration * deltaTime;
         m_velocity = glm::clamp(m_velocity, -m_properties->m_maxSpeed, m_properties->m_maxSpeed);
 
-        if (glm::length(m_velocity) > 0.0001f) 
+        if (glm::length(m_velocity) > 0.0001f)
         {
             m_direction = glm::normalize(m_velocity);
         }
@@ -86,12 +86,35 @@ struct Boid
         m_currentNeighborCount = neighborIndices.size();
 #else
         Search(this, otherBoids, m_neighborIndices, m_currentNeighborCount);
+#if MULTITHREAD
+        std::vector<size_t> neiIndices = m_neighborIndices;
+#else
+        // NOTE (MA): This is a reference that comes from Main, and is shared accross threads
+        // and is not protected against writes.
         neighborIndices = m_neighborIndices;
 #endif
-        assert(!glm::all(glm::isnan(force)));
-        if (HasFeature(eSeparation)) { force += m_properties->m_weightSeparation * Separation(otherBoids, neighborIndices); } assert(!glm::all(glm::isnan(force)));
-        if (HasFeature(eCohesion)) { force += m_properties->m_weightCohesion * Cohesion(otherBoids, neighborIndices); } assert(!glm::all(glm::isnan(force)));
-        if (HasFeature(eAlignment)) { force += m_properties->m_weightAlignment * Alignment(otherBoids, neighborIndices); } assert(!glm::all(glm::isnan(force)));
+#endif
+        if (HasFeature(eSeparation)) { force += m_properties->m_weightSeparation * Separation(otherBoids, 
+#if MULTITHREAD
+            neiIndices
+#else
+            neighborIndices
+#endif
+        ); }
+        if (HasFeature(eCohesion)) { force += m_properties->m_weightCohesion * Cohesion(otherBoids, 
+#if MULTITHREAD
+            neiIndices
+#else
+            neighborIndices
+#endif
+        ); }
+        if (HasFeature(eAlignment)) { force += m_properties->m_weightAlignment * Alignment(otherBoids, 
+#if MULTITHREAD
+            neiIndices
+#else
+            neighborIndices
+#endif
+        ); }
 
         return glm::clamp(force, -m_properties->m_maxForce, m_properties->m_maxForce);
     }
@@ -120,7 +143,7 @@ struct Boid
     {
         glm::vec3 desiredVelocity = glm::normalize(m_position - target);
         float distance = glm::length(desiredVelocity);
-        if (distance > 0.0f) 
+        if (distance > 0.0f)
         {
             desiredVelocity = glm::normalize(desiredVelocity);
         }
@@ -179,9 +202,11 @@ struct Boid
         size_t neighborCount = m_currentNeighborCount;
         for (size_t i = 0; i < neighborCount; ++i)
         {
-            glm::vec3 toAgent = m_position - neighbors[neighborIndices[i]].m_position;
+            auto& n = neighbors[neighborIndices[i]];
+            assert(m_position != n.m_position);
+            glm::vec3 toAgent = m_position - n.m_position;
             float distanceToAgent = glm::length(toAgent);
-            if (distanceToAgent > 0.0f) 
+            if (distanceToAgent > 0.0f)
             {
                 force += glm::normalize(toAgent) / distanceToAgent;
             }
@@ -205,7 +230,7 @@ struct Boid
             force /= static_cast<float>(neighborCount);
             force -= m_direction;
         }
-        
+
         return force;
     }
 
@@ -224,7 +249,7 @@ struct Boid
         {
             centerOfMass /= static_cast<float>(neighborCount);
             force = Seek(centerOfMass);
-            
+
             return glm::normalize(force);
         }
 
@@ -252,7 +277,7 @@ struct Boid
     void SetFeature(unsigned int feature) { m_properties->m_features = feature; }
 
 
-    int* AllocNeighborIndices(size_t size) 
+    int* AllocNeighborIndices(size_t size)
     {
         return static_cast<int*>(malloc(sizeof(int) * size));
     }
@@ -280,7 +305,7 @@ struct Boid
 #if !USE_AABB || (USE_AABB && USE_AABB_PRUNE_BY_DIST)
             glm::vec3 toAgent = agent->m_position - n.m_position;
             float distanceSqToAgent = glm::length2(toAgent);
-            if (distanceSqToAgent > agent->m_properties->m_neighborRange * agent->m_properties->m_neighborRange)
+            if (distanceSqToAgent < FLT_EPSILON || distanceSqToAgent > agent->m_properties->m_neighborRange * agent->m_properties->m_neighborRange)
             {
                 continue;
             }
@@ -295,6 +320,7 @@ struct Boid
         }
     }
 
+    unsigned int m_id = -1;
     glm::vec3 m_position;
     glm::vec3 m_velocity;
     glm::vec3 m_direction;
@@ -312,7 +338,6 @@ struct Boid
     std::vector<size_t> m_neighborIndices;
     size_t m_currentNeighborCount = 0u;
 
-    unsigned int m_id = -1;
     static unsigned int ID;
 };
 
