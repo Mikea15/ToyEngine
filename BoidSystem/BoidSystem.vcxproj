@@ -172,7 +172,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="Search.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Agent.h" />
@@ -183,7 +182,6 @@
     <ClInclude Include="BoidSystemState.h" />
     <ClInclude Include="OOP\Boid.h" />
     <ClInclude Include="Path.h" />
-    <ClInclude Include="Search.h" />
     <ClInclude Include="ThreadedState.h" />
   </ItemGroup>
   <ItemGroup>
