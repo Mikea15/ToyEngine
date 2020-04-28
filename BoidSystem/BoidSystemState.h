@@ -30,6 +30,18 @@ struct AsyncJob
     Boid copy;
 };
 
+struct BoidJob
+{
+    // input
+    std::vector<size_t> neighborIndices;
+    size_t index;
+    float deltatime;
+
+    // in/out
+    Boid agent;
+};
+
+
 class BoidSystemState
     : public BaseState
 {
@@ -123,6 +135,14 @@ public:
                 MathUtils::RandomInUnitSphere() * 10.0f
             );
         }
+
+#if MULTITHREAD && USE_THREAD_JOBS
+        m_isRunning.store(true);
+        for (size_t i = 0; i < NUM_THREADS; ++i)
+        {
+            m_workers.push_back(std::thread([&]() { WorkerThreadLoop(); }));
+        }
+#endif
 
         DebugDraw::Init();
     };
@@ -230,7 +250,7 @@ public:
                 aj.index = i;
                 aj.copy = m_wanderers[i];
                 return aj;
-            });
+                });
 
             {
                 std::lock_guard<std::mutex> lock(m_mutex);
@@ -254,6 +274,34 @@ public:
         }
 
 #elif USE_THREAD_JOBS
+
+        // prepare jobs
+
+        for (size_t i = 0; i < ENTITY_COUNT; i++)
+        {
+            BoidJob job;
+            job.agent = m_wanderers[i];
+            job.deltatime = deltaTime;
+            job.index = i;
+            job.neighborIndices = neighborIndices;
+
+            {
+                std::lock_guard<std::mutex> lock(m_jobQMutex);
+                m_boidJobQ.push(job);
+            }
+        }
+
+        {
+            std::unique_lock<std::mutex> lock(m_jobFinishedMutex);
+            m_cvarNotifJobsDone.wait(lock, [&]() { return m_finishedJobs.size() == ENTITY_COUNT; });
+        }
+
+        for (const BoidJob& b : m_finishedJobs)
+        {
+            m_wanderers[b.index] = b.agent;
+        }
+
+        m_finishedJobs.clear();
 
 #endif
 #else
@@ -359,6 +407,43 @@ public:
         }
     }
 
+#if MULTITHREAD && USE_THREAD_JOBS
+    void WorkerThreadLoop()
+    {
+        while (m_isRunning.load())
+        {
+            bool hasJobs = false;
+            BoidJob job;
+            {
+                std::scoped_lock<std::mutex> lock(m_jobQMutex);
+                if (!m_boidJobQ.empty()) 
+                {
+                    job = m_boidJobQ.front();
+                    m_boidJobQ.pop();
+                    hasJobs = true;
+                }
+            }
+
+            if (hasJobs)
+            {
+                job.agent.UpdateTargets();
+                glm::vec3 force = job.agent.CalcSteeringBehavior(m_wanderers, neighborIndices);
+                job.agent.UpdatePosition(job.deltatime, force);
+
+                {
+                    std::scoped_lock<std::mutex> lock(m_jobFinishedMutex);
+                    m_finishedJobs.push_back(job);
+                    m_cvarNotifJobsDone.notify_one();
+                }
+            }
+            else
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            }
+        }
+    }
+#endif
+
     void Render(float alpha = 1.0f) override
     {
 #if 0
@@ -384,6 +469,14 @@ public:
 
     void Cleanup() override
     {
+#if MULTITHREAD && USE_THREAD_JOBS
+        m_isRunning.store(false);
+        for (size_t i = 0; i < NUM_THREADS; ++i)
+        {
+            m_workers[i].join();
+        }
+#endif
+
         BaseState::Cleanup();
     };
 
@@ -409,5 +502,17 @@ private:
 #if MULTITHREAD
     std::mutex m_mutex;
     std::condition_variable m_cvar;
+
+    // threaded. jobs
+    std::atomic_bool m_isRunning;
+    std::vector<std::thread> m_workers;
+
+    std::mutex m_jobQMutex;
+    std::queue<BoidJob> m_boidJobQ;
+
+    std::mutex m_jobFinishedMutex;
+    std::vector<BoidJob> m_finishedJobs;
+
+    std::condition_variable m_cvarNotifJobsDone;
 #endif
 };

@@ -316,14 +316,13 @@ struct Boid
 #if USE_AABB
             if (!aabb.Contains(n.m_position)) { continue; }
 #endif
-#if !USE_AABB || (USE_AABB && USE_AABB_PRUNE_BY_DIST)
             glm::vec3 toAgent = agent->m_position - n.m_position;
             float distanceSqToAgent = glm::length2(toAgent);
             if (distanceSqToAgent < FLT_EPSILON || distanceSqToAgent > agent->m_properties->m_neighborRange * agent->m_properties->m_neighborRange)
             {
                 continue;
             }
-#endif
+
             if (maxNeighbors > 0 && outResultCount >= maxNeighbors)
             {
                 break;

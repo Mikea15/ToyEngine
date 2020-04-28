@@ -2,20 +2,19 @@
 
 #define MULTITHREAD 1
 
-#define NUM_THREADS 4
-#define USE_THREAD 1
-#define USE_THREAD_JOBS 0
+#define NUM_THREADS 8
+#define USE_THREAD 0
+#define USE_THREAD_JOBS 1
 #define USE_ASYNC 0
 
 #define USE_OCTREE 0
-#define USE_OCTREE_PRUNE_BY_DIST 1
-#define USE_AABB 1
-#define USE_AABB_PRUNE_BY_DIST 1
+#define USE_OCTREE_PRUNE_BY_DIST 0
+#define USE_AABB 0
 
 #if _DEBUG
-#define ENTITY_COUNT 350
+#define ENTITY_COUNT 600
 #else
-#define ENTITY_COUNT 2000
+#define ENTITY_COUNT 2500
 #endif
 
 #include <imgui.h>
