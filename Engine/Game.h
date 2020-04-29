@@ -25,6 +25,7 @@ public:
 	SDLHandler* GetSDLHandler() { return &m_sdlHandler; }
 	SimpleRenderer* GetRenderer() { return m_renderer; }
 	PhysXHandler* GetPhysX() { return &m_physxHandler; }
+	SystemComponentManager* GetSystemComponentManager() { return m_systemComponents; }
 
 	double GetTimeMS() const { return m_time; }
 

@@ -19,10 +19,15 @@ typename std::enable_if<EnableBitMaskOperators<E>::enable, E>::type
 operator |(E lhs, E rhs)
 {
 	using underlyingType = typename std::underlying_type<E>::type;
-	return static_cast<E>(
-		static_cast<underlyingType>(lhs) |
-		static_cast<underlyingType>(lhs)
-		);
+	return static_cast<E>(static_cast<underlyingType>(lhs) | static_cast<underlyingType>(lhs));
+}
+
+template<typename E>
+typename std::enable_if<EnableBitMaskOperators<E>::enable, E>::type
+operator &(E lhs, E rhs)
+{
+	using underlyingType = typename std::underlying_type<E>::type;
+	return static_cast<E>(static_cast<underlyingType>(lhs) & static_cast<underlyingType>(lhs));
 }
 
 #define ENABLE_BITMASK_OPERATORS(x)  \
