@@ -6,41 +6,9 @@
 #include "Path.h"
 
 #include "Engine/Systems/KDTree.h"
+#include "Engine/SystemComponents/StatSystemComponent.h"
 
 class Game;
-
-#if MULTITHREAD
-#include <atomic>
-#include <thread>
-#include <mutex>
-#include <condition_variable>
-#include <future>
-#endif
-
-struct JobBlock
-{
-    size_t start;
-    size_t end;
-    std::vector<Boid> boids;
-};
-
-struct AsyncJob
-{
-    size_t index;
-    Boid copy;
-};
-
-struct BoidJob
-{
-    // input
-    std::vector<size_t> neighborIndices;
-    size_t index;
-    float deltatime;
-
-    // in/out
-    Boid agent;
-};
-
 
 class BoidSystemState
     : public BaseState
@@ -136,21 +104,9 @@ public:
             );
         }
 
-#if MULTITHREAD && USE_THREAD_JOBS
-        m_isRunning.store(true);
-        for (size_t i = 0; i < NUM_THREADS; ++i)
-        {
-            m_workers.push_back(std::thread([&]() { WorkerThreadLoop(); }));
-        }
-#endif
-
         DebugDraw::Init();
     };
 
-    void HandleInput(SDL_Event* event) override
-    {
-        BaseState::HandleInput(event);
-    };
 
     void Update(float deltaTime) override
     {
@@ -175,136 +131,6 @@ public:
         PopulateKDTree();
 #endif
 
-#if MULTITHREAD
-#if USE_THREAD
-        std::vector<std::thread> threads;
-        std::atomic<int> finishedThreads{ 0 };
-        const size_t groupSize = m_wanderers.size() / NUM_THREADS;
-        size_t rest = m_wanderers.size() % NUM_THREADS;
-
-        std::vector<JobBlock> job;
-        job.resize(NUM_THREADS);
-
-        size_t groupIndex = 0;
-
-        for (size_t t = 0; t < NUM_THREADS; ++t)
-        {
-            auto& tJob = job[t];
-
-            tJob.start = t * groupSize;
-            tJob.end = tJob.start + groupSize;
-            if (t == NUM_THREADS - 1) {
-                tJob.end += rest;
-            }
-            tJob.boids = std::vector<Boid>(m_wanderers.begin() + (tJob.start), m_wanderers.begin() + tJob.end);
-
-            std::thread thr([&]() {
-                size_t boidsize = tJob.boids.size();
-                for (size_t i = 0; i < boidsize; i++)
-                {
-                    tJob.boids[i].UpdateTargets();
-                    glm::vec3 force = tJob.boids[i].CalcSteeringBehavior(m_wanderers, neighborIndices);
-                    tJob.boids[i].UpdatePosition(deltaTime, force);
-                }
-
-                // no more jobs.
-                {
-                    std::lock_guard<std::mutex> lock(m_mutex);
-                    finishedThreads++;
-                    m_cvar.notify_one();
-                }
-                });
-            threads.push_back(std::move(thr));
-        }
-
-        {
-            std::unique_lock<std::mutex> lock(m_mutex);
-            m_cvar.wait(lock, [&finishedThreads] {
-                return finishedThreads == NUM_THREADS;
-                });
-        }
-
-        for (std::thread& t : threads)
-        {
-            t.join();
-        }
-
-        for (size_t t = 0; t < NUM_THREADS; t++)
-        {
-            for (size_t i = job[t].start; i < job[t].end; i++)
-            {
-                m_wanderers[i] = job[t].boids[i - job[t].start];
-            }
-        }
-#elif USE_ASYNC
-        std::vector<std::future<AsyncJob>> futures;
-
-        for (size_t i = 0; i < ENTITY_COUNT; i++)
-        {
-            auto future = std::async(std::launch::async, [deltaTime, i, this]() {
-                m_wanderers[i].UpdateTargets();
-                glm::vec3 force = m_wanderers[i].CalcSteeringBehavior(m_wanderers, neighborIndices);
-                m_wanderers[i].UpdatePosition(deltaTime, force);
-
-                AsyncJob aj;
-                aj.index = i;
-                aj.copy = m_wanderers[i];
-                return aj;
-                });
-
-            {
-                std::lock_guard<std::mutex> lock(m_mutex);
-                futures.push_back(std::move(future));
-            }
-        }
-
-        {
-            std::unique_lock<std::mutex> lock(m_mutex);
-            m_cvar.wait(lock, [&futures] {
-                return futures.size() == ENTITY_COUNT;
-                });
-        }
-
-        for (std::future<AsyncJob>& aj : futures)
-        {
-            //aj.wait();
-
-            AsyncJob result = aj.get();
-            m_wanderers[result.index] = result.copy;
-        }
-
-#elif USE_THREAD_JOBS
-
-        // prepare jobs
-
-        for (size_t i = 0; i < ENTITY_COUNT; i++)
-        {
-            BoidJob job;
-            job.agent = m_wanderers[i];
-            job.deltatime = deltaTime;
-            job.index = i;
-            job.neighborIndices = neighborIndices;
-
-            {
-                std::lock_guard<std::mutex> lock(m_jobQMutex);
-                m_boidJobQ.push(job);
-            }
-        }
-
-        {
-            std::unique_lock<std::mutex> lock(m_jobFinishedMutex);
-            m_cvarNotifJobsDone.wait(lock, [&]() { return m_finishedJobs.size() == ENTITY_COUNT; });
-        }
-
-        for (const BoidJob& b : m_finishedJobs)
-        {
-            m_wanderers[b.index] = b.agent;
-        }
-
-        m_finishedJobs.clear();
-
-#endif
-#else
         for (size_t i = 0; i < ENTITY_COUNT; i++)
         {
 #if USE_OCTREE
@@ -326,7 +152,6 @@ public:
 #elif USE_KDTREE
         m_kdtree.DebugDraw();
 #endif
-#endif // MULTITHREAD
 
         for (size_t i = 0; i < ENTITY_COUNT; i++)
         {
@@ -407,43 +232,6 @@ public:
         }
     }
 
-#if MULTITHREAD && USE_THREAD_JOBS
-    void WorkerThreadLoop()
-    {
-        while (m_isRunning.load())
-        {
-            bool hasJobs = false;
-            BoidJob job;
-            {
-                std::scoped_lock<std::mutex> lock(m_jobQMutex);
-                if (!m_boidJobQ.empty()) 
-                {
-                    job = m_boidJobQ.front();
-                    m_boidJobQ.pop();
-                    hasJobs = true;
-                }
-            }
-
-            if (hasJobs)
-            {
-                job.agent.UpdateTargets();
-                glm::vec3 force = job.agent.CalcSteeringBehavior(m_wanderers, neighborIndices);
-                job.agent.UpdatePosition(job.deltatime, force);
-
-                {
-                    std::scoped_lock<std::mutex> lock(m_jobFinishedMutex);
-                    m_finishedJobs.push_back(job);
-                    m_cvarNotifJobsDone.notify_one();
-                }
-            }
-            else
-            {
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            }
-        }
-    }
-#endif
-
     void Render(float alpha = 1.0f) override
     {
 #if 0
@@ -467,19 +255,6 @@ public:
         Debug::ShowPanel(m_sharedBoidProperties);
     };
 
-    void Cleanup() override
-    {
-#if MULTITHREAD && USE_THREAD_JOBS
-        m_isRunning.store(false);
-        for (size_t i = 0; i < NUM_THREADS; ++i)
-        {
-            m_workers[i].join();
-        }
-#endif
-
-        BaseState::Cleanup();
-    };
-
 private:
     ViewportGrid m_viewGrid;
 
@@ -498,21 +273,4 @@ private:
 
     kdtree m_kdtree;
     std::vector<glm::vec3> randomPoints;
-
-#if MULTITHREAD
-    std::mutex m_mutex;
-    std::condition_variable m_cvar;
-
-    // threaded. jobs
-    std::atomic_bool m_isRunning;
-    std::vector<std::thread> m_workers;
-
-    std::mutex m_jobQMutex;
-    std::queue<BoidJob> m_boidJobQ;
-
-    std::mutex m_jobFinishedMutex;
-    std::vector<BoidJob> m_finishedJobs;
-
-    std::condition_variable m_cvarNotifJobsDone;
-#endif
 };

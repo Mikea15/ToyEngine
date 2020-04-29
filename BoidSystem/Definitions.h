@@ -1,10 +1,10 @@
 #pragma once
 
-#define MULTITHREAD 1
+#define MULTITHREAD 0
 
 #define NUM_THREADS 8
-#define USE_THREAD 0
-#define USE_THREAD_JOBS 1
+#define USE_THREAD 1
+#define USE_THREAD_JOBS 0
 #define USE_ASYNC 0
 
 #define USE_OCTREE 0
@@ -12,9 +12,31 @@
 #define USE_AABB 0
 
 #if _DEBUG
-#define ENTITY_COUNT 600
+#define ENTITY_COUNT 300
 #else
 #define ENTITY_COUNT 2500
+#endif
+
+#ifndef APP_INFO
+#if MULTITHREAD
+    #if USE_THREAD
+    #define TYPE "MT - " NUM_THREADS " Threads - Blocks"
+    #elif USE_THREAD_JOBS
+    #define TYPE "MT - " NUM_THREADS " Threads - Jobs"
+    #else
+    #define TYPE "MT - Async Jobs"
+    #endif
+#else
+    #define TYPE "Single Thread"
+#endif
+#if USE_OCTREE
+#define EXTRA " - Search: Octree"
+#elif USE_AABB
+#define EXTRA " - Search: AABB"
+#else
+#define EXTRA " - Search: Distance"
+#endif
+#define APP_INFO "Boid System - " TYPE " - " EXTRA
 #endif
 
 #include <imgui.h>
@@ -64,10 +86,11 @@ namespace Debug
     void ShowPanel(Properties& properties)
     {
         ImGui::Begin("Boid::Properties");
-
         ImGui::SliderFloat("Max Speed", &properties.m_maxSpeed, 0.0f, 50.0f);
         ImGui::SliderFloat("Max Force", &properties.m_maxForce, 0.0f, 50.0f);
         ImGui::SliderFloat("Vehicle Mass", &properties.m_mass, 0.1f, 10.0f);
+        ImGui::SliderFloat("Neighbor Range", &properties.m_neighborRange, 1.0f, 10.0f);
+        ImGui::Separator();
 
         ImGui::Text("Independent Behavior");
         ImGui::SliderFloat("Wander", &properties.m_weightWander, 0.0f, 5.0f);
@@ -75,15 +98,16 @@ namespace Debug
         ImGui::SliderFloat("Flee", &properties.m_weightFlee, 0.0f, 5.0f);
         ImGui::SliderFloat("Arrive", &properties.m_weightArrive, 0.0f, 5.0f);
         ImGui::SliderFloat("FollowPath", &properties.m_weightFollowPath, 0.0f, 5.0f);
-
         ImGui::Separator();
+
         ImGui::Text("Group Behavior");
         ImGui::SliderFloat("Alignment", &properties.m_weightAlignment, 0.0f, 5.0f);
         ImGui::SliderFloat("Cohesion", &properties.m_weightCohesion, 0.0f, 5.0f);
         ImGui::SliderFloat("Separation", &properties.m_weightSeparation, 0.0f, 5.0f);
-
         ImGui::Separator();
+
         ImGui::SliderFloat("Wall Limits", &properties.m_weightWallLimits, 0.0f, 5.0f);
+        ImGui::Separator();
 
         ImGui::End();
     }

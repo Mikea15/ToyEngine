@@ -24,6 +24,8 @@ public:
 
 	void WriteInfo(std::stringstream& stringStream);
 
+	void SetCustomInfoLog(const std::string& info);
+
 private:
 	float m_totalTime = 0.0f;
 	float m_renderCount = 0.0f;
@@ -54,4 +56,6 @@ private:
 	bool show_demo_window = false;
 	bool show_another_window = false;
 	bool open = true;
+
+	std::string m_info;
 };
