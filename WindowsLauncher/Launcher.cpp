@@ -1,7 +1,9 @@
 
 #include "Launcher.h"
 #include "Engine/Game.h"
+
 #include "BoidSystem/BoidSystemState.h"
+#include "BoidSystem/ThreadedState.h"
 
 #include <chrono>
 #include <set>
@@ -135,8 +137,14 @@ int main(int argc, char* argv[])
 	getchar();
 	return 0;
 #else
-	BoidSystemState stubState;
-	Game game(&stubState);
+
+#if MULTITHREAD
+	ThreadedState state;
+#else
+	BoidSystemState state;
+#endif
+
+	Game game(&state);
 	return game.Execute();
 #endif
 }
