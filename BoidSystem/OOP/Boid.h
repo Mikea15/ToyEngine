@@ -279,8 +279,8 @@ struct Boid
         if (m_position.y > limits.GetMax().y) { force.y = -1; }
         else if (m_position.y < limits.GetMin().y) { force.y = 1.0f; }
 
-        if (m_position.z > limits.GetMax().z) { force.x = -1; }
-        else if (m_position.z < limits.GetMin().z) { force.x = 1.0f; }
+        if (m_position.z > limits.GetMax().z) { force.z = -1; }
+        else if (m_position.z < limits.GetMin().z) { force.z = 1.0f; }
 
         return force;
     }
@@ -355,7 +355,3 @@ struct Boid
 };
 
 unsigned int Boid::ID = 0;
-
-
-
-// ENABLE_BITMASK_OPERATORS(Boid::Feature);
