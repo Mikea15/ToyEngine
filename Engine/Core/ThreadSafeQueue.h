@@ -5,11 +5,11 @@
 #include <condition_variable>
 
 template<typename T>
-class Queue
+class ThreadSafeQueue
 {
 public:
-    Queue() {}
-    Queue(const Queue& copy)
+    ThreadSafeQueue() {}
+    ThreadSafeQueue(const ThreadSafeQueue& copy)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_data = copy.m_data;
