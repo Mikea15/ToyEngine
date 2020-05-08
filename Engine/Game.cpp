@@ -15,7 +15,6 @@
 
 Game::Game(State* state)
 	: m_isRunning(true)
-	, m_deltaTime(1.0f / 60.0f)
 	, m_gameState(nullptr)
 {
 	LoadConfig();
@@ -85,26 +84,16 @@ void Game::SetState(State* state)
 
 int Game::Execute()
 {
-	m_frameTime.Init();
+	m_gameTime.Init();
 	float accumulator = 0.0f;
 
 	while (m_isRunning)
 	{
 		PROFILE_SCOPE("UpdateLoop");
+		m_gameTime.Tick();
 
-		float frameTime = m_frameTime.GetFrameTime();
-		m_time += frameTime;
-
-		// cap on how many updates we can do.
-		// eg. dt: 1/60 ( 60 ups ).
-		// frametime: 0.25
-		// max ups = frametime / m_deltaTime
-		// max ups = 0.25 / 0.016 = 15.6ups
-		// for 30 ups -> max frametime 0.25 ( 7.5 )
-		// for 60 ups -> max frametime 0.083 ( 5 updates )
-		if (frameTime > 0.25f)
-			frameTime = 0.25f;
-
+		const float frameTime = m_gameTime.GetElapsed();
+		const float updateRate = m_gameTime.GetUpdateRate();
 		accumulator += frameTime;
 
 		// System Components PreUpdate
@@ -124,6 +113,7 @@ int Game::Execute()
 				case SDL_KEYDOWN:
 					switch (event.key.keysym.sym)
 					{
+						break;
 					case SDLK_ESCAPE:
 						m_isRunning = false;
 						break;
@@ -142,28 +132,35 @@ int Game::Execute()
 
 		{
 			PROFILE_SCOPE("Update");
-			// Handle Updates / Fixed Update
-			while (accumulator >= m_deltaTime)
+
+			// Handle Updates at Fixed Update Rate
+			// if update rate is 60fps, and frame time is 30fps.
+			// accumulator 33ms, update rate, 16ms.
+			// 1 update -> accumulator 33-16=17.
+			// 2 update -> accumulator 17-16=1
+			// no update 3 because accumulator = 1 < 16 ( update Rate )
+			// we'll update twice, before rendering a new frame.
+			while (accumulator >= updateRate)
 			{
 				// physx tick
 				// m_physxHandler.Tick(m_deltaTime);
 
 				// system components
-				m_systemComponents->Update(m_deltaTime);
+				m_systemComponents->Update(updateRate);
 
 				// window Update
-				m_sdlHandler.Update(m_deltaTime);
+				m_sdlHandler.Update(updateRate);
 
 				// Update
-				m_gameState->Update(m_deltaTime);
+				m_gameState->Update(updateRate);
 
-				accumulator -= m_deltaTime;
+				accumulator -= updateRate;
 			}
 		}
 
 
 		// Handle Rendering
-		const float alpha = accumulator / m_deltaTime;
+		const float alpha = accumulator / updateRate;
 
 		// Render
 		{

@@ -173,6 +173,7 @@
     <ClInclude Include="Camera\FlyCamera.h" />
     <ClInclude Include="Core\exp_Octree.h" />
     <ClInclude Include="Core\StackAllocator.h" />
+    <ClInclude Include="Core\ThreadSafeQueue.h" />
     <ClInclude Include="Core\VectorContainer.h" />
     <ClInclude Include="External\ImGuizmo\imGuIZMOquat.h" />
     <ClInclude Include="External\ImGuizmo\vgConfig.h" />
@@ -228,7 +229,7 @@
     <ClInclude Include="Systems\BST.h" />
     <ClInclude Include="Systems\BTree.h" />
     <ClInclude Include="Systems\BVH.h" />
-    <ClInclude Include="Systems\GameFrameTime.h" />
+    <ClInclude Include="Systems\GameTime.h" />
     <ClInclude Include="Systems\GeomDefines.h" />
     <ClInclude Include="Systems\KDTree.h" />
     <ClInclude Include="Systems\Octree.h" />
@@ -293,7 +294,7 @@
     <ClCompile Include="Systems\BST.cpp" />
     <ClCompile Include="Systems\BTree.cpp" />
     <ClCompile Include="Systems\BVH.cpp" />
-    <ClCompile Include="Systems\GameFrameTime.cpp" />
+    <ClCompile Include="Systems\GameTime.cpp" />
     <ClCompile Include="Systems\Octree.cpp" />
     <ClCompile Include="Systems\Plane.cpp" />
     <ClCompile Include="Systems\QuadTree.cpp" />

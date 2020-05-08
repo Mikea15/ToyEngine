@@ -4,6 +4,19 @@
 
 namespace MathUtils
 {
+	static float Clamp(float a, float min, float max)
+	{
+		if (a > max)
+		{
+			a = max;
+		}
+		if (a < min)
+		{
+			a = min;
+		}
+		return a;
+	}
+
 	static float Lerp(float a, float b, float t)
 	{
 		return a + t * (b - a);
