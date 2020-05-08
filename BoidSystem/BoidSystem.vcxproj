@@ -175,8 +175,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Agent.h" />
-    <ClInclude Include="CompositionState.h" />
-    <ClInclude Include="Composition\AgentComposition.h" />
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="Behaviours\IBehavior.h" />
     <ClInclude Include="BoidSystemState.h" />

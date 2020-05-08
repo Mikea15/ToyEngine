@@ -35,13 +35,7 @@
     <ClInclude Include="Definitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Composition\AgentComposition.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ThreadedState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CompositionState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Behaviours\IBehavior.h">
