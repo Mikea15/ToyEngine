@@ -15,7 +15,7 @@ class Game;
 #include <condition_variable>
 #include <future>
 
-#include "Core/Concurrency/Queue.h"
+#include "Core/ThreadSafeQueue.h"
 
 struct JobBlock
 {
@@ -459,7 +459,7 @@ private:
     std::atomic_bool m_isRunning;
     std::vector<std::thread> m_workers;
 
-    concurrency::Queue<BoidJob> m_boidJobQ;
+    ThreadSafeQueue<BoidJob> m_boidJobQ;
 
     std::mutex m_jobFinishedMutex;
     std::vector<BoidJob> m_finishedJobs;
