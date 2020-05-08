@@ -120,8 +120,8 @@ public:
         if (world->agent->m_position.y > world->limits.GetMax().y) { force.y = -1; }
         else if (world->agent->m_position.y < world->limits.GetMin().y) { force.y = 1.0f; }
 
-        if (world->agent->m_position.z > world->limits.GetMax().z) { force.x = -1; }
-        else if (world->agent->m_position.z < world->limits.GetMin().z) { force.x = 1.0f; }
+        if (world->agent->m_position.z > world->limits.GetMax().z) { force.z = -1; }
+        else if (world->agent->m_position.z < world->limits.GetMin().z) { force.z = 1.0f; }
 
         return force;
     }
