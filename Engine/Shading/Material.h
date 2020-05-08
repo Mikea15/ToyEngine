@@ -5,7 +5,7 @@
 #include "Texture.h"
 #include "TextureCube.h"
 
-#include <glm/glm.hpp>
+#include "Engine/Vector.h"
 #include <GL/glew.h>
 
 #include <map>

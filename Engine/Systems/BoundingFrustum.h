@@ -1,7 +1,6 @@
 #pragma once
 
-#include <glm/glm.hpp>
-#include <glm/mat4x4.hpp>
+#include "Engine/Vector.h"
 
 #include <GL/glew.h>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include "Engine/Vector.h"
 #include <GL/glew.h>
 
 #include "GeomDefines.h"

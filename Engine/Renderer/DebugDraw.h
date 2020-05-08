@@ -3,7 +3,7 @@
 #include "Shading/Shader.h"
 #include "Resources/ShaderLoader.h"
 
-#include <glm/glm.hpp>
+#include "Engine/Vector.h"
 #include <GL/glew.h>
 
 //

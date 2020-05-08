@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <glm/fwd.hpp>
+#include "Engine/Vector.h"
 #include <nlohmann/json.hpp>
 
 using namespace nlohmann;

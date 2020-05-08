@@ -15,14 +15,14 @@ public:
         m_data = copy.m_data;
     }
 
-    void Push(T val)
+    void push(T val)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_data.push(val);
         m_cvar.notify_one();
     }
 
-    void WaitAndPop(T& val)
+    void wait_pop(T& val)
     {
         std::unique_lock<std::mutex> lock(m_mutex);
         m_cvar.wait([this]() { return !m_data.empty(); });
@@ -31,7 +31,7 @@ public:
         m_data.pop();
     }
 
-    std::shared_ptr<T> WaitAndPop()
+    std::shared_ptr<T> wait_pop()
     {
         std::unique_lock<std::mutex> lock(m_mutex);
         m_cvar.wait([this]() { return !m_data.empty(); });
@@ -42,7 +42,7 @@ public:
         return val;
     }
 
-    bool TryPop(T& val)
+    bool try_pop(T& val)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         if (m_data.empty())
@@ -56,7 +56,7 @@ public:
         return true;
     }
 
-    std::shared_ptr<T> TryPop()
+    std::shared_ptr<T> try_pop()
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         if (m_data.empty())
@@ -70,13 +70,13 @@ public:
         return val;
     }
 
-    bool Empty()
+    bool empty()
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         return m_data.empty();
     }
 
-    unsigned int Size()
+    unsigned int size()
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         return static_cast<unsigned int>(m_data.size());

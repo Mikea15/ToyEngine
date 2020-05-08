@@ -9,7 +9,7 @@
 #include <condition_variable>
 #include <chrono>
 
-#include <glm/gtc/noise.hpp>
+#include "Engine/Vector.h"
 
 #include "Mesh/Mesh.h"
 

@@ -31,8 +31,7 @@
 #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
 #endif
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "Engine/Vector.h"
 
 #define NUM_VERT 1000000
 #define PI 3.14159f

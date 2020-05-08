@@ -2,8 +2,7 @@
 
 #include <vector>
 
-#include <glm/glm.hpp>
-
+#include "Engine/Vector.h"
 
 class Renderer;
 class Material;

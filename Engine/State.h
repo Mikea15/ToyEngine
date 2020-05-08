@@ -28,14 +28,8 @@ union SDL_Event;
 #include "Systems/BVH.h"
 
 #include <stack>
-#define GLM_ENABLE_EXPERIMENTAL
 
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/quaternion.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/compatibility.hpp>
-
-#include "External/ImGuizmo/imGuIZMOquat.h"
+#include "Engine/Vector.h"
 
 class State
 {

@@ -8,11 +8,7 @@
 #include <imgui.h>
 #include <assert.h>
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/quaternion.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/compatibility.hpp>
+#include "Engine/Vector.h"
 
 SceneNode::SceneNode(unsigned int id)
 	: m_id(id)

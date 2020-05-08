@@ -3,8 +3,7 @@
 #include <vector>
 #include <functional>
 
-#define GLM_FORCE_SWIZZLE
-#include <glm/glm.hpp>
+#include "Engine/Vector.h"
 
 
 static const float PI = 3.14159265359f;

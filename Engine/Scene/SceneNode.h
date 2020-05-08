@@ -2,8 +2,7 @@
 
 #include <vector>
 
-#include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
+#include "Engine/Vector.h"
 
 class Scene;
 class Mesh;

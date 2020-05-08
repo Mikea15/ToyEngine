@@ -1,9 +1,8 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include "Engine/Vector.h"
 
 #include <string>
-
 
 class Texture;
 class TextureCube;

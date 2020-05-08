@@ -15,11 +15,14 @@ public:
 	void Tick();
 	TimePrecision GetElapsed() const;
 	TimePrecision GetTotalTime() const;
-	TimePrecision GetUpdateRate() const { return m_updateRate; }
+	TimePrecision GetUpdateRate() const { return m_updateRate * m_timeScale; }
 
+	TimePrecision GetTimeScaleMin() const { return m_timeScaleMin; }
+	TimePrecision GetTimeScaleMax() const { return m_timeScaleMax; }
 	void IncreaseTimeScale();
 	void DecreaseTimeScale();
 	void SetTimeScale(TimePrecision scale);
+	TimePrecision GetTimeScale() const { return m_timeScale; }
 
 private:
 	high_resolution_clock::time_point m_initialTime{};
