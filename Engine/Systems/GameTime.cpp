@@ -41,7 +41,7 @@ TimePrecision GameTime::GetElapsed() const
 
 TimePrecision GameTime::GetTotalTime() const
 {
-	return duration<TimePrecision, std::centi>(high_resolution_clock::now() - m_initialTime).count();
+	return duration_cast<duration<TimePrecision>>(m_previousNow - m_initialTime).count();
 }
 
 void GameTime::IncreaseTimeScale()

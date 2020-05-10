@@ -2,13 +2,15 @@
 
 #include "SystemComponentManager.h"
 
+class GameTime;
+
 class StatSystemComponent
 	: public SystemComponent
 {
 	CLASS_DECLARATION(StatSystemComponent)
 
 public:
-	StatSystemComponent();
+	StatSystemComponent(GameTime* pGameTime);
 	~StatSystemComponent() override;
 
 	void Initialize(Game* game) override;
@@ -27,7 +29,8 @@ public:
 	void SetCustomInfoLog(const std::string& info);
 
 private:
-	float m_totalTime = 0.0f;
+	GameTime* m_pGameTime;
+
 	float m_renderCount = 0.0f;
 	float m_updateCount = 0.0f;
 	float m_oneSecond = 0.0f;
@@ -40,7 +43,6 @@ private:
 	float m_minFrameTime = 9999.0f;
 	float m_maxFrameTime = 0.0f;
 
-	float m_lastFrameTimeMS = 0.0f;
 	float m_lastDeltaTime = 0.0f;
 
 	static const int s_sampleCount = 350;

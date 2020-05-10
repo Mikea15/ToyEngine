@@ -37,7 +37,7 @@ void Game::InitSystems()
 
 	// System Components
 	m_systemComponents = new SystemComponentManager();
-	m_systemComponents->AddComponent<StatSystemComponent>();
+	m_systemComponents->AddComponent<StatSystemComponent>(&m_gameTime);
 
 	m_systemComponents->Initialize(this);
 
