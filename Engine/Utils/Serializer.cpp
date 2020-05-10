@@ -4,6 +4,8 @@
 #include "Scene/Scene.h"
 #include "Scene/SceneNode.h"
 
+#include <glm/glm.hpp>
+
 SceneNode* Serializer::LoadScene()
 {
 	std::string tempLevelPath = "../../../../data/level.json";

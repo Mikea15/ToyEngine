@@ -1,6 +1,11 @@
 #include "FlyCamera.h"
 
-#include "Engine/Vector.h"
+#define GLM_ENABLE_EXPERIMENTAL
+
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/compatibility.hpp>
 
 
 FlyCamera::FlyCamera(glm::vec3 position, glm::vec3 forward, glm::vec3 up) 
@@ -23,7 +28,7 @@ void FlyCamera::Update(float deltaTime)
 	m_yaw = glm::lerp(m_yaw, m_targetYaw, glm::clamp(dampingFactor * 2.0f, 0.0f, 1.0f));
 	m_pitch = glm::lerp(m_pitch, m_targetPitch, glm::clamp(dampingFactor * 2.0f, 0.0f, 1.0f));
 
-	const float radian = glm::radians(1.0f);
+	static constexpr float radian = glm::radians(1.0f);
 	glm::vec3 forward(
 		cos(radian * m_pitch) * cos(radian * m_yaw),
 		sin(radian * m_pitch),

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Vector.h"
+#include <glm/gtx/norm.hpp>
 
 namespace MathUtils
 {

@@ -2,13 +2,11 @@
 
 #include "Game.h"
 
-#include "Systems/GameTime.h"
 #include "Utils/FileIO.h"
 
 CLASS_DEFINITION(SystemComponent, StatSystemComponent)
 
-StatSystemComponent::StatSystemComponent(GameTime* pGameTime)
-    : m_pGameTime(pGameTime)
+StatSystemComponent::StatSystemComponent()
 {
 }
 
@@ -31,7 +29,10 @@ void StatSystemComponent::HandleInput(SDL_Event* event)
 
 void StatSystemComponent::PreUpdate(float frameTime)
 {
-    m_oneSecond += m_pGameTime->GetElapsed();
+    float frameTimeMS = frameTime * 1000.0f;
+
+    m_totalTime += frameTime;
+    m_oneSecond += frameTime;
 
     if (m_oneSecond >= 1.0f)
     {
@@ -57,6 +58,8 @@ void StatSystemComponent::PreUpdate(float frameTime)
             m_maxFps = (m_fpsBuffer[i] > m_maxFps) ? m_fpsBuffer[i] : m_maxFps;
         }
     }
+
+    m_lastFrameTimeMS = frameTimeMS;
 }
 
 void StatSystemComponent::Update(float deltaTime)
@@ -71,7 +74,7 @@ void StatSystemComponent::Update(float deltaTime)
     }
     m_currentSampleInterval = 0.0f;
 
-    m_msBuffer[m_currentMsBufferIndex++] = m_pGameTime->GetElapsed() * 1000.0f; // to Milliseconds.
+    m_msBuffer[m_currentMsBufferIndex++] = m_lastFrameTimeMS;
     if (m_currentMsBufferIndex >= s_sampleCount)
     {
         m_currentMsBufferIndex = 0;
@@ -117,7 +120,7 @@ void StatSystemComponent::RenderUI()
 
     // frame time
     char bufferMS[40];
-    sprintf_s(bufferMS, "%.2f (ms) / %.2f (avg)", m_pGameTime->GetElapsed(), avgMS);
+    sprintf_s(bufferMS, "%.2f (ms) / %.2f (avg)", m_lastFrameTimeMS, avgMS);
     ImGui::PushItemWidth(-padding);
     ImGui::PlotLines("", m_msBuffer, IM_ARRAYSIZE(m_msBuffer), m_currentMsBufferIndex, bufferMS, 60, -5, ImVec2(0, 50));
     // ImGui::NextColumn();
@@ -139,37 +142,38 @@ void StatSystemComponent::RenderUI()
         ImGui::Separator();
     }
 
-    ImGui::Text("Ms: %.3f, Avg: %.2f (Min: %.2f / Max: %.2f)", (m_pGameTime->GetElapsed() / 1000.0f), avgMS, m_minFrameTime, m_maxFrameTime);
-    ImGui::Text("FPS: %.2f, Avg: %.2f (Min: %.2f / Max: %.2f)", m_framesPerSecond, avgFPS, m_minFps, m_maxFps);
+    ImGui::Columns(2, NULL, false);
+    ImGui::PushItemWidth(15);
+    ImGui::Text("Frame Time: %0.2f", m_lastFrameTimeMS);
+    ImGui::Text("Min: %.1f", m_minFrameTime);
+    ImGui::Text("Max: %.1f", m_maxFrameTime);
+    ImGui::Text("Avg: %.2f", avgMS);
+    ImGui::NextColumn();
+
+    ImGui::PushItemWidth(15);
+    ImVec4 color = (m_framesPerSecond < 30) ? ImVec4(0.9f, 0.7f, 0.f, 1.f) : ImVec4(0.1f, 0.75f, 0.1f, 1.0f);
+    ImGui::TextColored(color, "FPS: %.2f", m_framesPerSecond);
+    ImGui::Text("Min %.1f", m_minFps);
+    ImGui::Text("Max: %.1f", m_maxFps);
+    ImGui::Text("Avg: %.2f", avgFPS);
+    ImGui::NextColumn();
 
     ImGui::Separator();
 
-    ImGui::Text("Total Time: %0.1f", m_pGameTime->GetTotalTime());
-    ImGui::Text("Update Rate: %.2f", m_pGameTime->GetUpdateRate());
-    ImGui::Text("DeltaTime: %.3f (ms)", m_pGameTime->GetElapsed());
-
-    ImGui::Separator();
-
-    ImGui::Text("TimeScale: %.1f", m_pGameTime->GetTimeScale());
-    float timeScale = m_pGameTime->GetTimeScale();
-    ImGui::SliderFloat("TimeScale", &timeScale, m_pGameTime->GetTimeScaleMin(),
-        m_pGameTime->GetTimeScaleMax());
-    if (m_pGameTime->GetTimeScale() != timeScale) {
-        m_pGameTime->SetTimeScale(timeScale);
-    }
-
-    ImGui::Separator();
-
-    ImGui::Text("Update: %.0f", m_updateCount);
-    ImGui::Text("Frame: %.0f", m_renderCount);
-    ImGui::Text("Updates (p/sec): %.1f", m_updatesPerSecond);
-    ImGui::Text("Updates (p/frame): %.1f", m_updateCount / m_renderCount);
-
-    ImGui::Separator();
-
+    ImGui::Text("Total Time: %0.2f", m_totalTime);
+    ImGui::Text("dt: %.3f (ms)", m_lastDeltaTime);
+    ImGui::Text("Updates (p/sec): %.2f", m_updatesPerSecond);
     ImGui::Text("One (s): %.3f", m_oneSecond);
+    ImGui::NextColumn();
 
+    ImGui::Text("# Updates: %.1f", m_updateCount);
+    ImGui::Text("# Frames: %.1f", m_renderCount);
+    ImGui::Text("# Updates (p/frame): %.3f", m_updateCount / m_renderCount);
+    ImGui::NextColumn();
+
+    ImGui::Columns(1);
     ImGui::Separator();
+
     ImGui::Checkbox("Demo window", &show_demo_window);
     ImGui::End();
 
@@ -192,14 +196,14 @@ void StatSystemComponent::Cleanup()
 float StatSystemComponent::GetAverageFPS() const
 {
     float avg = 0.0f;
-    for (int i = 0; i < m_currentFpsBufferIndex; ++i)
+    for (int i = 0; i < s_sampleCount - 1; ++i)
     {
         avg += m_fpsBuffer[i];
     }
 
-    if (m_currentFpsBufferIndex > 0)
+    if (s_sampleCount > 0)
     {
-        return avg / m_currentFpsBufferIndex;
+        return avg / s_sampleCount;
     }
     return 0.0f;
 }
@@ -207,14 +211,14 @@ float StatSystemComponent::GetAverageFPS() const
 float StatSystemComponent::GetAverageMS() const
 {
     float avg = 0.0f;
-    for (int i = 0; i < m_currentMsBufferIndex; ++i)
+    for (int i = 0; i < s_sampleCount - 1; ++i)
     {
         avg += m_msBuffer[i];
     }
 
-    if (m_currentMsBufferIndex > 0)
+    if (s_sampleCount > 0)
     {
-        return avg / m_currentMsBufferIndex;
+        return avg / s_sampleCount;
     }
     return 0.0f;
 }
@@ -223,7 +227,7 @@ void StatSystemComponent::WriteInfo(std::stringstream& stringStream)
 {
     char buffer[150];
     sprintf_s(buffer, "Time: %0.1f - FPS Avg: %0.1f [Min: %0.1f, Max: %0.1f] - MS Avg: %0.1f [Min: %0.1f, Max: %0.1f]\n",
-        m_pGameTime->GetTotalTime(), GetAverageFPS(), m_minFps, m_maxFps,
+        m_totalTime, GetAverageFPS(), m_minFps, m_maxFps,
         GetAverageMS(), m_minFrameTime, m_maxFrameTime);
 
     stringStream << buffer;

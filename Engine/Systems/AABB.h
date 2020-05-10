@@ -2,7 +2,8 @@
 
 #include <vector>
 
-#include "Engine/Vector.h"
+
+#include <glm/glm.hpp>
 #include "GeomDefines.h"
 
 class Plane;

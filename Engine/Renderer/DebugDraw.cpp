@@ -3,11 +3,17 @@
 
 #include "Utils/Logger.h"
 
-#include "Engine/Vector.h"
+#include <glm/glm.hpp>
 #include <GL/glew.h>
 
 #include <vector>
 
+#define GLM_ENABLE_EXPERIMENTAL
+
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/compatibility.hpp>
 
 namespace DebugDraw
 {

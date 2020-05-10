@@ -16,7 +16,9 @@
 #include "Shading/TextureCube.h"
 #include "Camera/Camera.h"
 
-#include "Engine/Vector.h"
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/norm.hpp>
+
 PBR::PBR(Renderer* renderer)
 {
 	m_Renderer = renderer;

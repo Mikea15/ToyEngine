@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Engine/Vector.h"
+#include <glm/glm.hpp>
+#include <glm/ext/vector_float3.hpp>
 
 #include "Engine/Core/VectorContainer.h"
 

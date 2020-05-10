@@ -1,6 +1,11 @@
 #include "Camera.h"
 
-#include "Engine/Vector.h"
+#define GLM_ENABLE_EXPERIMENTAL
+
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/compatibility.hpp>
 
 //must be less than 90 to avoid gimbal lock
 const float Camera::s_maxPitchAngle = 85.0f;

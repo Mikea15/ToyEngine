@@ -11,7 +11,8 @@
 #include "Shading/Shader.h"
 #include "Camera/Camera.h"
 
-#include "Engine/Vector.h"
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/compatibility.hpp>
 
 #include <imgui.h>
 

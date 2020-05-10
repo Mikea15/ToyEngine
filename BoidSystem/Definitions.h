@@ -11,10 +11,10 @@
 
 #define USE_OCTREE 0
 #define USE_OCTREE_PRUNE_BY_DIST 0
-#define USE_AABB 0
+#define USE_AABB 1
 
 #if _DEBUG
-#define ENTITY_COUNT 300
+#define ENTITY_COUNT 100
 #else
 #define ENTITY_COUNT 2500
 #endif
