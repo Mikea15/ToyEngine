@@ -33,20 +33,155 @@ Octree::~Octree()
     delete m_dbr;
 }
 
+void Octree::Clear()
+{
+    delete m_root;
+    m_root = nullptr;
+    m_data = nullptr;
+}
+
+void Octree::Initialize(const std::vector<glm::vec3>& points)
+{
+    assert(!points.empty());
+
+    Clear();
+
+    const size_t n = points.size();
+    m_data = &points;
+
+    m_edges = std::vector<size_t>(n);
+
+    glm::vec3 min = points[0];
+    glm::vec3 max = points[0];
+
+    for (size_t i = 0; i < n; i++)
+    {
+        // always point to the next.
+        m_edges[i] = i + 1;
+
+        if (points[i].x < min.x) min.x = points[i].x;
+        if (points[i].y < min.y) min.y = points[i].y;
+        if (points[i].z < min.z) min.z = points[i].z;
+        if (points[i].x > max.x) max.x = points[i].x;
+        if (points[i].y > max.y) max.y = points[i].y;
+        if (points[i].z > max.z) max.z = points[i].z;
+    }
+
+    glm::vec3 extent = (max - min) * 0.5f;
+    glm::vec3 center = min + extent;
+
+    // m_root.m_bounds = AABB(center, extent);
+    m_root = CreateOctant(center, extent, 0, n - 1, n);
+}
+
+Octree::Octant* Octree::CreateOctant(glm::vec3 center, glm::vec3 extent, size_t startIndex, size_t endIndex, size_t numObjects)
+{
+    Octant* octant = new Octant();
+    octant->m_isLeaf = true;
+    octant->m_bounds = AABB(center, extent);
+    octant->m_startIndex = startIndex;
+    octant->m_endIndex = endIndex;
+    octant->m_count = numObjects;
+
+    if (numObjects > 4)
+    {
+        octant->m_isLeaf = false;
+
+        const std::vector<glm::vec3>& points = *m_data;
+        // each child ( 8 octants ), start index, end index, and size.
+        std::vector<std::tuple<size_t, size_t, size_t>> child(8, { 0, 0, 0 });
+
+        // link disjoint child subsets.
+        size_t index = startIndex;
+        for (size_t i = 0; i < numObjects; ++i)
+        {
+            const glm::vec3& p = points[index];
+            uint32_t mortonCode = 0;
+            if (p.x > center.x) mortonCode |= 1;
+            if (p.y > center.y) mortonCode |= 2;
+            if (p.z > center.z) mortonCode |= 4;
+
+            // find octant child based on morton code.
+            auto& childTuple = child[mortonCode];
+            auto& childStartIndex = std::get<0>(childTuple);
+            auto& childEndIndex = std::get<1>(childTuple);
+            auto& childSize = std::get<2>(childTuple);
+
+            if (childSize == 0)
+            {
+                childStartIndex = index;
+            }
+            else
+            {
+                // the index from the end index of this child
+                m_edges[childEndIndex] = index;
+            }
+
+            // increment size.
+            childSize++;
+
+            // end index
+            childEndIndex = index;
+
+            // advance the index
+            index = m_edges[index];
+        }
+
+        glm::vec3 childExtent = extent * 0.5f;
+        bool first = true;
+        size_t lastChildIndex = 0u;
+        for (size_t i = 0; i < 8; ++i)
+        {
+            auto& childTuple = child[i];
+            // child size
+            if (std::get<2>(childTuple) == 0) { continue; }
+
+            // determine the position of this child.
+            glm::vec3 childDirection = {
+                (i & 1) > 0 ? 1.0f : -1.0f,
+                (i & 2) > 0 ? 1.0f : -1.0f,
+                (i & 4) > 0 ? 1.0f : -1.0f
+            };
+            glm::vec3 childPos = center + childDirection * childExtent;
+
+            octant->m_child[i] = CreateOctant(childPos, childExtent,
+                std::get<0>(childTuple), std::get<1>(childTuple), std::get<2>(childTuple));
+
+            if (first)
+            {
+                first = false;
+                octant->m_startIndex = octant->m_child[i]->m_startIndex;
+            }
+            else
+            {
+                m_edges[octant->m_child[lastChildIndex]->m_endIndex] = octant->m_child[i]->m_startIndex;
+            }
+            
+            lastChildIndex = i;
+
+            // push last index of parent octant.
+            octant->m_endIndex = octant->m_child[i]->m_endIndex;
+        }
+
+    }
+
+    return octant;
+}
+
 void Octree::Subdivide()
 {
     auto center = m_bounds.GetPosition();
     auto halfSize = m_bounds.GetHalfSize() * 0.5f;
 
-    const glm::vec3 ufl = center + glm::vec3(-1, 1, 1)   * halfSize;
-    const glm::vec3 ufr = center + glm::vec3(1, 1, 1)    * halfSize;
-    const glm::vec3 ubl = center + glm::vec3(-1, 1, -1)  * halfSize;
-    const glm::vec3 ubr = center + glm::vec3(1, 1, -1)   * halfSize;
+    const glm::vec3 ufl = center + glm::vec3(-1, 1, 1) * halfSize;
+    const glm::vec3 ufr = center + glm::vec3(1, 1, 1) * halfSize;
+    const glm::vec3 ubl = center + glm::vec3(-1, 1, -1) * halfSize;
+    const glm::vec3 ubr = center + glm::vec3(1, 1, -1) * halfSize;
 
-    const glm::vec3 dfl = center + glm::vec3(-1, -1, 1)  * halfSize;
-    const glm::vec3 dfr = center + glm::vec3(1, -1, 1)   * halfSize;
+    const glm::vec3 dfl = center + glm::vec3(-1, -1, 1) * halfSize;
+    const glm::vec3 dfr = center + glm::vec3(1, -1, 1) * halfSize;
     const glm::vec3 dbl = center + glm::vec3(-1, -1, -1) * halfSize;
-    const glm::vec3 dbr = center + glm::vec3(1, -1, -1)  * halfSize;
+    const glm::vec3 dbr = center + glm::vec3(1, -1, -1) * halfSize;
 
     m_ufl = new Octree(ufl, halfSize);
     m_ufr = new Octree(ufr, halfSize);
@@ -82,13 +217,88 @@ bool Octree::Insert(const glm::vec3& position, size_t index)
     return false;
 }
 
+void Octree::FindNeighborsAlt(const glm::vec3& pos, float range, std::vector<size_t>& outIndiceResults)
+{
+    outIndiceResults.clear();
+    if (m_root == nullptr) 
+    {
+        return;
+    }
+
+    FindNeighborsAlt(m_root, pos, range, outIndiceResults);
+}
+
+void Octree::FindNeighborsAlt(Octant* octant, const glm::vec3& pos, float range, std::vector<size_t>& outIndiceResults)
+{
+    const std::vector<glm::vec3>& points = *m_data;
+
+    // contains full octant?
+#if 0
+    if (glm::length(octant->m_bounds.GetPosition() - pos) < range)
+    {
+        size_t index = octant->m_startIndex;
+        for (size_t i = 0; i < octant->m_count; i++)
+        {
+            outIndiceResults.push_back(index);
+            index = m_edges[index];
+        }
+        return;
+    }
+#endif
+
+    if (octant->m_isLeaf)
+    {
+        size_t index = octant->m_startIndex;
+        for (size_t i = 0; i < octant->m_count; i++)
+        {
+            const glm::vec3& p = points[index];
+            float distance = glm::length(pos - p);
+            if (distance < range) {
+                outIndiceResults.push_back(index);
+            }
+            index = m_edges[index];
+        }
+        return;
+    }
+
+    for (size_t i = 0; i < 8; i++)
+    {
+        if (octant->m_child[i] == nullptr) { continue; }
+        // if ! overlap pos, range, childOctant continue
+        FindNeighborsAlt(octant->m_child[i], pos, range, outIndiceResults);
+    }
+}
+
+void Octree::FindNeighbors(const glm::vec3& pos, float range, std::vector<OcNode>& outResult)
+{
+    if (!m_bounds.Contains(pos, range)) { return; }
+    for (const OcNode& node : m_nodes)
+    {
+        if (glm::length(pos - node.m_pos) <= range)
+        {
+            outResult.push_back(node);
+        }
+    }
+
+    if (m_ufl == nullptr) { return; }
+
+    m_ufl->FindNeighbors(pos, range, outResult);
+    m_ufr->FindNeighbors(pos, range, outResult);
+    m_ubl->FindNeighbors(pos, range, outResult);
+    m_ubr->FindNeighbors(pos, range, outResult);
+    m_dfl->FindNeighbors(pos, range, outResult);
+    m_dfr->FindNeighbors(pos, range, outResult);
+    m_dbl->FindNeighbors(pos, range, outResult);
+    m_dbr->FindNeighbors(pos, range, outResult);
+}
+
 void Octree::Search(const AABB& aabb, std::vector<OcNode>& outResult)
 {
     if (!m_bounds.Contains(aabb)) { return; }
 
     for (const OcNode& node : m_nodes)
     {
-        if (aabb.Contains(node.m_storePos))
+        if (aabb.Contains(node.m_pos))
         {
             outResult.push_back(node);
         }
@@ -119,7 +329,7 @@ void Octree::Search(const BoundingFrustum& frustum, std::vector<OcNode>& outResu
     // if (frustum.Contains(BoundingBox(m_storePos, 1.0f)) != ContainmentType::Disjoint)
     for (const OcNode& node : m_nodes)
     {
-        if (frustum.Contains(node.m_storePos) != ContainmentType::Disjoint)
+        if (frustum.Contains(node.m_pos) != ContainmentType::Disjoint)
         {
             outResult.push_back(node);
         }
@@ -143,7 +353,7 @@ void Octree::Search(const BoundingFrustum& frustum, std::vector<OcNode>& outResu
 
 void Octree::GetAllBoundingBoxes(std::vector<AABB>& outResult)
 {
-    if( !m_nodes.empty() ) {
+    if (!m_nodes.empty()) {
         outResult.push_back(m_bounds);
     }
 

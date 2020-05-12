@@ -194,19 +194,20 @@ public:
         AABB searchAabb = AABB(pos, range);
 
         neighborResult.clear();
-        m_octree.Search(searchAabb, neighborResult);
+        m_octree.FindNeighbors(pos, range, neighborResult);
+        //m_octree.Search(searchAabb, neighborResult);
 
 #if USE_OCTREE_PRUNE_BY_DIST
         std::remove_if(neighborResult.begin(), neighborResult.end(), [&](const OcNode& n) {
-            return glm::length2(pos - m_wanderers[n.m_storeIndex].m_position) > range * range;
+            return glm::length2(pos - m_wanderers[n.m_data].m_position) > range * range;
             });
 #endif
 
         neighborIndices.clear();
         for (const OcNode& node : neighborResult)
         {
-            if (node.m_storeIndex == agentIndex) { continue; }
-            neighborIndices.emplace_back(node.m_storeIndex);
+            if (node.m_data == agentIndex) { continue; }
+            neighborIndices.emplace_back(node.m_data);
         }
     }
 

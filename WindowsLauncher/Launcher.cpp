@@ -5,6 +5,10 @@
 #include "BoidSystem/BoidSystemState.h"
 #include "BoidSystem/ThreadedState.h"
 
+#include "Engine/Systems/Octree.h"
+#include "Engine/Core/exp_Octree.h"
+#define OCTREE_TEST 1
+
 #include <chrono>
 #include <set>
 
@@ -47,7 +51,7 @@
 #define TIME_END() \
 	QueryPerformanceCounter(&end);													\
 	int totalTime = (int)((end.QuadPart - start.QuadPart) * 1000 / freq.QuadPart);	\
-	printf("Time %d\n", totalTime);													\
+	printf("Time %d (ms)\n", totalTime);													\
 
 
 int main(int argc, char* argv[])
@@ -100,7 +104,9 @@ int main(int argc, char* argv[])
 
 	getchar();
 	return 0;
+
 #elif SIMD_TESTS
+
 	float* buf = new float[NUM_VERT + 4];
 
 	std::srand(std::time(nullptr));
@@ -136,8 +142,73 @@ int main(int argc, char* argv[])
 	delete[] buf;
 	getchar();
 	return 0;
-#else
+#elif OCTREE_TEST
 
+	float range = 2.0f;
+	glm::vec3 qPoint = { 0.0f, 0.0f, 0.0f };
+	size_t nPoints = 1000;
+	size_t nTests = 10000;
+
+	std::vector<glm::vec3> points(nPoints);
+	for (size_t i = 0; i < nPoints; i++)
+	{
+		points[i] = MathUtils::RandomInUnitSphere() * 10.0f;
+	}
+
+	std::vector<size_t> indices;
+	{
+		Octree oct;
+		TIME_START();
+		oct.Initialize(points);
+		
+		for (size_t i = 0; i < nTests; i++)
+		{
+			indices.clear();
+			oct.FindNeighborsAlt(qPoint, range, indices);
+		}
+		TIME_END();
+	}
+
+	std::vector<OcNode> result;
+	{
+		Octree oct = Octree(glm::vec3(0.0f), 10.0f);
+		TIME_START();
+		for (size_t i = 0; i < nPoints; i++)
+		{
+			oct.Insert(points[i], i);
+		}
+
+		for (size_t i = 0; i < nTests; i++)
+		{
+			result.clear();
+			oct.Search(AABB(qPoint, range), result);
+			std::remove_if(result.begin(), result.end(), [&](const OcNode& n) {
+				return glm::length2(qPoint - points[n.m_data]) > range * range;
+				});
+		}
+		TIME_END();
+	}
+	
+	std::vector<size_t> indices2;
+	{
+		unibn::OctreeParams oParams;
+		oParams.bucketSize = 4;
+		unibn::Octree<glm::vec3> oct2;
+
+		TIME_START();
+		oct2.initialize(points, oParams);
+
+		for (size_t i = 0; i < nTests; i++)
+		{
+			indices2.clear();
+			oct2.radiusNeighbors<unibn::L2Distance<glm::vec3>>(qPoint, range, indices2);
+		}
+		TIME_END();
+	}
+	
+	getchar();
+	return 0;
+#else
 #if MULTITHREAD
 	ThreadedState state;
 #else

@@ -277,7 +277,7 @@ public:
             job.index = i;
             job.neighborIndices = neighborIndices;
 
-            m_boidJobQ.Push(job);
+            m_boidJobQ.push(job);
         }
 
         {
@@ -337,15 +337,15 @@ public:
 
 #if USE_OCTREE_PRUNE_BY_DIST
         std::remove_if(neighborResult.begin(), neighborResult.end(), [&](const OcNode& n) {
-            return glm::length2(pos - m_wanderers[n.m_storeIndex].m_position) > range * range;
+            return glm::length2(pos - m_wanderers[n.m_data].m_position) > range * range;
             });
 #endif
 
         neighborIndices.clear();
         for (const OcNode& node : neighborResult)
         {
-            if (node.m_storeIndex == agentIndex) { continue; }
-            neighborIndices.emplace_back(node.m_storeIndex);
+            if (node.m_data == agentIndex) { continue; }
+            neighborIndices.emplace_back(node.m_data);
         }
     }
 
@@ -377,7 +377,7 @@ public:
         while (m_isRunning.load())
         {
             BoidJob job;
-            if (m_boidJobQ.TryPop(job))
+            if (m_boidJobQ.try_pop(job))
             {
                 job.agent.UpdateTargets();
                 glm::vec3 force = job.agent.CalcSteeringBehavior(m_wanderers, neighborIndices);
