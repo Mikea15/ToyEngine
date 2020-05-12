@@ -1,9 +1,26 @@
 { "traceEvents": [
-{ "pid":1, "tid":0, "ph":"X", "ts":17470860, "dur":926, "name":"Update", "args":{ "detail":""} },
-{ "pid":1, "tid":1, "ph":"X", "ts":0, "dur":92948, "name":"Total RenderUI", "args":{ "count":10416, "avg ms":0} },
-{ "pid":1, "tid":2, "ph":"X", "ts":0, "dur":92414, "name":"Total UpdateLoop", "args":{ "count":10416, "avg ms":0} },
-{ "pid":1, "tid":3, "ph":"X", "ts":0, "dur":69342, "name":"Total RenderLoop", "args":{ "count":10416, "avg ms":0} },
-{ "pid":1, "tid":4, "ph":"X", "ts":0, "dur":60577, "name":"Total Update", "args":{ "count":10416, "avg ms":0} },
-{ "pid":1, "tid":5, "ph":"X", "ts":0, "dur":55196, "name":"Total HandleInput", "args":{ "count":10416, "avg ms":0} },
+{ "pid":1, "tid":1, "ph":"X", "ts":0, "dur":11686, "name":"Total RenderUI", "args":{ "count":1419, "avg ms":0} },
+{ "pid":1, "tid":2, "ph":"X", "ts":0, "dur":10594, "name":"Total UpdateLoop", "args":{ "count":1419, "avg ms":0} },
+{ "pid":1, "tid":3, "ph":"X", "ts":0, "dur":9440, "name":"Total RenderLoop", "args":{ "count":1419, "avg ms":0} },
+{ "pid":1, "tid":4, "ph":"X", "ts":0, "dur":7608, "name":"Total HandleInput", "args":{ "count":1419, "avg ms":0} },
+{ "pid":1, "tid":5, "ph":"X", "ts":0, "dur":7553, "name":"Total Update", "args":{ "count":1419, "avg ms":0} },
+{ "cat":"", "pid":1, "tid":0, "ts":0, "ph":"M", "name":"process_name", "args":{ "name":"clang" } }
+] }
+
+pdateLoop", "args":{ "detail":""} },
+{ "pid":1, "tid":0, "ph":"X", "ts":63642757, "dur":512, "name":"UpdateLoop", "args":{ "detail":""} },
+{ "pid":1, "tid":1, "ph":"X", "ts":0, "dur":304765, "name":"Total UpdateLoop", "args":{ "count":29213, "avg ms":0} },
+{ "pid":1, "tid":2, "ph":"X", "ts":0, "dur":288500, "name":"Total RenderUI", "args":{ "count":29213, "avg ms":0} },
+{ "pid":1, "tid":3, "ph":"X", "ts":0, "dur":196707, "name":"Total Update", "args":{ "count":29213, "avg ms":0} },
+{ "pid":1, "tid":4, "ph":"X", "ts":0, "dur":190525, "name":"Total RenderLoop", "args":{ "count":29213, "avg ms":0} },
+{ "pid":1, "tid":5, "ph":"X", "ts":0, "dur":179383, "name":"Total HandleInput", "args":{ "count":29213, "avg ms":0} },
+{ "cat":"", "pid":1, "tid":0, "ts":0, "ph":"M", "name":"process_name", "args":{ "name":"clang" } }
+] }
+te", "args":{ "detail":""} },
+{ "pid":1, "tid":1, "ph":"X", "ts":0, "dur":371636, "name":"Total UpdateLoop", "args":{ "count":43507, "avg ms":0} },
+{ "pid":1, "tid":2, "ph":"X", "ts":0, "dur":363770, "name":"Total RenderUI", "args":{ "count":43507, "avg ms":0} },
+{ "pid":1, "tid":3, "ph":"X", "ts":0, "dur":284854, "name":"Total RenderLoop", "args":{ "count":43507, "avg ms":0} },
+{ "pid":1, "tid":4, "ph":"X", "ts":0, "dur":245403, "name":"Total Update", "args":{ "count":43507, "avg ms":0} },
+{ "pid":1, "tid":5, "ph":"X", "ts":0, "dur":228742, "name":"Total HandleInput", "args":{ "count":43507, "avg ms":0} },
 { "cat":"", "pid":1, "tid":0, "ts":0, "ph":"M", "name":"process_name", "args":{ "name":"clang" } }
 ] }

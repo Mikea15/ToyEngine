@@ -1,14 +1,48 @@
 ------------------
    Runtime Stats  
 ------------------
-Elapsed Time: 56.2991
+Time: 46.7 - FPS Avg: 4.8 [Min: 4.0, Max: 20.0] - MS Avg: 237.4 [Min: 49.5, Max: 250.0]     // main
+Time: 45.7 - FPS Avg: 4.0 [Min: 4.0, Max: 4.0] - MS Avg: 249.3 [Min: 250.0, Max: 250.0]     // 1 thread
+Time: 45.5 - FPS Avg: 180.4 [Min: 142.0, Max: 255.0] - MS Avg: 3.1 [Min: 1.1, Max: 21.4]    // 2 threads
+Time: 46.1 - FPS Avg: 270.2 [Min: 222.0, Max: 328.0] - MS Avg: 1.8 [Min: 1.1, Max: 17.2]    // 3 threads
+Time: 46.0 - FPS Avg: 291.5 [Min: 211.0, Max: 365.0] - MS Avg: 1.4 [Min: 1.1, Max: 16.0]    // 4 threads
+Time: 46.6 - FPS Avg: 303.5 [Min: 276.0, Max: 341.0] - MS Avg: 1.3 [Min: 1.1, Max: 2.4]     // 5 threads
+Time: 91.7 - FPS Avg: 289.9 [Min: 272.0, Max: 311.0] - MS Avg: 1.3 [Min: 1.1, Max: 2.3]     // 6 threads
+Time: 45.9 - FPS Avg: 292.3 [Min: 211.0, Max: 351.0] - MS Avg: 1.4 [Min: 1.1, Max: 16.8]    // 7 threads
+Time: 49.1 - FPS Avg: 279.9 [Min: 227.0, Max: 320.0] - MS Avg: 1.4 [Min: 1.1, Max: 16.9]    // 8 threads
 
-FPS
-Avg: 156.989
-Min: 103
-Max: 184
-
-MS
-Avg: 2.79553
-Min: 1.0985
-Max: 20.2266
+Time: 8.3 - FPS Avg: 0.9 [Min: 0.0, Max: 5.0] - MS Avg: 59.3 [Min: 0.0, Max: 250.0]
+Time: 2.3 - FPS Avg: 0.2 [Min: 0.0, Max: 5.0] - MS Avg: 16.4 [Min: 0.0, Max: 250.0]
+Time: 19.0 - FPS Avg: 2.1 [Min: 0.0, Max: 6.0] - MS Avg: 134.4 [Min: 0.0, Max: 250.0]
+Time: 5.7 - FPS Avg: 0.6 [Min: 0.0, Max: 6.0] - MS Avg: 40.1 [Min: 0.0, Max: 250.0]
+Time: 28.1 - FPS Avg: 219.1 [Min: 0.0, Max: 394.0] - MS Avg: 1.9 [Min: 0.0, Max: 60.3]
+Time: 10.4 - FPS Avg: 226.8 [Min: 0.0, Max: 915.0] - MS Avg: 0.3 [Min: 0.0, Max: 3.6]
+Time: 13.6 - FPS Avg: 283.0 [Min: 0.0, Max: 854.0] - MS Avg: 0.4 [Min: 0.0, Max: 3.6]
+Time: 18.6 - FPS Avg: 415.6 [Min: 0.0, Max: 875.0] - MS Avg: 0.5 [Min: 0.0, Max: 6.1]
+Time: 9.0 - FPS Avg: 2.1 [Min: 0.0, Max: 16.0] - MS Avg: 40.9 [Min: 0.0, Max: 250.0]
+Time: 11.4 - FPS Avg: 1.3 [Min: 0.0, Max: 8.0] - MS Avg: 79.4 [Min: 0.0, Max: 250.0]
+Time: 28.7 - FPS Avg: 441.2 [Min: 0.0, Max: 874.0] - MS Avg: 0.9 [Min: 0.0, Max: 14.3]
+Time: 9.5 - FPS Avg: 2.7 [Min: 0.0, Max: 20.0] - MS Avg: 38.7 [Min: 0.0, Max: 250.0]
+Time: 14.5 - FPS Avg: 1.6 [Min: 0.0, Max: 7.0] - MS Avg: 100.3 [Min: 0.0, Max: 250.0]
+Time: 37.3 - FPS Avg: 481.6 [Min: 26.0, Max: 547.0] - MS Avg: 1.0 [Min: 0.7, Max: 16.4]
+Time: 6.7 - FPS Avg: 0.8 [Min: 0.0, Max: 9.0] - MS Avg: 44.9 [Min: 0.0, Max: 250.0]
+Time: 48.9 - FPS Avg: 269.4 [Min: 236.0, Max: 298.0] - MS Avg: 1.2 [Min: 0.7, Max: 16.3]
+Time: 49.1 - FPS Avg: 258.1 [Min: 231.0, Max: 303.0] - MS Avg: 3.2 [Min: 0.7, Max: 20.3]
+Time: 47.6 - FPS Avg: 417.3 [Min: 386.0, Max: 441.0] - MS Avg: 0.9 [Min: 0.7, Max: 1.7]
+Time: 46.9 - FPS Avg: 268.6 [Min: 228.0, Max: 313.0] - MS Avg: 1.7 [Min: 0.7, Max: 18.5]
+Time: 49.6 - FPS Avg: 517.1 [Min: 487.0, Max: 543.0] - MS Avg: 0.9 [Min: 0.7, Max: 2.1]
+Time: 18.4 - FPS Avg: 2.1 [Min: 0.0, Max: 6.0] - MS Avg: 131.0 [Min: 0.0, Max: 250.0]
+Time: 220.2 - FPS Avg: 30.9 [Min: 4.0, Max: 92.0] - MS Avg: 61.1 [Min: 0.8, Max: 250.0]
+Time: 36.8 - FPS Avg: 4.0 [Min: 4.0, Max: 6.0] - MS Avg: 249.3 [Min: 250.0, Max: 250.0]
+Time: 40.3 - FPS Avg: 4.0 [Min: 4.0, Max: 4.0] - MS Avg: 249.3 [Min: 250.0, Max: 250.0]
+Time: 81.0 - FPS Avg: 4.0 [Min: 4.0, Max: 4.0] - MS Avg: 249.3 [Min: 250.0, Max: 250.0]
+Time: 5.2 - FPS Avg: 0.5 [Min: 0.0, Max: 6.0] - MS Avg: 36.6 [Min: 0.0, Max: 250.0]
+Time: 70.6 - FPS Avg: 4.0 [Min: 4.0, Max: 4.0] - MS Avg: 249.3 [Min: 250.0, Max: 250.0]
+Time: 0.0 - FPS Avg: -0.0 [Min: 9999.0, Max: 0.0] - MS Avg: -0.0 [Min: 9999.0, Max: 0.0]
+Time: 0.0 - FPS Avg: -0.0 [Min: 9999.0, Max: 0.0] - MS Avg: -0.0 [Min: 9999.0, Max: 0.0]
+Time: 104.0 - FPS Avg: 4.0 [Min: 4.0, Max: 4.0] - MS Avg: 249.3 [Min: 250.0, Max: 250.0]
+Time: 99.5 - FPS Avg: 4.0 [Min: 4.0, Max: 4.0] - MS Avg: 249.3 [Min: 250.0, Max: 250.0]
+Time: 8.0 - FPS Avg: 105.2 [Min: 0.0, Max: 573.0] - MS Avg: 0.5 [Min: 0.0, Max: 4.0]
+Time: 73.4 - FPS Avg: 567.2 [Min: 62.0, Max: 3069.0] - MS Avg: 4.9 [Min: 0.1, Max: 48.0]
+Time: 11.0 - FPS Avg: 173.5 [Min: 0.0, Max: 235.0] - MS Avg: 15.7 [Min: 0.0, Max: 250.0]
+Time: 6.4 - FPS Avg: 187.3 [Min: 0.0, Max: 246.0] - MS Avg: 2.8 [Min: 0.0, Max: 26.1]

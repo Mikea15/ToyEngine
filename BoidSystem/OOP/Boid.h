@@ -17,8 +17,7 @@ struct Boid
     }
 
     Boid(Properties* properties)
-        : m_id(++ID)
-        , m_properties(properties)
+        : Boid()
     {
         m_velocity = MathUtils::RandomInUnitSphere();
         m_position = MathUtils::RandomInUnitSphere();
@@ -28,6 +27,8 @@ struct Boid
         m_neighborIndices.resize(ENTITY_COUNT);
     }
 
+    Boid(Properties* properties)
+        : Boid()
     Boid(const Boid& other)
         : m_id(other.m_id)
         , m_properties(other.m_properties)
@@ -346,12 +347,18 @@ struct Boid
     Boid* m_fleeBoid;
 
     Properties* m_properties = nullptr;
-    Properties m_defaultProperties;
+
+
+
+    // Have an array of boids. This will create lots of copies for now.
+    // we'll deal with those optimizations later on.
+    std::vector<Boid> m_neighborsScratch;
 
     std::vector<size_t> m_neighborIndices;
     size_t m_currentNeighborCount = 0u;
 
     static unsigned int ID;
+    static Properties DefaultProperties;
 };
 
 unsigned int Boid::ID = 0;
