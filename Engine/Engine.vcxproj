@@ -172,10 +172,10 @@
     <ClInclude Include="Camera\CameraFrustum.h" />
     <ClInclude Include="Camera\FlyCamera.h" />
     <ClInclude Include="Core\exp_Octree.h" />
+    <ClInclude Include="Core\Profiler.h" />
     <ClInclude Include="Core\StackAllocator.h" />
     <ClInclude Include="Core\ThreadSafeQueue.h" />
     <ClInclude Include="Core\VectorContainer.h" />
-    <ClInclude Include="External\ImGuizmo\imGuIZMOquat.h" />
     <ClInclude Include="External\ImGuizmo\vgConfig.h" />
     <ClInclude Include="External\ImGuizmo\vGizmo.h" />
     <ClInclude Include="External\ImGuizmo\vGizmoMath.h" />
@@ -194,7 +194,6 @@
     <ClInclude Include="Mesh\Sphere.h" />
     <ClInclude Include="Mesh\Torus.h" />
     <ClInclude Include="PhysxHandler.h" />
-    <ClInclude Include="Core\Profiler.h" />
     <ClInclude Include="Renderer\CommandBuffer.h" />
     <ClInclude Include="Renderer\DebugDraw.h" />
     <ClInclude Include="Renderer\GLStateCache.h" />
@@ -250,7 +249,6 @@
     <ClCompile Include="Camera\Camera.cpp" />
     <ClCompile Include="Camera\CameraFrustum.cpp" />
     <ClCompile Include="Camera\FlyCamera.cpp" />
-    <ClCompile Include="External\ImGuizmo\imGuIZMOquat.cpp" />
     <ClCompile Include="External\Imgui\imgui_demo.cpp" />
     <ClCompile Include="External\Imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="External\Imgui\imgui_impl_sdl.cpp" />

@@ -201,9 +201,6 @@
     <ClInclude Include="PhysxHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="External\ImGuizmo\imGuIZMOquat.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="External\ImGuizmo\vgConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -222,16 +219,7 @@
     <ClInclude Include="External\Imgui\imstb_textedit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Core\StackAllocator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Profiler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Systems\Terrain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\VectorContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\exp_Octree.h">
@@ -240,10 +228,19 @@
     <ClInclude Include="Systems\KDTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Systems\GameTime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Profiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\StackAllocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Core\ThreadSafeQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Systems\GameTime.h">
+    <ClInclude Include="Core\VectorContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -408,9 +405,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PhysxHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="External\ImGuizmo\imGuIZMOquat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Systems\Terrain.cpp">

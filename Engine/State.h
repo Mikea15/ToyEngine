@@ -35,8 +35,6 @@ union SDL_Event;
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/compatibility.hpp>
 
-#include "External/ImGuizmo/imGuIZMOquat.h"
-
 class State
 {
 public:

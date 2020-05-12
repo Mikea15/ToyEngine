@@ -22,6 +22,7 @@ public:
 
 	//
 	bool Contains(const glm::vec3& point) const;
+	bool Contains(const glm::vec3& point, float radius) const;
 	bool Contains(const AABB& aabb) const;
 
 	//! Intersects BoundingSphere

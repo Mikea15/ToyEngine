@@ -110,6 +110,16 @@ bool AABB::Contains(const glm::vec3& point) const
 	return true;
 }
 
+bool AABB::Contains(const glm::vec3& point, float radius) const
+{
+	if (point.x + radius < m_min.x || point.x - radius > m_max.x) return false;
+	if (point.y + radius < m_min.y || point.y - radius > m_max.y) return false;
+	if (point.z + radius < m_min.z || point.z - radius > m_max.z) return false;
+
+	return true;
+	return false;
+}
+
 bool AABB::Contains(const AABB& aabb) const
 {
 	if (aabb.m_max.x < m_min.x || aabb.m_min.x > m_max.x) return false;
