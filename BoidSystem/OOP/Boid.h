@@ -11,14 +11,13 @@
 struct Boid
 {
     Boid()
-        : Boid(&m_defaultProperties)
     {
-
     }
 
     Boid(Properties* properties)
-        : Boid()
     {
+        m_properties = properties;
+
         m_velocity = MathUtils::RandomInUnitSphere();
         m_position = MathUtils::RandomInUnitSphere();
         m_targetBoid = nullptr;
@@ -27,8 +26,6 @@ struct Boid
         m_neighborIndices.resize(ENTITY_COUNT);
     }
 
-    Boid(Properties* properties)
-        : Boid()
     Boid(const Boid& other)
         : m_id(other.m_id)
         , m_properties(other.m_properties)
