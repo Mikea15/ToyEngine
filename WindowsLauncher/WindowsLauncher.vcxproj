@@ -162,9 +162,6 @@
     <ClCompile Include="Launcher.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Launcher.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">
       <Project>{1aea9030-9442-48fd-aaa6-3c771d691989}</Project>
     </ProjectReference>

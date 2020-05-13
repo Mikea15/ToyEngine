@@ -36,8 +36,6 @@ public:
 			{
 				delete m_child[i];
 			}
-
-			delete[] m_child;
 		}
 
 		AABB m_bounds;
@@ -68,7 +66,9 @@ public:
 private:
 	Octant* CreateOctant(glm::vec3 center, glm::vec3 extent, size_t startIndex, size_t endIndex, size_t numObjects);
 	
-	void FindNeighborsAlt(Octant* octant, const glm::vec3& pos, float range, std::vector<size_t>& outIndiceResults);
+	void FindNeighborsAlt(Octant* octant, const glm::vec3& pos, float range, float rangeSq, std::vector<size_t>& outIndiceResults);
+	bool ContainsOctant(Octant* octant, const glm::vec3& pos, float rangeSq);
+	bool OverlapsOctant(Octant* octant, const glm::vec3& pos, float range, float rangeSq);
 	
 	void Subdivide();
 

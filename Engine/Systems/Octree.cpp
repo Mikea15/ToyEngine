@@ -4,6 +4,9 @@
 
 #include "Renderer/DebugDraw.h"
 
+#include <algorithm>
+#include <glm/gtx/norm.hpp>
+
 Octree::Octree()
     : Octree(glm::vec3(0.0f), 0.0f)
 {
@@ -225,16 +228,15 @@ void Octree::FindNeighborsAlt(const glm::vec3& pos, float range, std::vector<siz
         return;
     }
 
-    FindNeighborsAlt(m_root, pos, range, outIndiceResults);
+    FindNeighborsAlt(m_root, pos, range, range * range, outIndiceResults);
 }
 
-void Octree::FindNeighborsAlt(Octant* octant, const glm::vec3& pos, float range, std::vector<size_t>& outIndiceResults)
+void Octree::FindNeighborsAlt(Octant* octant, const glm::vec3& pos, float range, float rangeSq, std::vector<size_t>& outIndiceResults)
 {
     const std::vector<glm::vec3>& points = *m_data;
 
-    // contains full octant?
-#if 0
-    if (glm::length(octant->m_bounds.GetPosition() - pos) < range)
+    // contains full octant, add all indices.
+    if (ContainsOctant(octant, pos, rangeSq))
     {
         size_t index = octant->m_startIndex;
         for (size_t i = 0; i < octant->m_count; i++)
@@ -244,7 +246,6 @@ void Octree::FindNeighborsAlt(Octant* octant, const glm::vec3& pos, float range,
         }
         return;
     }
-#endif
 
     if (octant->m_isLeaf)
     {
@@ -252,8 +253,8 @@ void Octree::FindNeighborsAlt(Octant* octant, const glm::vec3& pos, float range,
         for (size_t i = 0; i < octant->m_count; i++)
         {
             const glm::vec3& p = points[index];
-            float distance = glm::length(pos - p);
-            if (distance < range) {
+            if (glm::length2(pos - p) < rangeSq) 
+            {
                 outIndiceResults.push_back(index);
             }
             index = m_edges[index];
@@ -264,9 +265,49 @@ void Octree::FindNeighborsAlt(Octant* octant, const glm::vec3& pos, float range,
     for (size_t i = 0; i < 8; i++)
     {
         if (octant->m_child[i] == nullptr) { continue; }
-        // if ! overlap pos, range, childOctant continue
-        FindNeighborsAlt(octant->m_child[i], pos, range, outIndiceResults);
+        if (!OverlapsOctant(octant->m_child[i], pos, range, rangeSq)) { continue; }
+        FindNeighborsAlt(octant->m_child[i], pos, range, rangeSq, outIndiceResults);
     }
+}
+
+bool Octree::ContainsOctant(Octant* octant, const glm::vec3& pos, float rangeSq)
+{
+    // find the distance to the center.
+    glm::vec3 diff = glm::abs(octant->m_bounds.GetPosition() - pos);
+    // add the extent.
+    diff += glm::vec3(octant->m_bounds.GetHalfSize(), octant->m_bounds.GetHalfSize(), octant->m_bounds.GetHalfSize());
+    // diff is now the vector to the furthest points on the octant
+    return glm::length2(diff) < rangeSq;
+}
+
+bool Octree::OverlapsOctant(Octant* octant, const glm::vec3& pos, float range, float rangeSq)
+{
+    // find the distance to the center.
+    glm::vec3 diff = glm::abs(octant->m_bounds.GetPosition() - pos);
+
+    float extent = octant->m_bounds.GetHalfSize();
+    float maxDistance = range + octant->m_bounds.GetHalfSize();
+
+    if (diff.x > maxDistance || diff.y > maxDistance || diff.z > maxDistance)
+    {
+        return false;
+    }
+
+    size_t numLessExtent = (diff.x < extent) + (diff.y < extent) + (diff.z < extent);
+    
+    // inside surface region of octant
+    if (numLessExtent > 1) 
+    {
+        return true;
+    }
+
+    diff = {
+        std::max(diff.x - extent, 0.0f),
+        std::max(diff.y - extent, 0.0f),
+        std::max(diff.z - extent, 0.0f),
+    };
+
+    return glm::length2(diff) < rangeSq;
 }
 
 void Octree::FindNeighbors(const glm::vec3& pos, float range, std::vector<OcNode>& outResult)
