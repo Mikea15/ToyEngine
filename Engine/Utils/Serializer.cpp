@@ -16,8 +16,6 @@ SceneNode* Serializer::LoadScene()
 void Serializer::SaveScene(SceneNode* node)
 {
 	std::string tempLevelPath = "../../../../data/level.json";
-
-
 }
 
 

@@ -1,7 +1,6 @@
-#include "material.h"
+#include "Material.h"
 
 #include "Resources/Resources.h"
-
 
 
 Material::Material()

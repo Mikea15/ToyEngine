@@ -4,10 +4,6 @@
 #include "BoidSystem/BoidSystemState.h"
 #include "BoidSystem/ThreadedState.h"
 
-#include "Engine/Systems/Octree.h"
-#include "Engine/Core/exp_Octree.h"
-#define OCTREE_TEST 1
-
 #include <chrono>
 #include <set>
 
@@ -46,11 +42,13 @@
 	LARGE_INTEGER start, end;			\
 	QueryPerformanceCounter(&start);	\
 
-#define TIME_END() \
+#define TIME_END2(n) \
 	QueryPerformanceCounter(&end);													\
 	int totalTime = (int)((end.QuadPart - start.QuadPart) * 1000 / freq.QuadPart);	\
-	printf(" / time %d (ms)\n", totalTime);	\
+	printf(" / avg %.4f (ms)\n", static_cast<float>(totalTime)/static_cast<float>(n));	\
 	}					\
+
+#define TIME_END() TIME_END2(1)
 
 int main(int argc, char* argv[])
 {
@@ -140,131 +138,6 @@ int main(int argc, char* argv[])
 	delete[] buf;
 	getchar();
 	return 0;
-#elif OCTREE_TEST
-
-	LARGE_INTEGER freq;
-	QueryPerformanceFrequency(&freq);
-
-	float range = 5.0f;
-	glm::vec3 qPoint = { 0.0f, 0.0f, 0.0f };
-	size_t nPoints = 100000;
-	size_t nTests = 500;
-
-	std::vector<glm::vec3> points(nPoints);
-	for (size_t i = 0; i < nPoints; i++)
-	{
-		points[i] = MathUtils::RandomInUnitSphere() * 10.0f;
-	}
-
-	printf("Octrees - Points: %d, Tests: %d\n\n", nPoints, nTests);
-
-	{
-		std::vector<OcNode> result;
-		Octree oct = Octree(glm::vec3(0.0f), 10.0f);
-		TIME_START();
-		printf("Old: Insertion");
-		for (size_t i = 0; i < nPoints; i++)
-		{
-			oct.Insert(points[i], i);
-		}
-		TIME_END();
-
-		TIME_START();
-		printf("Old: Search");
-		int results = 0;
-		for (size_t i = 0; i < nTests; i++)
-		{
-			result.clear();
-			oct.Search(AABB(qPoint, range), result);
-			auto it = std::remove_if(result.begin(), result.end(), [&](const OcNode& n) {
-				return glm::length2(qPoint - points[n.m_data]) > range * range;
-				});
-
-			results = result.size();
-		}
-		printf(" (r: %d)", results);
-		TIME_END();
-		printf("\n");
-	}
-
-	{
-		std::vector<OcNode> result;
-		Octree oct = Octree(glm::vec3(0.0f), 10.0f);
-		TIME_START();
-		printf("Old Alt: Insertion");
-		for (size_t i = 0; i < nPoints; i++)
-		{
-			oct.Insert(points[i], i);
-		}
-		TIME_END();
-
-		TIME_START();
-		printf("Old Alt: Search");
-		int results = 0;
-		for (size_t i = 0; i < nTests; i++)
-		{
-			result.clear();
-			oct.FindNeighbors(qPoint, range, result);
-
-			results = result.size();
-		}
-		printf(" (r: %d)", results);
-		TIME_END();
-		printf("\n");
-	}
-
-	{
-		std::vector<size_t> indices;
-		Octree oct;
-		TIME_START();
-		printf("New: Insertion");
-		oct.Initialize(points);
-		TIME_END();
-
-		TIME_START();
-		printf("New: Search");
-		int results = 0;
-		for (size_t i = 0; i < nTests; i++)
-		{
-			indices.clear();
-			oct.FindNeighborsAlt(qPoint, range, indices);
-
-			results = indices.size();
-		}
-		printf(" (r: %d)", results);
-		TIME_END();
-		printf("\n");
-	}
-	
-	{
-		std::vector<size_t> indices;
-		unibn::OctreeParams oParams;
-		oParams.bucketSize = 4;
-		unibn::Octree<glm::vec3> oct2;
-
-		TIME_START();
-		printf("Exp: Insertion");
-		oct2.initialize(points, oParams);
-		TIME_END();
-
-		TIME_START();
-		printf("Exp: Search");
-		int results = 0;
-		for (size_t i = 0; i < nTests; i++)
-		{
-			indices.clear();
-			oct2.radiusNeighbors<unibn::L2Distance<glm::vec3>>(qPoint, range, indices);
-
-			results = indices.size();
-		}
-		printf(" (r: %d)", results);
-		TIME_END();
-		printf("\n");
-	}
-	
-	getchar();
-	return 0;
-
 #else
 
 #if MULTITHREAD

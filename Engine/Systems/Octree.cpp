@@ -1,6 +1,15 @@
+/* 
+    Octree Implementation heavily influenced by
+    J. Behley, V. Steinhage, A.B. Cremers. Efficient Radius Neighbor Search 
+    in Three-dimensional Point Clouds, Proc. of the IEEE International 
+    Conference on Robotics and Automation (ICRA), 2015.
+
+    https://jbehley.github.io/
+    https://jbehley.github.io/papers/behley2015icra.pdf
+*/
 #include "Octree.h"
 
-#include "BoundingFrustum.h"
+#include "Systems/BoundingFrustum.h"
 
 #include "Renderer/DebugDraw.h"
 
@@ -46,7 +55,7 @@ void Octree::Clear()
 void Octree::Initialize(const std::vector<glm::vec3>& points)
 {
     assert(!points.empty());
-
+    
     Clear();
 
     const size_t n = points.size();
@@ -70,23 +79,31 @@ void Octree::Initialize(const std::vector<glm::vec3>& points)
         if (points[i].z > max.z) max.z = points[i].z;
     }
 
-    glm::vec3 extent = (max - min) * 0.5f;
-    glm::vec3 center = min + extent;
+    glm::vec3 center = min;
+    float maxExtent = (max.x - min.x) * 0.5f;
+    center.x += maxExtent;
+    for (size_t i = 1; i < 3; ++i) {
+        float extent = (max[i] - min[i]) * 0.5f;
+        center[i] += extent;
+        if (extent > maxExtent) {
+            maxExtent = extent;
+        }
+    }
 
-    // m_root.m_bounds = AABB(center, extent);
-    m_root = CreateOctant(center, extent, 0, n - 1, n);
+    m_root = CreateOctant(center, maxExtent, 0, n - 1, n);
 }
 
-Octree::Octant* Octree::CreateOctant(glm::vec3 center, glm::vec3 extent, size_t startIndex, size_t endIndex, size_t numObjects)
+Octree::Octant* Octree::CreateOctant(glm::vec3 center, float extent, size_t start, size_t end, size_t size)
 {
     Octant* octant = new Octant();
     octant->m_isLeaf = true;
-    octant->m_bounds = AABB(center, extent);
-    octant->m_startIndex = startIndex;
-    octant->m_endIndex = endIndex;
-    octant->m_count = numObjects;
+    octant->m_center = center;
+    octant->m_radius = extent;
+    octant->m_start = start;
+    octant->m_end = end;
+    octant->m_size = size;
 
-    if (numObjects > 4)
+    if (size > 4)
     {
         octant->m_isLeaf = false;
 
@@ -95,49 +112,45 @@ Octree::Octant* Octree::CreateOctant(glm::vec3 center, glm::vec3 extent, size_t 
         std::vector<std::tuple<size_t, size_t, size_t>> child(8, { 0, 0, 0 });
 
         // link disjoint child subsets.
-        size_t index = startIndex;
-        for (size_t i = 0; i < numObjects; ++i)
+        size_t currentIndex = start;
+        for (size_t i = 0; i < size; ++i)
         {
-            const glm::vec3& p = points[index];
+            const glm::vec3& p = points[currentIndex];
+
             uint32_t mortonCode = 0;
             if (p.x > center.x) mortonCode |= 1;
             if (p.y > center.y) mortonCode |= 2;
             if (p.z > center.z) mortonCode |= 4;
 
             // find octant child based on morton code.
-            auto& childTuple = child[mortonCode];
-            auto& childStartIndex = std::get<0>(childTuple);
-            auto& childEndIndex = std::get<1>(childTuple);
-            auto& childSize = std::get<2>(childTuple);
+            auto& childStartIdx = std::get<0>(child[mortonCode]);
+            auto& childEndIdx = std::get<1>(child[mortonCode]);
+            auto& childSize = std::get<2>(child[mortonCode]);
 
             if (childSize == 0)
             {
-                childStartIndex = index;
+                childStartIdx = currentIndex;
             }
             else
             {
-                // the index from the end index of this child
-                m_edges[childEndIndex] = index;
+                m_edges[childEndIdx] = currentIndex;
             }
 
-            // increment size.
             childSize++;
-
-            // end index
-            childEndIndex = index;
-
-            // advance the index
-            index = m_edges[index];
+            childEndIdx = currentIndex;
+            currentIndex = m_edges[currentIndex];
         }
 
-        glm::vec3 childExtent = extent * 0.5f;
+        float childExtent = extent * 0.5f;
         bool first = true;
         size_t lastChildIndex = 0u;
         for (size_t i = 0; i < 8; ++i)
         {
-            auto& childTuple = child[i];
-            // child size
-            if (std::get<2>(childTuple) == 0) { continue; }
+            auto& childStartIdx = std::get<0>(child[i]);
+            auto& childEndIdx = std::get<1>(child[i]);
+            auto& childSize = std::get<2>(child[i]);
+
+            if (childSize == 0) { continue; }
 
             // determine the position of this child.
             glm::vec3 childDirection = {
@@ -147,25 +160,23 @@ Octree::Octant* Octree::CreateOctant(glm::vec3 center, glm::vec3 extent, size_t 
             };
             glm::vec3 childPos = center + childDirection * childExtent;
 
-            octant->m_child[i] = CreateOctant(childPos, childExtent,
-                std::get<0>(childTuple), std::get<1>(childTuple), std::get<2>(childTuple));
+            octant->m_child[i] = CreateOctant(childPos, childExtent, childStartIdx, childEndIdx, childSize);
 
             if (first)
             {
-                first = false;
-                octant->m_startIndex = octant->m_child[i]->m_startIndex;
+                octant->m_start = octant->m_child[i]->m_start;
             }
             else
             {
-                m_edges[octant->m_child[lastChildIndex]->m_endIndex] = octant->m_child[i]->m_startIndex;
+                m_edges[octant->m_child[lastChildIndex]->m_end] = octant->m_child[i]->m_start;
             }
             
             lastChildIndex = i;
 
             // push last index of parent octant.
-            octant->m_endIndex = octant->m_child[i]->m_endIndex;
+            octant->m_end = octant->m_child[i]->m_end;
+            first = false;
         }
-
     }
 
     return octant;
@@ -220,7 +231,7 @@ bool Octree::Insert(const glm::vec3& position, size_t index)
     return false;
 }
 
-void Octree::FindNeighborsAlt(const glm::vec3& pos, float range, std::vector<size_t>& outIndiceResults)
+void Octree::FindNeighborsAlt(const glm::vec3& pos, float radius, std::vector<size_t>& outIndiceResults)
 {
     outIndiceResults.clear();
     if (m_root == nullptr) 
@@ -228,18 +239,18 @@ void Octree::FindNeighborsAlt(const glm::vec3& pos, float range, std::vector<siz
         return;
     }
 
-    FindNeighborsAlt(m_root, pos, range, range * range, outIndiceResults);
+    FindNeighborsAlt(m_root, pos, radius, radius * radius, outIndiceResults);
 }
 
-void Octree::FindNeighborsAlt(Octant* octant, const glm::vec3& pos, float range, float rangeSq, std::vector<size_t>& outIndiceResults)
+void Octree::FindNeighborsAlt(Octant* octant, const glm::vec3& pos, float radius, float radiusSq, std::vector<size_t>& outIndiceResults)
 {
     const std::vector<glm::vec3>& points = *m_data;
 
     // contains full octant, add all indices.
-    if (ContainsOctant(octant, pos, rangeSq))
+    if (ContainsOctant(octant, pos, radiusSq))
     {
-        size_t index = octant->m_startIndex;
-        for (size_t i = 0; i < octant->m_count; i++)
+        size_t index = octant->m_start;
+        for (size_t i = 0; i < octant->m_size; ++i)
         {
             outIndiceResults.push_back(index);
             index = m_edges[index];
@@ -249,11 +260,12 @@ void Octree::FindNeighborsAlt(Octant* octant, const glm::vec3& pos, float range,
 
     if (octant->m_isLeaf)
     {
-        size_t index = octant->m_startIndex;
-        for (size_t i = 0; i < octant->m_count; i++)
+        size_t index = octant->m_start;
+        for (size_t i = 0; i < octant->m_size; i++)
         {
             const glm::vec3& p = points[index];
-            if (glm::length2(pos - p) < rangeSq) 
+            float distSq = glm::length2(p - pos);
+            if (distSq < radiusSq) 
             {
                 outIndiceResults.push_back(index);
             }
@@ -262,38 +274,37 @@ void Octree::FindNeighborsAlt(Octant* octant, const glm::vec3& pos, float range,
         return;
     }
 
-    for (size_t i = 0; i < 8; i++)
+    for (size_t i = 0; i < 8; ++i)
     {
         if (octant->m_child[i] == nullptr) { continue; }
-        if (!OverlapsOctant(octant->m_child[i], pos, range, rangeSq)) { continue; }
-        FindNeighborsAlt(octant->m_child[i], pos, range, rangeSq, outIndiceResults);
+        if (!OverlapsOctant(octant->m_child[i], pos, radius, radiusSq)) { continue; }
+        FindNeighborsAlt(octant->m_child[i], pos, radius, radiusSq, outIndiceResults);
     }
 }
 
 bool Octree::ContainsOctant(Octant* octant, const glm::vec3& pos, float rangeSq)
 {
     // find the distance to the center.
-    glm::vec3 diff = glm::abs(octant->m_bounds.GetPosition() - pos);
+    glm::vec3 diff = glm::abs(octant->m_center - pos);
     // add the extent.
-    diff += glm::vec3(octant->m_bounds.GetHalfSize(), octant->m_bounds.GetHalfSize(), octant->m_bounds.GetHalfSize());
+    diff += glm::vec3(octant->m_radius, octant->m_radius, octant->m_radius);
     // diff is now the vector to the furthest points on the octant
     return glm::length2(diff) < rangeSq;
 }
 
-bool Octree::OverlapsOctant(Octant* octant, const glm::vec3& pos, float range, float rangeSq)
+bool Octree::OverlapsOctant(Octant* octant, const glm::vec3& pos, float radius, float radiusSq)
 {
     // find the distance to the center.
-    glm::vec3 diff = glm::abs(octant->m_bounds.GetPosition() - pos);
+    glm::vec3 diff = glm::abs(octant->m_center - pos);
 
-    float extent = octant->m_bounds.GetHalfSize();
-    float maxDistance = range + octant->m_bounds.GetHalfSize();
+    float maxDistance = radius + octant->m_radius;
 
     if (diff.x > maxDistance || diff.y > maxDistance || diff.z > maxDistance)
     {
         return false;
     }
 
-    size_t numLessExtent = (diff.x < extent) + (diff.y < extent) + (diff.z < extent);
+    size_t numLessExtent = (diff.x < octant->m_radius) + (diff.y < octant->m_radius) + (diff.z < octant->m_radius);
     
     // inside surface region of octant
     if (numLessExtent > 1) 
@@ -302,12 +313,24 @@ bool Octree::OverlapsOctant(Octant* octant, const glm::vec3& pos, float range, f
     }
 
     diff = {
-        std::max(diff.x - extent, 0.0f),
-        std::max(diff.y - extent, 0.0f),
-        std::max(diff.z - extent, 0.0f),
+        std::max(diff.x - octant->m_radius, 0.0f),
+        std::max(diff.y - octant->m_radius, 0.0f),
+        std::max(diff.z - octant->m_radius, 0.0f),
     };
 
-    return glm::length2(diff) < rangeSq;
+    return glm::length2(diff) < radiusSq;
+}
+
+bool Octree::InsideOctant(Octant* octant, const glm::vec3& pos, float range)
+{
+    glm::vec3 diff = glm::abs(pos - octant->m_center);
+    diff += glm::vec3(octant->m_radius, octant->m_radius, octant->m_radius);
+
+    if (diff.x > octant->m_radius) return false;
+    if (diff.y > octant->m_radius) return false;
+    if (diff.z > octant->m_radius) return false;
+
+    return true;
 }
 
 void Octree::FindNeighbors(const glm::vec3& pos, float range, std::vector<OcNode>& outResult)

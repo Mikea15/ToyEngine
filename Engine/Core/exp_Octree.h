@@ -27,6 +27,7 @@
 #include <cstring>  // memset.
 #include <limits>
 #include <vector>
+#include <algorithm>
 
 // needed for gtest access to protected/private members ...
 namespace

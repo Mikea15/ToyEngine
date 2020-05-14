@@ -5,7 +5,7 @@
 
 #include <glm/glm.hpp>
 
-#include "AABB.h"
+#include "Systems/AABB.h"
 
 class BoundingFrustum;
 
@@ -28,24 +28,30 @@ public:
 	using const_reference	= const T&;
 	*/
 
-	struct Octant
+	struct alignas(16) Octant
 	{
+		Octant()
+		{
+			memset(&m_child, 0, 8 * sizeof(Octant*));
+		}
 		~Octant()
 		{
-			for (size_t i = 0; i < 8; i++)
+			for (size_t i = 0; i < 8; ++i)
 			{
 				delete m_child[i];
 			}
 		}
 
-		AABB m_bounds;
-
-		bool m_isLeaf = false;
-		size_t m_startIndex = 0u;
-		size_t m_endIndex = 0u;
-		size_t m_count = 0u;
-
 		Octant* m_child[8];
+
+		glm::vec3 m_center{ 0.0f, 0.0f, 0.0f };
+		float m_radius = 0.0f;
+
+		size_t m_start = 0u;
+		size_t m_end = 0u;
+		size_t m_size = 0u;
+		
+		bool m_isLeaf = false;
 	};
 	
 
@@ -64,12 +70,12 @@ public:
 	void DebugDraw();
 
 private:
-	Octant* CreateOctant(glm::vec3 center, glm::vec3 extent, size_t startIndex, size_t endIndex, size_t numObjects);
+	Octant* CreateOctant(glm::vec3 center, float extent, size_t start, size_t end, size_t size);
 	
 	void FindNeighborsAlt(Octant* octant, const glm::vec3& pos, float range, float rangeSq, std::vector<size_t>& outIndiceResults);
 	bool ContainsOctant(Octant* octant, const glm::vec3& pos, float rangeSq);
 	bool OverlapsOctant(Octant* octant, const glm::vec3& pos, float range, float rangeSq);
-	
+	bool InsideOctant(Octant* octant, const glm::vec3& pos, float rangeSq);
 	void Subdivide();
 
 private:
@@ -80,7 +86,7 @@ private:
 
 	const std::vector<glm::vec3>* m_data;
 	std::vector<size_t> m_edges;
-	Octant* m_root;
+	Octant* m_root = nullptr;
 
 	Octree* m_ufl = nullptr;
 	Octree* m_ufr = nullptr;
