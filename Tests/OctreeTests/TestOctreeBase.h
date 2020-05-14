@@ -1,0 +1,48 @@
+#pragma once
+
+#include "../TestRunner.h"
+
+#include "Engine/Systems/Octree.h"
+#include "Engine/Core/exp_Octree.h"
+#include "Engine/Utils/MathUtils.h"
+
+#include <glm/glm.hpp>
+
+struct OctreeBaseTest
+    : BaseTest
+{
+	~OctreeBaseTest() override {}
+
+	void Setup() override
+	{
+		points.clear();
+		points.resize(nPoints);
+
+		for (size_t i = 0; i < nPoints; i++)
+		{
+			points[i] = MathUtils::RandomInUnitSphere() * 10.0f;
+		}
+	}
+
+	void Execute() override
+	{
+		Setup();
+		printf("Test: %s ", TestName.c_str());
+		ProfileTime time;
+		CoreTest();
+		const int ms = time.GetTime();
+		printf(" - time: %d ms\n", ms);
+	}
+
+	void CoreTest() override
+	{
+		// NOTE (MA): needs to be implemented by children tests.
+	}
+
+protected:
+	float range = 5.0f;
+	glm::vec3 qPoint = { 0.0f, 0.0f, 0.0f };
+	size_t nPoints = 50000;
+	size_t nTests = 1000;
+	std::vector<glm::vec3> points;
+};
