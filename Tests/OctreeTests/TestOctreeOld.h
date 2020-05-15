@@ -2,10 +2,10 @@
 
 #include "TestOctreeBase.h"
 
-struct TestOctreeAltInsert
-    : OctreeBaseTest
+struct TestOctreeOldInsert
+	: OctreeBaseTest
 {
-	GENERIC_TEST_CTOR(TestOctreeAltInsert);
+	GENERIC_TEST_CTOR(TestOctreeOldInsert);
 
 	void Setup() override
 	{
@@ -14,7 +14,7 @@ struct TestOctreeAltInsert
 		oct = Octree(glm::vec3(0.0f), 10.0f);
 	}
 
-	void CoreTest() override 
+	void CoreTest() override
 	{
 		for (size_t i = 0; i < nPoints; i++)
 		{
@@ -25,10 +25,10 @@ struct TestOctreeAltInsert
 	Octree oct;
 };
 
-struct TestOctreeAltSearch
-    : OctreeBaseTest
+struct TestOctreeOldSearch
+	: OctreeBaseTest
 {
-	GENERIC_TEST_CTOR(TestOctreeAltSearch);
+	GENERIC_TEST_CTOR(TestOctreeOldSearch);
 
 	void Setup() override
 	{
@@ -46,7 +46,10 @@ struct TestOctreeAltSearch
 		for (size_t i = 0; i < nTests; i++)
 		{
 			result.clear();
-			oct.FindNeighbors(qPoint, range, result);
+			oct.Search(AABB(qPoint, range), result);
+			result.erase(std::remove_if(result.begin(), result.end(), [&](const OcNode& n) {
+				return glm::length2(qPoint - points[n.m_data]) > range * range;
+				}), result.end());
 			output = result.size();
 		}
 	}

@@ -36,12 +36,11 @@ struct TestOctreeJensBSearch
 
 	void CoreTest() override
 	{
-		int results = 0;
 		for (size_t i = 0; i < nTests; i++)
 		{
 			indices.clear();
 			oct.radiusNeighbors<unibn::L2Distance<glm::vec3>>(qPoint, range, indices);
-			results = indices.size();
+			output = indices.size();
 		}
 	}
 

@@ -33,13 +33,12 @@ struct TestOctreeNewSearch
 
 	void CoreTest() override
 	{
-		int results = 0;
 		for (size_t i = 0; i < nTests; i++)
 		{
 			indices.clear();
 			oct.FindNeighborsAlt(qPoint, range, indices);
 
-			results = indices.size();
+			output = indices.size();
 		}
 	}
 

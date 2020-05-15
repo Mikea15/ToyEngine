@@ -165,6 +165,7 @@
     <ClInclude Include="OctreeTests\TestOctreeJensB.h" />
     <ClInclude Include="OctreeTests\TestOctreeNew.h" />
     <ClInclude Include="OctreeTests\TestOctreeAlt.h" />
+    <ClInclude Include="OctreeTests\TestOctreeOld.h" />
     <ClInclude Include="TestRunner.h" />
   </ItemGroup>
   <ItemGroup>

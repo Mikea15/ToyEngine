@@ -198,9 +198,9 @@ public:
         //m_octree.Search(searchAabb, neighborResult);
 
 #if USE_OCTREE_PRUNE_BY_DIST
-        std::remove_if(neighborResult.begin(), neighborResult.end(), [&](const OcNode& n) {
+        neighborResult.erase(std::remove_if(neighborResult.begin(), neighborResult.end(), [&](const OcNode& n) {
             return glm::length2(pos - m_wanderers[n.m_data].m_position) > range * range;
-            });
+            }), neighborResult.end());
 #endif
 
         neighborIndices.clear();

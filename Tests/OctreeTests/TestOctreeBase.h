@@ -31,6 +31,9 @@ struct OctreeBaseTest
 		ProfileTime time;
 		CoreTest();
 		const int ms = time.GetTime();
+		if (output >= 0) {
+			printf(" - (output: %d) ", output);
+		}
 		printf(" - time: %d ms\n", ms);
 	}
 
@@ -40,6 +43,8 @@ struct OctreeBaseTest
 	}
 
 protected:
+	int output = -1;
+
 	float range = 5.0f;
 	glm::vec3 qPoint = { 0.0f, 0.0f, 0.0f };
 	size_t nPoints = 50000;
