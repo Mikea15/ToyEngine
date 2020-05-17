@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TestOctreeBase.h"
+#include "Engine/Core/AABBOctree.h"
 
 struct TestOctreeOldInsert
 	: OctreeBaseTest
@@ -11,7 +12,7 @@ struct TestOctreeOldInsert
 	{
 		OctreeBaseTest::Setup();
 
-		oct = Octree(glm::vec3(0.0f), 10.0f);
+		oct = AABBOctree(glm::vec3(0.0f), 10.0f);
 	}
 
 	void CoreTest() override
@@ -22,7 +23,7 @@ struct TestOctreeOldInsert
 		}
 	}
 
-	Octree oct;
+	AABBOctree oct;
 };
 
 struct TestOctreeOldSearch
@@ -34,7 +35,7 @@ struct TestOctreeOldSearch
 	{
 		OctreeBaseTest::Setup();
 
-		oct = Octree(glm::vec3(0.0f), 10.0f);
+		oct = AABBOctree(glm::vec3(0.0f), 10.0f);
 		for (size_t i = 0; i < nPoints; i++)
 		{
 			oct.Insert(points[i], i);
@@ -54,6 +55,6 @@ struct TestOctreeOldSearch
 		}
 	}
 
-	Octree oct;
+	AABBOctree oct;
 	std::vector<OcNode> result;
 };

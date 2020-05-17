@@ -2,6 +2,8 @@
 
 #include "TestOctreeBase.h"
 
+#include "Engine/Core/AABBOctree.h"
+
 struct TestOctreeAltInsert
     : OctreeBaseTest
 {
@@ -11,7 +13,7 @@ struct TestOctreeAltInsert
 	{
 		OctreeBaseTest::Setup();
 
-		oct = Octree(glm::vec3(0.0f), 10.0f);
+		oct = AABBOctree(glm::vec3(0.0f), 10.0f);
 	}
 
 	void CoreTest() override 
@@ -22,7 +24,7 @@ struct TestOctreeAltInsert
 		}
 	}
 
-	Octree oct;
+	AABBOctree oct;
 };
 
 struct TestOctreeAltSearch
@@ -34,7 +36,7 @@ struct TestOctreeAltSearch
 	{
 		OctreeBaseTest::Setup();
 
-		oct = Octree(glm::vec3(0.0f), 10.0f);
+		oct = AABBOctree(glm::vec3(0.0f), 10.0f);
 		for (size_t i = 0; i < nPoints; i++)
 		{
 			oct.Insert(points[i], i);
@@ -51,6 +53,6 @@ struct TestOctreeAltSearch
 		}
 	}
 
-	Octree oct;
+	AABBOctree oct;
 	std::vector<OcNode> result;
 };

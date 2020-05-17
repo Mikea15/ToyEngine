@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TestOctreeBase.h"
+#include "Engine/Core/Octree.h"
 
 struct TestOctreeNewInsert
 	: OctreeBaseTest
@@ -17,7 +18,7 @@ struct TestOctreeNewInsert
 		oct.Initialize(points);
 	}
 
-	Octree oct;
+	core::Octree oct;
 };
 
 struct TestOctreeNewSearch
@@ -36,14 +37,14 @@ struct TestOctreeNewSearch
 		for (size_t i = 0; i < nTests; i++)
 		{
 			indices.clear();
-			oct.FindNeighborsAlt(qPoint, range, indices);
+			oct.FindNeighbors(qPoint, range, indices);
 
 			output = indices.size();
 		}
 	}
 
 	std::vector<size_t> indices;
-	Octree oct;
+	core::Octree oct;
 };
 
 

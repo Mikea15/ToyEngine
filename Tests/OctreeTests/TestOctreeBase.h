@@ -2,8 +2,6 @@
 
 #include "../TestRunner.h"
 
-#include "Engine/Systems/Octree.h"
-#include "Engine/Core/exp_Octree.h"
 #include "Engine/Utils/MathUtils.h"
 
 #include <glm/glm.hpp>

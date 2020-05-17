@@ -50,10 +50,8 @@ struct ProfileTime
         return static_cast<int>((end.QuadPart - start.QuadPart) * 1000 / freq.QuadPart);
     }
 
-    std::function<void(int&)> endCb = nullptr;
-
-    LARGE_INTEGER freq;
-    LARGE_INTEGER start, end;
+    LARGE_INTEGER freq{};
+    LARGE_INTEGER start{}, end{};
 };
 
 struct TestRunner
