@@ -11,6 +11,7 @@
 struct Boid
 {
     Boid()
+        : m_properties(&DefaultProperties)
     {
     }
 
@@ -215,6 +216,11 @@ struct Boid
         for (size_t i = 0; i < neighborCount; ++i)
         {
             auto& n = neighbors[neighborIndices[i]];
+#if NEW_OCTREE // TODO: Avoid returning self index to prevent this check
+            if (n == *this) {
+                continue;
+            }
+#endif
             assert(m_position != n.m_position);
             glm::vec3 toAgent = m_position - n.m_position;
             float distanceToAgent = glm::length(toAgent);
@@ -359,3 +365,4 @@ struct Boid
 };
 
 unsigned int Boid::ID = 0;
+Properties Boid::DefaultProperties{};

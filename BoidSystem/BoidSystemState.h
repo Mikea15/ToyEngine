@@ -5,10 +5,14 @@
 #include "OOP/Boid.h"
 #include "Path.h"
 
+#include "Engine/Core/AABBOctree.h"
+#include "Engine/Core/Octree.h"
 #include "Engine/Systems/KDTree.h"
 #include "Engine/SystemComponents/StatSystemComponent.h"
 
 class Game;
+
+#define NEW_OCTREE 0
 
 class BoidSystemState
     : public BaseState
@@ -182,20 +186,30 @@ public:
 
     void PopulateOctree()
     {
+#if !NEW_OCTREE
         m_octree = AABBOctree(glm::vec3(0.0f), 50.0f);
         for (size_t i = 0; i < ENTITY_COUNT; i++)
         {
             m_octree.Insert(m_wanderers[i].m_position, i);
         }
+#else
+        std::vector<glm::vec3> points(ENTITY_COUNT);
+        for (size_t i = 0; i < ENTITY_COUNT; i++) 
+        {
+            points[i] = m_wanderers[i].m_position;
+        }
+        m_coreOctree.Initialize(points);
+#endif
     }
 
     void QueryOctree(glm::vec3 pos, float range, size_t agentIndex)
     {
+#if !NEW_OCTREE
         AABB searchAabb = AABB(pos, range);
 
         neighborResult.clear();
-        m_octree.FindNeighbors(pos, range, neighborResult);
-        //m_octree.Search(searchAabb, neighborResult);
+        // m_octree.FindNeighbors(pos, range, neighborResult);
+        m_octree.Search(searchAabb, neighborResult);
 
 #if USE_OCTREE_PRUNE_BY_DIST
         neighborResult.erase(std::remove_if(neighborResult.begin(), neighborResult.end(), [&](const OcNode& n) {
@@ -209,6 +223,9 @@ public:
             if (node.m_data == agentIndex) { continue; }
             neighborIndices.emplace_back(node.m_data);
         }
+#else
+        m_coreOctree.FindNeighbors(pos, range, neighborIndices);
+#endif
     }
 
     void PopulateKDTree()
@@ -267,6 +284,8 @@ private:
 
     Path m_path;
     Path m_path2;
+
+    core::Octree m_coreOctree;
 
     AABBOctree m_octree;
     std::vector<OcNode> neighborResult;

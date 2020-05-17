@@ -15,6 +15,7 @@ namespace core
     Octree::~Octree()
     {
         delete m_root;
+        delete m_data;
     }
 
     void Octree::Initialize(const std::vector<glm::vec3>& points)
@@ -24,7 +25,7 @@ namespace core
         Clear();
 
         const size_t n = points.size();
-        m_data = &points;
+        m_data = new std::vector<glm::vec3>(points); // copy points for now
 
         m_edges = std::vector<size_t>(n);
 
@@ -175,7 +176,7 @@ namespace core
             size_t index = octant->m_start;
             for (size_t i = 0; i < octant->m_size; ++i)
             {
-                outIndiceResults.push_back(index);
+                outIndiceResults.emplace_back(index);
                 index = m_edges[index];
             }
             return;
@@ -188,9 +189,9 @@ namespace core
             {
                 const glm::vec3& p = points[index];
                 float distSq = glm::length2(p - pos);
-                if (distSq < radiusSq)
+                if (distSq > 0.0 && distSq < radiusSq)
                 {
-                    outIndiceResults.push_back(index);
+                    outIndiceResults.emplace_back(index);
                 }
                 index = m_edges[index];
             }
