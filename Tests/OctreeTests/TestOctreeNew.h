@@ -34,13 +34,8 @@ struct TestOctreeNewSearch
 
 	void CoreTest() override
 	{
-		for (size_t i = 0; i < nTests; i++)
-		{
-			indices.clear();
-			oct.FindNeighbors(qPoint, range, indices);
-
-			output = indices.size();
-		}
+		oct.FindNeighbors(qPoint, range, indices);
+		output = indices.size();
 	}
 
 	std::vector<size_t> indices;

@@ -11,7 +11,7 @@ struct TestOctreeJensBInsert
 	void Setup() override
 	{
 		OctreeBaseTest::Setup();
-		oParams.bucketSize = 4;
+		oParams.bucketSize = 16;
 	}
 
 	void CoreTest() override
@@ -31,18 +31,14 @@ struct TestOctreeJensBSearch
 	void Setup() override
 	{
 		OctreeBaseTest::Setup();
-		oParams.bucketSize = 4;
+		oParams.bucketSize = 16;
 		oct.initialize(points, oParams);
 	}
 
 	void CoreTest() override
 	{
-		for (size_t i = 0; i < nTests; i++)
-		{
-			indices.clear();
-			oct.radiusNeighbors<unibn::L2Distance<glm::vec3>>(qPoint, range, indices);
-			output = indices.size();
-		}
+		oct.radiusNeighbors<unibn::L2Distance<glm::vec3>>(qPoint, range, indices);
+		output = indices.size();
 	}
 
 	unibn::OctreeParams oParams;

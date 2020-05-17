@@ -8,15 +8,9 @@ struct TestOctreeOldInsert
 {
 	GENERIC_TEST_CTOR(TestOctreeOldInsert);
 
-	void Setup() override
-	{
-		OctreeBaseTest::Setup();
-
-		oct = AABBOctree(glm::vec3(0.0f), 10.0f);
-	}
-
 	void CoreTest() override
 	{
+		oct = AABBOctree(glm::vec3(0.0f), 10.0f);
 		for (size_t i = 0; i < nPoints; i++)
 		{
 			oct.Insert(points[i], i);
@@ -44,15 +38,13 @@ struct TestOctreeOldSearch
 
 	void CoreTest() override
 	{
-		for (size_t i = 0; i < nTests; i++)
-		{
-			result.clear();
-			oct.Search(AABB(qPoint, range), result);
-			result.erase(std::remove_if(result.begin(), result.end(), [&](const OcNode& n) {
-				return glm::length2(qPoint - points[n.m_data]) > range * range;
-				}), result.end());
-			output = result.size();
-		}
+		result.clear();
+		oct.Search(AABB(qPoint, range), result);
+		const float rangeSq = range * range;
+		result.erase(std::remove_if(result.begin(), result.end(), [&](const OcNode& n) {
+			return glm::length2(qPoint - points[n.m_data]) > rangeSq;
+			}), result.end());
+		output = result.size();
 	}
 
 	AABBOctree oct;

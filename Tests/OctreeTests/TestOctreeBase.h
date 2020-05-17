@@ -27,7 +27,10 @@ struct OctreeBaseTest
 		Setup();
 		printf("Test: %s ", TestName.c_str());
 		ProfileTime time;
-		CoreTest();
+		for (size_t i = 0; i < nTests; ++i)
+		{
+			CoreTest();
+		}
 		const int ms = time.GetTime();
 		if (output >= 0) {
 			printf(" - (output: %d) ", output);
@@ -46,6 +49,6 @@ protected:
 	float range = 5.0f;
 	glm::vec3 qPoint = { 0.0f, 0.0f, 0.0f };
 	size_t nPoints = 50000;
-	size_t nTests = 1000;
+	size_t nTests = 100;
 	std::vector<glm::vec3> points;
 };
