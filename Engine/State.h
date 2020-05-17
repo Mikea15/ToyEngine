@@ -18,7 +18,7 @@ union SDL_Event;
 #include "Mesh/Cube.h"
 
 #include "Systems/QuadTree.h"
-#include "Systems/Octree.h"
+#include "Core/AABBOctree.h"
 
 #include "Utils/MathUtils.h"
 #include "Renderer/DebugDraw.h"
@@ -214,7 +214,7 @@ public:
 		plasmaOrb->SetScale(0.6f);
 
 		m_qTree = QuadTree(glm::vec3(0.0f), 50.0f);
-		m_oTree = Octree(glm::vec3(0.0f), 50.0f);
+		m_oTree = AABBOctree(glm::vec3(0.0f), 50.0f);
 
 		const float spacing = 7.2f;
 		for (int x = 0; x < 5; ++x)
@@ -417,7 +417,7 @@ public:
 			if (ImGui::BeginMenu("Viewport")) {
 				ImGui::Checkbox("Draw Objects", &m_drawObjects);
 				ImGui::Checkbox("Draw Quadtree", &m_drawQuadtree);
-				ImGui::Checkbox("Draw Octree", &m_drawOctree);
+				ImGui::Checkbox("Draw AABBOctree", &m_drawOctree);
 				ImGui::Checkbox("Draw BVH", &m_drawBVH);
 				ImGui::Checkbox("Draw Grid", &m_drawGrid);
 				ImGui::EndMenu();
@@ -463,7 +463,7 @@ private:
 	bool m_drawGrid = true;
 
 	QuadTree m_qTree;
-	Octree m_oTree;
+	AABBOctree m_oTree;
 	ViewportGrid m_viewGrid;
 
 	bvh::Tree m_bvhTree;

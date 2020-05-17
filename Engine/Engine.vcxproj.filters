@@ -168,9 +168,6 @@
     <ClInclude Include="Systems\GeomDefines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Systems\Octree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Systems\Plane.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -241,6 +238,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\VectorContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Octree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\AABBOctree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -386,9 +389,6 @@
     <ClCompile Include="Systems\BVH.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Systems\Octree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Systems\Plane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -411,6 +411,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Systems\GameTime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Octree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\AABBOctree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -321,7 +321,7 @@ public:
 
     void PopulateOctree()
     {
-        m_octree = Octree(glm::vec3(0.0f), 50.0f);
+        m_octree = AABBOctree(glm::vec3(0.0f), 50.0f);
         for (size_t i = 0; i < ENTITY_COUNT; i++)
         {
             m_octree.Insert(m_wanderers[i].m_position, i);
@@ -445,7 +445,7 @@ private:
     Path m_path;
     Path m_path2;
 
-    Octree m_octree;
+    AABBOctree m_octree;
     std::vector<OcNode> neighborResult;
     std::vector<size_t> neighborIndices;
 
