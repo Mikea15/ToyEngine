@@ -33,14 +33,18 @@ public:
 	~AABBOctree();
 
 	bool Insert(const glm::vec3& pos, size_t index = -1);
-	void FindNeighbors(const glm::vec3& pos, float range, std::vector<OcNode>& outResult);
+	void FindNeighbors(const glm::vec3& pos, float radius, std::vector<OcNode>& outResult);
 	void Search(const AABB& aabb, std::vector<OcNode>& outResult);
 	void Search(const BoundingFrustum& frustum, std::vector<OcNode>& outResult);
+
 	void GetAllBoundingBoxes(std::vector<AABB>& outResult);
 	void DebugDraw();
 
 private:
 	void Subdivide();
+	void InternalSearch(const AABB& aabb, std::vector<OcNode>& outResult);
+	void InternalSearch(const BoundingFrustum& frustum, std::vector<OcNode>& outResult);
+	void InternalFindNeighbors(const glm::vec3& pos, float radius, float radiusSq, std::vector<OcNode>& outResult);
 
 private:
 	AABB m_bounds;
@@ -48,13 +52,6 @@ private:
 	size_t m_maxNodes = 16;
 	std::vector<OcNode> m_nodes;
 
-	AABBOctree* m_ufl = nullptr;
-	AABBOctree* m_ufr = nullptr;
-	AABBOctree* m_ubl = nullptr;
-	AABBOctree* m_ubr = nullptr;
-	AABBOctree* m_dfl = nullptr;
-	AABBOctree* m_dfr = nullptr;
-	AABBOctree* m_dbl = nullptr;
-	AABBOctree* m_dbr = nullptr;
+	AABBOctree* m_child[8];
 };
 

@@ -14,7 +14,7 @@
 #define USE_AABB 0
 
 #if _DEBUG
-#define ENTITY_COUNT 500
+#define ENTITY_COUNT 300
 #else
 #define ENTITY_COUNT 2500
 #endif
