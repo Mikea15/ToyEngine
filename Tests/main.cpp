@@ -6,6 +6,8 @@
 #include "OctreeTests/TestOctreeNew.h"
 #include "OctreeTests/TestOctreeJensB.h"
 
+#include "Branches/TestAABB.h"
+
 int main()
 {
     TestRunner testRunner;
@@ -18,6 +20,8 @@ int main()
     testRunner.Add(new TestOctreeNewSearch());
     testRunner.Add(new TestOctreeJensBInsert());
     testRunner.Add(new TestOctreeJensBSearch());
+
+    // testRunner.Add(new TestAABB());
 
     testRunner.RunAll();
 

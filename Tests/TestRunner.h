@@ -33,6 +33,21 @@ struct BaseTest
     std::string TestName = "BaseTest";
 };
 
+struct BaseCompareTest
+    : BaseTest
+{
+    virtual ~BaseCompareTest() override {};
+
+    virtual void Setup() override {};
+    virtual void CoreTest() override {};
+    virtual void Execute() override {};
+
+    virtual void CoreTest1() = 0;
+    virtual void CoreTest2() = 0;
+
+    std::string TestName = "BaseCompareTest";
+};
+
 #define GENERIC_TEST_CTOR(className) \
     className()  { TestName = #className; } \
 

@@ -161,6 +161,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Branches\TestAABB.h" />
     <ClInclude Include="OctreeTests\TestOctreeBase.h" />
     <ClInclude Include="OctreeTests\TestOctreeJensB.h" />
     <ClInclude Include="OctreeTests\TestOctreeNew.h" />
