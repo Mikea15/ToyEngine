@@ -46,7 +46,7 @@ struct TestOctreeJensBSearch
 
 	unibn::OctreeParams oParams;
 	unibn::Octree<glm::vec3> oct;
-	std::vector<size_t> indices;
+	std::vector<uint32_t> indices;
 };
 
 
