@@ -10,7 +10,8 @@
 
 int main()
 {
-    TestRunner testRunner;
+    const size_t numTests = 1000;
+    TestRunner<numTests> testRunner;
 
     testRunner.Add(new TestOctreeOldInsert());
     testRunner.Add(new TestOctreeOldSearch());
@@ -22,8 +23,10 @@ int main()
     testRunner.Add(new TestOctreeJensBSearch());
 
     // testRunner.Add(new TestAABB());
+    testRunner.Add(new TestAABB(), new TestAABBNoBranch());
 
-    testRunner.RunAll();
+    testRunner.RunTests();
+    testRunner.RunBenchs();
 
     getchar();
     return 0;

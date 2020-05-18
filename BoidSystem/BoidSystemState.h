@@ -12,8 +12,6 @@
 
 class Game;
 
-#define NEW_OCTREE 0
-
 class BoidSystemState
     : public BaseState
 {

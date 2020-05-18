@@ -9,7 +9,7 @@ struct TestOctreeAltInsert
 {
 	GENERIC_TEST_CTOR(TestOctreeAltInsert);
 
-	void CoreTest() override 
+	void Run() override 
 	{
 		oct = AABBOctree(glm::vec3(0.0f), 10.0f);
 		for (size_t i = 0; i < nPoints; i++)
@@ -26,9 +26,9 @@ struct TestOctreeAltSearch
 {
 	GENERIC_TEST_CTOR(TestOctreeAltSearch);
 
-	void Setup() override
+	void Init() override
 	{
-		OctreeBaseTest::Setup();
+		OctreeBaseTest::Init();
 
 		oct = AABBOctree(glm::vec3(0.0f), 10.0f);
 		for (size_t i = 0; i < nPoints; i++)
@@ -37,7 +37,7 @@ struct TestOctreeAltSearch
 		}
 	}
 
-	void CoreTest() override
+	void Run() override
 	{
 		result.clear();
 		oct.FindNeighbors(qPoint, range, result);

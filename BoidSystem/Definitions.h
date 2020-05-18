@@ -13,6 +13,8 @@
 #define USE_OCTREE_PRUNE_BY_DIST 0
 #define USE_AABB 0
 
+#define NEW_OCTREE 1
+
 #if _DEBUG
 #define ENTITY_COUNT 300
 #else

@@ -8,13 +8,13 @@ struct TestOctreeJensBInsert
 {
 	GENERIC_TEST_CTOR(TestOctreeJensBInsert);
 
-	void Setup() override
+	void Init() override
 	{
-		OctreeBaseTest::Setup();
+		OctreeBaseTest::Init();
 		oParams.bucketSize = 16;
 	}
 
-	void CoreTest() override
+	void Run() override
 	{
 		oct.initialize(points, oParams);
 	}
@@ -28,14 +28,14 @@ struct TestOctreeJensBSearch
 {
 	GENERIC_TEST_CTOR(TestOctreeJensBSearch);
 
-	void Setup() override
+	void Init() override
 	{
-		OctreeBaseTest::Setup();
+		OctreeBaseTest::Init();
 		oParams.bucketSize = 16;
 		oct.initialize(points, oParams);
 	}
 
-	void CoreTest() override
+	void Run() override
 	{
 		oct.radiusNeighbors<unibn::L2Distance<glm::vec3>>(qPoint, range, indices);
 		output = indices.size();

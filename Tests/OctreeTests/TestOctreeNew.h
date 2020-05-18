@@ -8,12 +8,12 @@ struct TestOctreeNewInsert
 {
 	GENERIC_TEST_CTOR(TestOctreeNewInsert);
 
-	void Setup() override
+	void Init() override
 	{
-		OctreeBaseTest::Setup();
+		OctreeBaseTest::Init();
 	}
 
-	void CoreTest() override
+	void Run() override
 	{
 		oct.Initialize(points);
 	}
@@ -26,13 +26,13 @@ struct TestOctreeNewSearch
 {
 	GENERIC_TEST_CTOR(TestOctreeNewSearch);
 
-	void Setup() override
+	void Init() override
 	{
-		OctreeBaseTest::Setup();
+		OctreeBaseTest::Init();
 		oct.Initialize(points);
 	}
 
-	void CoreTest() override
+	void Run() override
 	{
 		oct.FindNeighbors(qPoint, range, indices);
 		output = indices.size();
