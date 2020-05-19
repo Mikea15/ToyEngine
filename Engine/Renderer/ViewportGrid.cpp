@@ -1,4 +1,3 @@
-
 #include "ViewportGrid.h"
 
 ViewportGrid::ViewportGrid(float width, float depth, unsigned int rows, unsigned int cols)

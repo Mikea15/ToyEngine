@@ -22,13 +22,17 @@ namespace core
 		{
 			Octant() 
 			{
-				memset(&m_child, 0, sizeof(Octant*) * 8);
+				for (size_t i = 0; i < 8; ++i)
+				{
+					m_child[i] = nullptr;
+				}
 			}
 			~Octant()
 			{
 				for (size_t i = 0; i < 8; ++i)
 				{
 					delete m_child[i];
+					m_child[i] = nullptr;
 				}
 			}
 

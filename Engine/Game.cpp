@@ -1,5 +1,4 @@
-﻿
-#include "Game.h"
+﻿#include "Game.h"
 
 #include <algorithm>
 #include <cmath>

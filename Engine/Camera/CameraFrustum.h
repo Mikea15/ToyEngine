@@ -2,7 +2,6 @@
 
 #include <glm/glm.hpp>
 
-
 class Camera;
 
 struct FrustumPlane
@@ -72,7 +71,7 @@ public:
 	};
 
 public:
-	CameraFrustum() { } // NOTE(Joey): why do I need to define a constructor here? (otherwise I get deleted constructor error) LOOK IT UP!
+	CameraFrustum() { }
 
 	void Update(Camera* camera);
 

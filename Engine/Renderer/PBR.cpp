@@ -187,7 +187,7 @@ void PBR::RenderProbes()
 	m_Renderer->renderMesh(m_ProbeDebugSphere, m_ProbeDebugShader);
 
 	// then do the same for each capture probe (at their respective location)
-	for (int i = 0; i < m_CaptureProbes.size(); ++i)
+	for (size_t i = 0; i < m_CaptureProbes.size(); ++i)
 	{
 		m_ProbeDebugShader->SetVector("Position", m_CaptureProbes[i]->m_position);
 		if (m_CaptureProbes[i]->Prefiltered)

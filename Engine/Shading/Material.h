@@ -10,8 +10,6 @@
 
 #include <map>
 
-
-
 enum MaterialType
 {
 	MATERIAL_DEFAULT,
@@ -19,23 +17,13 @@ enum MaterialType
 	MATERIAL_POST_PROCESS,
 };
 
-// TODO(Joey): should be able to copy materials.
-// TODO(Joey): should not be able to change the shader of the material; this is set during creation via the renderer.
-/*
-
-  Material object, representing all render state required for rendering a mesh. This includes
-  shader parameters, texture samplers and GL state relevant for rendering a mesh. A material
-  object is required for rendering any scene node. The renderer holds a list of common material
-  defaults/templates for deriving or creating new materials.
-
-*/
 class Material
 {
 private:
 	// shader state
 	Shader* m_Shader;
 	std::map<std::string, UniformValue>        m_Uniforms;
-	std::map<std::string, UniformValueSampler> m_SamplerUniforms; // NOTE(Joey): process samplers differently 
+	std::map<std::string, UniformValueSampler> m_SamplerUniforms;
 public:
 	MaterialType Type = MATERIAL_CUSTOM;
 	glm::vec4 Color = glm::vec4(1.0f);

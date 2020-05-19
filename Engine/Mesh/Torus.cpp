@@ -1,27 +1,11 @@
 #include "Torus.h"
 
-
-
-// NOTE(Joey): resources:
-// http://www.paulsprojects.net/tutorials/simplebump/simplebump.html
-// http://www.gamedev.net/topic/334335-geometric-shapessolids-generation/?whichpage=1%25EF%25BF%25BD
-// http://gamedev.stackexchange.com/questions/16845/how-do-i-generate-a-torus-mesh
 Torus::Torus(float r1, float r2, unsigned int numSteps1, unsigned int numSteps2)
 {
-	// we generate an additional minor ring segment as we can't directly connect to the first 
-	// minor ring as the last set of vertices require unique texture coordinates.
-	// TODO(Joey): can probably merge these steps within the for-loop conditions for 
-	// readability (as we need to do numSteps + 1 at all the relevant locations which is 
-	// confusing and prone to bugs).
 	Positions.resize((numSteps1 + 1) * (numSteps2 + 1));
 	Normals.resize((numSteps1 + 1) * (numSteps2 + 1));
 	UV.resize((numSteps1 + 1) * (numSteps2 + 1));
 
-
-	// first calculate all points for the major ring on the xy plane (in textbook mathematics, 
-	// the z-axis is considered the up axis).
-	// TODO(Joey): no need really to pre-calculate these; integrate them within the main for 
-	// loops.
 	std::vector<glm::vec3> p(numSteps1 + 1);
 	float a = 0.0f;
 	float step = 2.0f * PI / numSteps1;
@@ -41,7 +25,7 @@ Torus::Torus(float r1, float r2, unsigned int numSteps1, unsigned int numSteps2)
 		// the basis vectors of the ring equal the difference  vector between the minorRing 
 		// center and the donut's center position (which equals the origin (0, 0, 0)) and the 
 		// positive z-axis.
-		glm::vec3 u = glm::normalize(glm::vec3(0.0f) - p[i]) * r2; // Could be p[i] also        
+		glm::vec3 u = glm::normalize(glm::vec3(0.0f) - p[i]) * r2; // Could be p[i] also
 		glm::vec3 v = glm::vec3(0.0f, 0.0f, 1.0f) * r2;
 
 		// create the vertices of each minor ring segment:
@@ -60,9 +44,6 @@ Torus::Torus(float r1, float r2, unsigned int numSteps1, unsigned int numSteps2)
 		}
 	}
 
-
-	// generate the indicies for a triangle topology:
-	// NOTE(Joey): as taken from gamedev.net resource.
 	Indices.resize(numSteps1 * numSteps2 * 6);
 
 	int index = 0;

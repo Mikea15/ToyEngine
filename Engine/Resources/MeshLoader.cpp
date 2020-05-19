@@ -194,24 +194,6 @@ Material* MeshLoader::parseMaterial(IRenderer* renderer, aiMaterial* aMaterial, 
 		material = renderer->CreateMaterial();
 	}
 
-	/* NOTE(Joey):
-
-	  About texture types:
-
-	  We use a PBR metallic/roughness workflow so the loaded models are expected to have
-	  textures conform the workflow: albedo, (normal), metallic, roughness, (ao). Since Assimp
-	  made certain assumptions regarding possible types of loaded textures it doesn't directly
-	  translate to our model thus we make some assumptions as well which the 3D author has to
-	  comply with if he wants the mesh(es) to directly render with its specified textures:
-
-		- aiTextureType_DIFFUSE:   Albedo
-		- aiTextureType_NORMALS:   Normal
-		- aiTextureType_SPECULAR:  metallic
-		- aiTextureType_SHININESS: roughness
-		- aiTextureType_AMBIENT:   AO (ambient occlusion)
-		- aiTextureType_EMISSIVE:  Emissive
-
-	*/
 	if (aMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0)
 	{
 		// we only load the first of the list of diffuse textures, we don't really care about 

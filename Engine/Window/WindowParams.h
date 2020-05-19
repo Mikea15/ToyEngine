@@ -19,7 +19,7 @@ public:
 	bool Fullscreen = false;
 	int DisplayIndex = 0;
 
-	std::string WindowName = "EnginePlayground v0.0.1 - Launcher";
+	std::string WindowName = "ToyEngine v0.0.1";
 
 	// 0 immediate, 1 wait for sync
 	bool VSync = 0;

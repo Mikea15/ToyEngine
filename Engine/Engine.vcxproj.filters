@@ -380,9 +380,6 @@
     <ClCompile Include="Systems\BoundingSphere.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Systems\BST.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Systems\BTree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

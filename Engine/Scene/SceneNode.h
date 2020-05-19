@@ -9,19 +9,6 @@ class Scene;
 class Mesh;
 class Material;
 
-/* NOTE(Joey):
-
-  An individual scene node that links a mesh to a material
-  to render the mesh with while at the same time
-  maintaining a parent-child hierarchy for transform
-  relations.
-
-  Each node can have any number of children (via a linked
-  list) and represents a single render able entity in a
-  larger scene where each child transform on top of their
-  parent node.
-
-*/
 class SceneNode
 {
 public:

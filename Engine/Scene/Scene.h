@@ -6,12 +6,6 @@ class Mesh;
 class Material;
 class SceneNode;
 
-/*
-
-  The global scene object. Always holds a root node to which other scene nodes can be attached.
-  There will always be one global scene object, which can be cleared, configured at will.
-
-*/
 class Scene
 {
 public:

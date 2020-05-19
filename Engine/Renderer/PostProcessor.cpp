@@ -245,7 +245,7 @@ void PostProcessor::Blit(Renderer* renderer, Texture* source)
 	m_PostProcessShader->SetBool("Bloom", Bloom);
 	// motion blur
 	m_PostProcessShader->SetBool("MotionBlur", MotionBlur);
-	m_PostProcessShader->SetFloat("MotionScale", ImGui::GetIO().Framerate / FPSTarget * 0.8);
+	m_PostProcessShader->SetFloat("MotionScale", ImGui::GetIO().Framerate / FPSTarget * 0.8f);
 	m_PostProcessShader->SetInt("MotionSamples", 16);
 
 	renderer->renderMesh(renderer->m_NDCPlane, m_PostProcessShader);

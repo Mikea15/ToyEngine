@@ -32,30 +32,29 @@ namespace core
         glm::vec3 min = points[0];
         glm::vec3 max = points[0];
 
-        for (size_t i = 0; i < n; i++)
+        for (size_t i = 0; i < n; ++i)
         {
             // always point to the next.
             m_edges[i] = i + 1;
 
-            if (points[i].x < min.x) min.x = points[i].x;
-            if (points[i].y < min.y) min.y = points[i].y;
-            if (points[i].z < min.z) min.z = points[i].z;
-            if (points[i].x > max.x) max.x = points[i].x;
-            if (points[i].y > max.y) max.y = points[i].y;
-            if (points[i].z > max.z) max.z = points[i].z;
+            if (points[i].x < min.x) { min.x = points[i].x; }
+            if (points[i].y < min.y) { min.y = points[i].y; }
+            if (points[i].z < min.z) { min.z = points[i].z; }
+            if (points[i].x > max.x) { max.x = points[i].x; }
+            if (points[i].y > max.y) { max.y = points[i].y; }
+            if (points[i].z > max.z) { max.z = points[i].z; }
         }
 
-        glm::vec3 center = min;
-        float maxExtent = (max.x - min.x) * 0.5f;
-        center.x += maxExtent;
-        for (size_t i = 1; i < 3; ++i) {
-            float extent = (max[i] - min[i]) * 0.5f;
-            center[i] += extent;
-            if (extent > maxExtent) {
-                maxExtent = extent;
+        glm::vec3 center = min + (max - min) * 0.5f;
+        glm::vec3 extent = (max - min);
+        float maxExtent = 0.0f;
+        for (size_t d = 0; d < 3; ++d)
+        {
+            if (extent[d] > maxExtent)
+            {
+                maxExtent = extent[d];
             }
         }
-
         m_root = CreateOctant(center, maxExtent, 0, n - 1, n);
     }
 

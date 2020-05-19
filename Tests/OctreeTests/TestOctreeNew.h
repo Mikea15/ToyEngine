@@ -42,5 +42,3 @@ struct TestOctreeNewSearch
 	core::Octree oct;
 };
 
-
-

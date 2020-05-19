@@ -1,6 +1,5 @@
 #include "GLStateCache.h"
 
-
 void GLStateCache::SetDepthTest(bool enable)
 {
 	if (m_depthTest != enable)
@@ -8,7 +7,6 @@ void GLStateCache::SetDepthTest(bool enable)
 		m_depthTest = enable;
 		ToggleState(GL_DEPTH_TEST, enable);
 	}
-
 }
 
 void GLStateCache::SetDepthFunc(GLenum depthFunc)

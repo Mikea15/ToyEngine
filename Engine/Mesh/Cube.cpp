@@ -1,7 +1,5 @@
 #include "Cube.h"
 
-
-
 Cube::Cube()
 {
 	Positions = std::vector<glm::vec3>{

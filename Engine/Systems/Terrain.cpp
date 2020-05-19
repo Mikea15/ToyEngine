@@ -133,7 +133,7 @@ void Terrain::GenerateMesh()
 	GenerateTerrainBlock(0, length, width, vertices);
 #endif
 
-	for (int v = 0; v < vertices.size(); v += 4)
+	for (size_t v = 0; v < vertices.size(); v += 4)
 	{
 		/* 2 --- 3
 		 * | \   |

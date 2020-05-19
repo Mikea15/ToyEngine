@@ -10,12 +10,6 @@ class Mesh;
 class Material;
 class RenderTarget;
 
-/*
-
-  Render command buffer, managing all per-frame render/draw calls and converting them to a
-  (more efficient) render-friendly format for the renderer to execute.
-
-*/
 class CommandBuffer
 {
 public:
@@ -38,10 +32,8 @@ public:
 
 	// clears the command buffer; usually done after issuing all the stored render commands.
 	void Clear();
+
 	// sorts the command buffer; first by shader, then by texture bind.
-	// TODO: build an approach using texture arrays (every push would add relevant material textures
-	// to texture array (if it wans't there already), and then add a texture index to each material
-	// slot; profile if the added texture adjustments actually saves performance!
 	void Sort();
 
 	// returns the list of render commands. For minimizing state changes it is advised to first 

@@ -2,13 +2,6 @@
 
 #include "Mesh.h"
 
-
-/*
-
-  A 3D torus (donut) mesh characterized by its two radii: inner hole and ring's radius and the
-  number of horizontal and vertical ring segments.
-
-*/
 class Torus : public Mesh
 {
 public:

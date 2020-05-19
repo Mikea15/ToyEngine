@@ -122,7 +122,7 @@ void Shader::Load(const std::string& name, std::string vsCode, std::string fsCod
 
 	// iterate over all active attributes
 	char buffer[128];
-	for (unsigned int i = 0; i < nrAttributes; ++i)
+	for (int i = 0; i < nrAttributes; ++i)
 	{
 		GLenum glType;
 		glGetActiveAttrib(ID, i, sizeof(buffer), 0, &Attributes[i].Size, &glType, buffer);
@@ -133,7 +133,7 @@ void Shader::Load(const std::string& name, std::string vsCode, std::string fsCod
 	}
 
 	// iterate over all active uniforms
-	for (unsigned int i = 0; i < nrUniforms; ++i)
+	for (int i = 0; i < nrUniforms; ++i)
 	{
 		GLenum glType;
 		glGetActiveUniform(ID, i, sizeof(buffer), 0, &Uniforms[i].Size, &glType, buffer);

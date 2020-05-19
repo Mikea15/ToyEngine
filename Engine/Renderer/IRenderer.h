@@ -8,6 +8,4 @@ class IRenderer
 {
 public:
 	virtual Material* CreateMaterial(std::string base = "default-fwd") = 0;
-
-
 };

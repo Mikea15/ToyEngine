@@ -5,7 +5,6 @@
 
 #include "Shading/Shader.h"
 
-
 class ShaderLoader
 {
 public:
@@ -15,5 +14,3 @@ public:
 private:
 	static std::string readShader(std::ifstream& file, const std::string& name, std::string path);
 };
-
-

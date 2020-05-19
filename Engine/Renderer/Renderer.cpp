@@ -23,8 +23,6 @@
 
 #include <stack>
 
-
-
 Renderer::Renderer()
 {
 
@@ -42,7 +40,7 @@ Renderer::~Renderer()
 	delete m_CustomTarget;
 
 	// shadows
-	for (int i = 0; i < m_ShadowRenderTargets.size(); ++i)
+	for (size_t i = 0; i < m_ShadowRenderTargets.size(); ++i)
 	{
 		delete m_ShadowRenderTargets[i];
 	}
@@ -296,8 +294,8 @@ void Renderer::RenderPushedCommands()
 		std::vector<RenderCommand> shadowRenderCommands = m_CommandBuffer->GetShadowCastRenderCommands();
 		m_ShadowViewProjections.clear();
 
-		unsigned int shadowRtIndex = 0;
-		for (int i = 0; i < m_DirectionalLights.size(); ++i)
+		size_t shadowRtIndex = 0;
+		for (size_t i = 0; i < m_DirectionalLights.size(); ++i)
 		{
 			DirectionalLight* light = m_DirectionalLights[i];
 			if (light->m_castShadows)
@@ -312,7 +310,7 @@ void Renderer::RenderPushedCommands()
 				glm::mat4 lightView = glm::lookAt(-light->m_direction * 10.0f, glm::vec3(0.0), glm::vec3(0, 1, 0));
 				m_DirectionalLights[i]->m_lightSpaceViewPrrojection = lightProjection * lightView;
 				m_DirectionalLights[i]->m_shadowMatRenderTarget = m_ShadowRenderTargets[shadowRtIndex];
-				for (int j = 0; j < shadowRenderCommands.size(); ++j)
+				for (size_t j = 0; j < shadowRenderCommands.size(); ++j)
 				{
 					renderShadowCastCommand(&shadowRenderCommands[j], lightProjection, lightView);
 				}
@@ -393,7 +391,7 @@ void Renderer::RenderPushedCommands()
 				glClear(GL_COLOR_BUFFER_BIT);
 			m_Camera->SetPerspective(m_Camera->GetFov(),
 				(float)renderTarget->Width / (float)renderTarget->Height,
-				0.1, 100.0f);
+				0.1f, 100.0f);
 		}
 		else
 		{
@@ -401,7 +399,7 @@ void Renderer::RenderPushedCommands()
 			// we'll use for post-processing.
 			glViewport(0, 0, m_RenderSize.x, m_RenderSize.y);
 			glBindFramebuffer(GL_FRAMEBUFFER, m_CustomTarget->ID);
-			m_Camera->SetPerspective(m_Camera->GetFov(), m_RenderSize.x / m_RenderSize.y, 0.1,
+			m_Camera->SetPerspective(m_Camera->GetFov(), m_RenderSize.x / m_RenderSize.y, 0.1f,
 				100.0f);
 		}
 
@@ -797,7 +795,7 @@ void Renderer::renderToCubemap(std::vector<RenderCommand>& renderCommands, Textu
 
 void Renderer::renderMesh(Mesh* mesh, Shader* shader)
 {
-	glBindVertexArray(mesh->m_VAO);
+	glBindVertexArray(mesh->m_vao);
 	if (mesh->Indices.size() > 0)
 	{
 		glDrawElements(mesh->Topology == TOPOLOGY::TRIANGLE_STRIP ? GL_TRIANGLE_STRIP : GL_TRIANGLES, mesh->Indices.size(), GL_UNSIGNED_INT, 0);

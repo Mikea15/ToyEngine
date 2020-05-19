@@ -8,7 +8,6 @@
 #include "Utils/Utils.h"
 #include "Utils/Logger.h"
 
-
 MaterialLibrary::MaterialLibrary(RenderTarget* gBuffer)
 {
 	generateDefaultMaterials();
@@ -37,7 +36,7 @@ Material* MaterialLibrary::CreateMaterial(std::string base)
 	{
 		Material copy = found->second->Copy();
 		Material* mat = new Material(copy);
-		m_Materials.push_back(mat); // TODO(Joey): a bit ugly for now, come up with a bettermemory management scheme for materials
+		m_Materials.push_back(mat); 
 		return mat;
 	}
 	else

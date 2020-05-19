@@ -7,13 +7,6 @@
 #include "ShadingTypes.h"
 
 
-/*
-
-  Shader object for quickly creating and using a GPU shader object. When compiling/linking a
-  shader object from source code, all vertex attributes and uniforms are extracted for saving
-  unnecessary additional CPU->GPU roundtrip times.
-
-*/
 class Shader
 {
 public:

@@ -15,15 +15,6 @@
 
 #include <glm/glm.hpp>
 
-
-
-/*
-
-  Forward declare the types, s.t. we don't need to include the required header files here.
-  Seeing as several objects throughout Cell will link to renderer.h we want to reduce as much
-  unnecessary additional header code as much as possible (saves in compilation times).
-
-*/
 class Mesh;
 class Material;
 class Scene;
@@ -36,13 +27,6 @@ class PostProcessor;
 class Texture;
 class Shader;
 
-/*
-
-  The main renderer; responsible for maintaining a render buffer queue, providing the front
-  push commands for filling the buffer, sorting the buffer, manage multiple render passes and
-  render the buffer(s) accordingly.
-
-*/
 class Renderer
 	: public IRenderer
 {

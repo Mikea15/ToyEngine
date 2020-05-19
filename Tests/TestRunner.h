@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <vector>
@@ -83,6 +82,7 @@ struct TestRunner
 
     void RunTests()
     {
+        printf("Running Tests\n");
         for (BaseTest* t : m_tests)
         {
             RunTest(t);
@@ -91,6 +91,7 @@ struct TestRunner
 
     void RunBenchs()
     {
+        printf("Running Benchs\n");
         for (std::pair<BaseTest*, BaseTest*> qb : m_quickBenchs)
         {
             float timeAvg1 = RunTest(qb.first);
@@ -99,12 +100,12 @@ struct TestRunner
             if (timeAvg1 > timeAvg2)
             {
                 const float factor = 1.0f - static_cast<float>(timeAvg2) / static_cast<float>(timeAvg1);
-                printf("[] %s ( %0.1f ms ) is faster than %s ( %0.1f ms ) by %.2f%%\n",
+                printf("  [] %s ( %0.1f ms ) is faster than %s ( %0.1f ms ) by %.2f%%\n",
                     qb.second->TestName.c_str(), timeAvg2, qb.first->TestName.c_str(), timeAvg1, factor);
             }
             else {
                 const float factor = 1.0f - static_cast<float>(timeAvg1) / static_cast<float>(timeAvg2);
-                printf("[] %s ( %0.1f ms ) is faster than %s ( %0.1f ms ) by %.2f%%\n",
+                printf("  [] %s ( %0.1f ms ) is faster than %s ( %0.1f ms ) by %.2f%%\n",
                     qb.first->TestName.c_str(), timeAvg1, qb.second->TestName.c_str(), timeAvg2, factor);
             }
         }
@@ -113,7 +114,7 @@ struct TestRunner
 private:
     float RunTest(BaseTest* test)
     {
-        printf("Test: %s ", test->TestName.c_str());
+        printf("  Test: %s ", test->TestName.c_str());
         test->Init();
 
         int time = 0;
@@ -125,7 +126,7 @@ private:
         }
 
         float timeAvg = static_cast<float>(time) / TestCount;
-        printf(" in %d (ms) / %0.5f (ms) avg.\n", time, timeAvg);
+        printf("in %d (ms) / %0.5f (ms) avg.\n", time, timeAvg);
         return timeAvg;
     }
 

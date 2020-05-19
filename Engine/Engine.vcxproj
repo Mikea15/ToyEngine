@@ -291,7 +291,6 @@
     <ClCompile Include="Systems\AABB.cpp" />
     <ClCompile Include="Systems\BoundingFrustum.cpp" />
     <ClCompile Include="Systems\BoundingSphere.cpp" />
-    <ClCompile Include="Systems\BST.cpp" />
     <ClCompile Include="Systems\BTree.cpp" />
     <ClCompile Include="Systems\BVH.cpp" />
     <ClCompile Include="Systems\GameTime.cpp" />

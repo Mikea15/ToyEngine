@@ -21,5 +21,4 @@ private:
 
 	unsigned int m_rows = 0;
 	unsigned int m_cols = 0;
-
 };

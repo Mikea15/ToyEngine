@@ -1,4 +1,3 @@
-
 #include "TestRunner.h"
 
 #include "OctreeTests/TestOctreeOld.h"
@@ -22,7 +21,6 @@ int main()
     testRunner.Add(new TestOctreeJensBInsert());
     testRunner.Add(new TestOctreeJensBSearch());
 
-    // testRunner.Add(new TestAABB());
     testRunner.Add(new TestAABB(), new TestAABBNoBranch());
 
     testRunner.RunTests();

@@ -523,7 +523,7 @@ void SimpleRenderer::RenderShadowCastCommand(RenderCommand* rc, const glm::mat4&
 void SimpleRenderer::RenderMesh(Mesh* mesh)
 {
 	// Render Mesh
-	glBindVertexArray(mesh->m_VAO);
+	glBindVertexArray(mesh->m_vao);
 
 	const GLenum mode = mesh->Topology == TOPOLOGY::TRIANGLE_STRIP ? GL_TRIANGLE_STRIP : GL_TRIANGLES;
 	if (!mesh->Indices.empty())

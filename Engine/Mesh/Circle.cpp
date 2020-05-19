@@ -18,7 +18,7 @@ Circle::Circle(unsigned int edgeSegments, unsigned int ringSegments)
 	bool oddRow = false;
 	for (unsigned int y = 0; y < ringSegments; ++y)
 	{
-		if (!oddRow) // NOTE(Joey): even rows: y == 0, y == 2; and so on
+		if (!oddRow)
 		{
 			for (unsigned int x = 0; x <= edgeSegments; ++x)
 			{

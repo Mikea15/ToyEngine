@@ -23,8 +23,6 @@ public:
 	void Resize(unsigned int width, unsigned int height);
 	void SetTarget(GLenum target);
 
-	// TODO(Joey): this shouldn't be called by end-users, come up with something else than private/friend
-	//void Bind(bool clear = true, bool setViewport = true);
 public:
 	unsigned int ID;
 

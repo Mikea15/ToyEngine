@@ -2,18 +2,11 @@
 
 #include <GL/glew.h>
 
-
-/*
-
-  Texture
-
-*/
 class Texture
 {
 public:
 	unsigned int ID;
-	// TODO(Joey): these should be private and only accessed w/ getters/setters s.t. we can 
-	// directly change the texture state where relevant from within the setters.
+
 	GLenum Target = GL_TEXTURE_2D;           // what type of texture we're dealing with
 	GLenum InternalFormat = GL_RGBA;                 // number of color components
 	GLenum Format = GL_RGBA;                 // the format each texel is stored in

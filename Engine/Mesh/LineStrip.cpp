@@ -2,9 +2,6 @@
 
 #include <vector>
 
-
-
-
 LineStrip::LineStrip(float width, unsigned int segments)
 {
 	float deltaX = 1.0f / segments;

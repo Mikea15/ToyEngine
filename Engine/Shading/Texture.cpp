@@ -2,8 +2,6 @@
 
 #include <assert.h>
 
-
-
 Texture::Texture()
 {
 

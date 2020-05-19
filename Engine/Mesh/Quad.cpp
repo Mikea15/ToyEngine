@@ -1,7 +1,5 @@
 #include "Quad.h"
 
-
-
 Quad::Quad()
 {
 	Positions =

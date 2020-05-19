@@ -9,15 +9,6 @@ class Shader;
 class Renderer;
 class Camera;
 
-/*
-
-  Manages and maintains all data and functionality related to end-of-frame post-processing.
-  This doesn't only include post-processing effects like SSAO, Bloom, Vignette, but also
-  includes general functionality like blitting, blurring, HDR and gammac-orrection.
-  The post-processor's multi-pass effects support multiple resolutions and adjusts accordingly
-  when a resolution change occurs.
-
-*/
 class PostProcessor
 {
 public:

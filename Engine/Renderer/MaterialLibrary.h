@@ -11,12 +11,6 @@ class SimpleRenderer;
 class Shader;
 class RenderTarget;
 
-/*
-
-  Manages and maintains a list of common render materials, either for storing a template list
-  of common materials or for storing internal renderer materials.
-
-*/
 class MaterialLibrary
 {
 	friend Renderer;
