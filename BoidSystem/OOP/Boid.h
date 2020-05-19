@@ -11,11 +11,19 @@
 struct Boid
 {
     Boid()
-        : m_properties(&DefaultProperties)
+        : m_id(++ID)
+        , m_properties(&DefaultProperties)
     {
+        m_velocity = MathUtils::RandomInUnitSphere();
+        m_position = MathUtils::RandomInUnitSphere();
+        m_targetBoid = nullptr;
+        m_fleeBoid = nullptr;
+
+        m_neighborIndices.resize(ENTITY_COUNT);
     }
 
     Boid(Properties* properties)
+        : m_id(++ID)
     {
         m_properties = properties;
 
@@ -322,7 +330,9 @@ struct Boid
 #endif
             glm::vec3 toAgent = agent->m_position - n.m_position;
             float distanceSqToAgent = glm::length2(toAgent);
-            if (distanceSqToAgent < FLT_EPSILON || distanceSqToAgent > agent->m_properties->m_neighborRange * agent->m_properties->m_neighborRange)
+            if (distanceSqToAgent < FLT_EPSILON 
+                || distanceSqToAgent > agent->m_properties->m_neighborRange 
+                * agent->m_properties->m_neighborRange)
             {
                 continue;
             }
@@ -350,8 +360,6 @@ struct Boid
     Boid* m_fleeBoid;
 
     Properties* m_properties = nullptr;
-
-
 
     // Have an array of boids. This will create lots of copies for now.
     // we'll deal with those optimizations later on.
