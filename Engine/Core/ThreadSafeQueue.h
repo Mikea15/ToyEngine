@@ -4,7 +4,7 @@
 #include <mutex>
 #include <condition_variable>
 
-template<typename T>
+template<typename T, typename Mutex = std::mutex>
 class ThreadSafeQueue
 {
 public:

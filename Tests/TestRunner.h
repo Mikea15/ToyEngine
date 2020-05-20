@@ -30,20 +30,6 @@ struct BaseTest
     std::string TestName = "BaseTest";
 };
 
-
-template<class T1 = BaseTest, class T2 = BaseTest>
-struct QuickBench
-{
-    void Init1() { t1->Init(); }
-    void Init2() { t2->Init(); }
-
-    void Run1() { t1->Execute(); }
-    void Run2() { t2->Execute(); }
-
-    T1* t1;
-    T2* t2;
-};
-
 #define GENERIC_TEST_CTOR(className) \
     className()  { TestName = #className; } \
 

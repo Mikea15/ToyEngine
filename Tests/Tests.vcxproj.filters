@@ -41,5 +41,8 @@
     <ClInclude Include="Branches\TestAABB.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MultiThreading\MutexLockTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

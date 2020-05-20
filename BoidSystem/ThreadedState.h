@@ -336,8 +336,9 @@ public:
         m_octree.Search(searchAabb, neighborResult);
 
 #if USE_OCTREE_PRUNE_BY_DIST
+        const float rangeSq = range * range;
         neighborResult.erase(std::remove_if(neighborResult.begin(), neighborResult.end(), [&](const OcNode& n) {
-            return glm::length2(pos - m_wanderers[n.m_data].m_position) > range * range;
+            return glm::length2(pos - m_wanderers[n.m_data].m_position) > rangeSq;
             }), neighborResult.end());
 #endif
 

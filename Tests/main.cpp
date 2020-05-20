@@ -7,21 +7,26 @@
 
 #include "Branches/TestAABB.h"
 
+#include "MultiThreading/MutexLockTest.h"
+
 int main()
 {
     const size_t numTests = 1000;
     TestRunner<numTests> testRunner;
 
-    testRunner.Add(new TestOctreeOldInsert());
-    testRunner.Add(new TestOctreeOldSearch());
-    testRunner.Add(new TestOctreeAltInsert());
-    testRunner.Add(new TestOctreeAltSearch());
-    testRunner.Add(new TestOctreeNewInsert());
-    testRunner.Add(new TestOctreeNewSearch());
-    testRunner.Add(new TestOctreeJensBInsert());
-    testRunner.Add(new TestOctreeJensBSearch());
+    // testRunner.Add(new TestOctreeOldInsert());
+    // testRunner.Add(new TestOctreeOldSearch());
+    // testRunner.Add(new TestOctreeAltInsert());
+    // testRunner.Add(new TestOctreeAltSearch());
+    // testRunner.Add(new TestOctreeNewInsert());
+    // testRunner.Add(new TestOctreeNewSearch());
+    // testRunner.Add(new TestOctreeJensBInsert());
+    // testRunner.Add(new TestOctreeJensBSearch());
 
-    testRunner.Add(new TestAABB(), new TestAABBNoBranch());
+    testRunner.Add(new StdMutexLockTest());
+    // testRunner.Add(new CustomMutexLockTest());
+
+    // testRunner.Add(new TestAABB(), new TestAABBNoBranch());
 
     testRunner.RunTests();
     testRunner.RunBenchs();
