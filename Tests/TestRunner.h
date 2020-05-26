@@ -97,6 +97,12 @@ struct TestRunner
         }
     }
 
+    void RunQuick(std::function<void(void)> f1, std::function<void(void)> f2) 
+    {
+        printf("f1: "); RunQuickTest(f1);
+        printf("f2: "); RunQuickTest(f2);
+    }
+
 private:
     float RunTest(BaseTest* test)
     {
@@ -108,6 +114,21 @@ private:
         {
             ProfileTime prof;
             test->Run();
+            time += prof.GetTime();
+        }
+
+        float timeAvg = static_cast<float>(time) / TestCount;
+        printf("in %d (ms) / %0.5f (ms) avg.\n", time, timeAvg);
+        return timeAvg;
+    }
+
+    float RunQuickTest(std::function<void(void)>& f1)
+    {
+        int time = 0;
+        for (size_t i = 0; i < TestCount; ++i)
+        {
+            ProfileTime prof;
+            f1();
             time += prof.GetTime();
         }
 

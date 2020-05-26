@@ -1,4 +1,3 @@
-#pragma once
 // [DEAR IMGUI]
 // This is a slightly modified version of stb_textedit.h 1.13. 
 // Those changes would need to be pushed into nothings/stb:
