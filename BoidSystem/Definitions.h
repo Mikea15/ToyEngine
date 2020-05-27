@@ -1,22 +1,22 @@
 #pragma once
 
-#define MULTITHREAD 0
+#define MULTITHREAD 1
 
 #if MULTITHREAD
 #define NUM_THREADS 8
 #define USE_THREAD 0
-#define USE_THREAD_JOBS 0
-#define USE_ASYNC 1
+#define USE_THREAD_JOBS 1
+#define USE_ASYNC 0
 #endif
 
-#define USE_OCTREE 1
+#define USE_OCTREE 0
 #define USE_OCTREE_PRUNE_BY_DIST 1
 #define USE_AABB 0
 
 #define NEW_OCTREE 0
 
 #if _DEBUG
-#define ENTITY_COUNT 300
+#define ENTITY_COUNT 400
 #else
 #define ENTITY_COUNT 2500
 #endif

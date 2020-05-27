@@ -76,7 +76,8 @@ int main()
             Vec4f toTarget = p2 - p;
             Vec4f len(toTarget[0] * toTarget[0], toTarget[1] * toTarget[1]
                 , toTarget[2] * toTarget[2], toTarget[3] * toTarget[3]);
-            float dist = horizontal_add(len);
+            float dist = sqrt(horizontal_add(len));
+
         }
 
     };

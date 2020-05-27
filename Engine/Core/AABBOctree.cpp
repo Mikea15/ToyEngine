@@ -146,9 +146,6 @@ void AABBOctree::InternalSearch(const BoundingFrustum& frustum, std::vector<OcNo
 {
     if (frustum.Contains(m_bounds) == ContainmentType::Disjoint) { return; }
 
-    // check objects at this bounds level
-    // while no BoundingSphere, this BoundingBox is a Generous aproximation of the spheres.
-    // if (frustum.Contains(BoundingBox(m_storePos, 1.0f)) != ContainmentType::Disjoint)
     for (const OcNode& node : m_nodes)
     {
         if (frustum.Contains(node.m_pos) != ContainmentType::Disjoint)

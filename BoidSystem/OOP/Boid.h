@@ -8,6 +8,8 @@
 #include "Definitions.h"
 #include "Engine/Utils/MathUtils.h"
 
+#include "Path.h"
+
 struct Boid
 {
     Boid()
@@ -45,6 +47,7 @@ struct Boid
 
         m_targetBoid = other.m_targetBoid;
         m_fleeBoid = other.m_fleeBoid;
+        m_path = other.m_path;
 
         m_neighborIndices.resize(ENTITY_COUNT);
     }
@@ -74,6 +77,11 @@ struct Boid
         if (m_fleeBoid)
         {
             m_fleePos = m_fleeBoid->m_position;
+        }
+        if (m_path)
+        {
+            m_path->UpdatePath(m_position);
+            SetTarget(m_path->GetCurrentGoal());
         }
     }
 
@@ -107,13 +115,13 @@ struct Boid
         m_currentNeighborCount = neighborIndices.size();
 #else
         Search(this, otherBoids, m_neighborIndices, m_currentNeighborCount);
+#endif
 #if MULTITHREAD
         std::vector<size_t> neiIndices = m_neighborIndices;
 #else
         // NOTE (MA): This is a reference that comes from Main, and is shared accross threads
         // and is not protected against writes.
         neighborIndices = m_neighborIndices;
-#endif
 #endif
         if (HasFeature(eSeparation)) { force += m_properties->m_weightSeparation * Separation(otherBoids, 
 #if MULTITHREAD
@@ -358,6 +366,8 @@ struct Boid
 
     Boid* m_targetBoid;
     Boid* m_fleeBoid;
+
+    Path* m_path = nullptr;
 
     Properties* m_properties = nullptr;
 

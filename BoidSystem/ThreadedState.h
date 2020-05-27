@@ -66,35 +66,80 @@ public:
 
         m_viewGrid = ViewportGrid(100, 100, 100, 100);
 
-        m_path = Path({
-            glm::vec3(0.0f, 0.0f, 40.0f),
-            glm::vec3(13.5f, 0.0f, 25.0f),
-            glm::vec3(25.0f, 0.0f, 10.0f),
-            glm::vec3(40.0f, 0.0f, 0.0f),
-            glm::vec3(45.0f, 0.0f, -25.0f),
-            glm::vec3(25.0f, 0.0f, -45.0f),
-            glm::vec3(10.0f, 0.0f, -25.0f),
-            glm::vec3(0.0f, 0.0f, -10.0f),
-            glm::vec3(-10.0f, 0.0f, -25.0f),
-            glm::vec3(-25.0f, 0.0f, -25.0f),
-            glm::vec3(-45.0f, 0.0f, 0.0f),
-            glm::vec3(-25.0f, 0.0f, 25.0f)
-            });
+        m_paths = { Path({
+                glm::vec3(0.0f, 0.0f, 40.0f),
+                glm::vec3(13.5f, 0.0f, 25.0f),
+                glm::vec3(25.0f, 0.0f, 10.0f),
+                glm::vec3(40.0f, 0.0f, 0.0f),
+                glm::vec3(45.0f, 0.0f, -25.0f),
+                glm::vec3(25.0f, 0.0f, -45.0f),
+                glm::vec3(10.0f, 0.0f, -25.0f),
+                glm::vec3(0.0f, 0.0f, -10.0f),
+                glm::vec3(-10.0f, 0.0f, -25.0f),
+                glm::vec3(-25.0f, 0.0f, -25.0f),
+                glm::vec3(-45.0f, 0.0f, 0.0f),
+                glm::vec3(-25.0f, 0.0f, 25.0f)
+            }),
+            Path({
+                glm::vec3(-25.0f, 5.0f, 25.0f),
+                glm::vec3(-45.0f, 5.0f, 0.0f),
+                glm::vec3(-25.0f, 5.0f, -25.0f),
+                glm::vec3(-10.0f, 5.0f, -25.0f),
+                glm::vec3(0.0f, 5.0f, -10.0f),
+                glm::vec3(10.0f, 5.0f, -25.0f),
+                glm::vec3(25.0f, 5.0f, -45.0f),
+                glm::vec3(45.0f, 5.0f, -25.0f),
+                glm::vec3(40.0f, 5.0f, 0.0f),
+                glm::vec3(25.0f, 5.0f, 10.0f),
+                glm::vec3(13.5f, 5.0f, 25.0f),
+                glm::vec3(0.0f, 5.0f, 40.0f)
+                }),
+            Path({
+                glm::vec3(0.0f, 20.0f, 40.0f),
+                glm::vec3(40.0f, 20.0f, 0.0f),
+                glm::vec3(13.5f, 20.0f, 25.0f),
+                glm::vec3(25.0f, 20.0f, 10.0f),
+                glm::vec3(45.0f, 20.0f, -25.0f),
+                glm::vec3(0.0f, 20.0f, -10.0f),
+                glm::vec3(10.0f, 20.0f, -25.0f),
+                glm::vec3(-25.0f, 20.0f, -25.0f),
+                glm::vec3(25.0f, 20.0f, -45.0f),
+                glm::vec3(-45.0f, 20.0f, 0.0f),
+                glm::vec3(-25.0f, 20.0f, 25.0f),
+                glm::vec3(-10.0f, 20.0f, -25.0f)
+            }),
+            Path({
+                glm::vec3(13.5f, 35.0f, 25.0f),
+                glm::vec3(25.0f, 35.0f, 10.0f),
+                glm::vec3(0.0f, 35.0f, 40.0f),
+                glm::vec3(25.0f, 35.0f, -45.0f),
+                glm::vec3(40.0f, 35.0f, 0.0f),
+                glm::vec3(45.0f, 35.0f, -25.0f),
+                glm::vec3(0.0f, 35.0f, -10.0f),
+                glm::vec3(-10.0f, 35.0f, -25.0f),
+                glm::vec3(10.0f, 35.0f, -25.0f),
+                glm::vec3(-25.0f, 35.0f, -25.0f),
+                glm::vec3(-25.0f, 35.0f, 25.0f),
+                glm::vec3(-45.0f, 35.0f, 0.0f),
+            })
+        };
 
-        m_path2 = Path({
-            glm::vec3(-25.0f, 5.0f, 25.0f),
-            glm::vec3(-45.0f, 5.0f, 0.0f),
-            glm::vec3(-25.0f, 5.0f, -25.0f),
-            glm::vec3(-10.0f, 5.0f, -25.0f),
-            glm::vec3(0.0f, 5.0f, -10.0f),
-            glm::vec3(10.0f, 5.0f, -25.0f),
-            glm::vec3(25.0f, 5.0f, -45.0f),
-            glm::vec3(45.0f, 5.0f, -25.0f),
-            glm::vec3(40.0f, 5.0f, 0.0f),
-            glm::vec3(25.0f, 5.0f, 10.0f),
-            glm::vec3(13.5f, 5.0f, 25.0f),
-            glm::vec3(0.0f, 5.0f, 40.0f)
-            });
+        for (size_t i = 0; i < m_paths.size(); ++i)
+        {
+            auto b = Boid(&m_sharedBoidProperties);
+            auto features = eSeek;
+
+            b.m_path = &m_paths[i];
+            b.SetFeature(features);
+
+            b.m_position = glm::vec3(
+                MathUtils::Rand(-50.0f, 50.0f),
+                MathUtils::Rand(-50.0f, 50.0f),
+                MathUtils::Rand(-50.0f, 50.0f)
+            );
+
+            m_pathFollowers.push_back(b);
+        }
 
         for (size_t i = 0; i < ENTITY_COUNT; i++)
         {
@@ -114,26 +159,10 @@ public:
                 MathUtils::Rand(-50.0f, 50.0f)
             );
 
-            if (MathUtils::Rand01() > 0.5f)
-            {
-                b.SetTarget(&m_simplePathFollower);
-            }
-            else
-            {
-                b.SetTarget(&m_simplePathFollower2);
-            }
+            const int randIndex = i % 4;
+            b.SetTarget(&m_pathFollowers[randIndex]);
 
             m_wanderers.push_back(b);
-        }
-
-        m_simplePathFollower.SetFeature(eSeek);
-        m_simplePathFollower2.SetFeature(eSeek);
-
-        for (size_t i = 0; i < 30; i++)
-        {
-            randomPoints.push_back(
-                MathUtils::RandomInUnitSphere() * 10.0f
-            );
         }
 
 #if USE_THREAD_JOBS
@@ -292,31 +321,23 @@ public:
 
         m_finishedJobs.clear();
 #endif
-        for (size_t i = 0; i < ENTITY_COUNT; i++)
+        for (size_t i = 0; i < ENTITY_COUNT; ++i)
         {
             m_wanderers[i].DrawDebug();
         }
 
         neighborIndices.clear();
 
+        for (size_t i = 0; i < m_paths.size(); ++i)
         {
-            m_path.UpdatePath(m_simplePathFollower.m_position);
-            m_path.DebugDraw();
-
-            m_simplePathFollower.SetTarget(m_path.GetCurrentGoal());
-            m_simplePathFollower.FullUpdate(deltaTime, m_wanderers, neighborIndices);
-            m_simplePathFollower.DrawDebug();
+            m_paths[i].DebugDraw();
         }
 
+        for (size_t i = 0; i < m_pathFollowers.size(); ++i)
         {
-            m_path2.UpdatePath(m_simplePathFollower2.m_position);
-            m_path2.DebugDraw();
-
-            m_simplePathFollower2.SetTarget(m_path2.GetCurrentGoal());
-            m_simplePathFollower2.FullUpdate(deltaTime, m_wanderers, neighborIndices);
-            m_simplePathFollower2.DrawDebug();
+            m_pathFollowers[i].FullUpdate(deltaTime, m_wanderers, neighborIndices);
+            m_pathFollowers[i].DrawDebug();
         }
-
     }
 
     void PopulateOctree()
@@ -437,21 +458,17 @@ public:
 private:
     ViewportGrid m_viewGrid;
 
-    Boid m_simplePathFollower;
-    Boid m_simplePathFollower2;
-
     Properties m_sharedBoidProperties;
     std::vector<Boid> m_wanderers;
 
-    Path m_path;
-    Path m_path2;
+    std::vector<Path> m_paths;
+    std::vector<Boid> m_pathFollowers;
 
     AABBOctree m_octree;
     std::vector<OcNode> neighborResult;
     std::vector<size_t> neighborIndices;
 
     kdtree m_kdtree;
-    std::vector<glm::vec3> randomPoints;
 
     std::mutex m_mutex;
     std::condition_variable m_cvar;
