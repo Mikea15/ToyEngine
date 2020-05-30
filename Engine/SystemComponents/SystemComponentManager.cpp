@@ -1,7 +1,5 @@
 #include "SystemComponentManager.h"
 
-const std::size_t SystemComponent::Type = std::hash<std::string>()(TO_STRING(SystemComponent));
-
 SystemComponentManager::SystemComponentManager()
 {
 }

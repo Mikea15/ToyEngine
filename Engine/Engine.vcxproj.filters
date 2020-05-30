@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="State.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -144,9 +141,6 @@
     <ClInclude Include="SystemComponents\StatSystemComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SystemComponents\SystemComponentManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Systems\AABB.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -247,6 +241,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\CustomMutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemComponents\SystemComponentManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -371,9 +374,6 @@
     <ClCompile Include="SystemComponents\StatSystemComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SystemComponents\SystemComponentManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Systems\AABB.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -417,6 +417,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Core\AABBOctree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemComponents\SystemComponentManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,11 +1,12 @@
 #pragma once
 
 #include "SystemComponentManager.h"
+#include "Core/ISystemComponent.h"
 
 class GameTime;
 
 class StatSystemComponent
-	: public SystemComponent
+	: public ISystemComponent
 {
 	CLASS_DECLARATION(StatSystemComponent)
 

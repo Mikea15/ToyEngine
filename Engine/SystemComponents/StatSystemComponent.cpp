@@ -5,7 +5,7 @@
 #include "Systems/GameTime.h"
 #include "Utils/FileIO.h"
 
-CLASS_DEFINITION(SystemComponent, StatSystemComponent)
+CLASS_DEFINITION(ISystemComponent, StatSystemComponent)
 
 StatSystemComponent::StatSystemComponent(GameTime* pGameTime)
     : m_pGameTime(pGameTime)
@@ -124,7 +124,7 @@ void StatSystemComponent::RenderUI()
 
     // fps
     char bufferFPS[40];
-    sprintf_s(bufferFPS, "%.2f (fps) / %.2f (avg)", m_framesPerSecond, avgFPS);
+    sprintf_s(bufferFPS, "%.2f (fsdaps) / %.2f (avg)", m_framesPerSecond, avgFPS);
     ImGui::PushItemWidth(-padding);
     ImGui::PlotLines("", m_fpsBuffer, IM_ARRAYSIZE(m_fpsBuffer), m_currentFpsBufferIndex, bufferFPS, 0, m_maxFps + 10, ImVec2(0, 50));
     // ImGui::NextColumn();

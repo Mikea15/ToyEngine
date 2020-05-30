@@ -6,99 +6,40 @@
 #include <iostream>
 #include <sstream>
 
-#define TO_STRING( x ) #x
-#define TO_STRING2( x ) TO_STRING(x)
-
-//****************
-// CLASS_DECLARATION
-//
-// This macro must be included in the declaration of any subclass of Component.
-// It declares variables used in type checking.
-//****************
-#define CLASS_DECLARATION( classname )                                         \
-public:                                                                        \
-    static const std::size_t Type;                                             \
-    virtual bool IsClassType( const std::size_t classType ) const override;    \
-
-//****************
-// CLASS_DEFINITION
-// 
-// This macro must be included in the class definition to properly initialize 
-// variables used in type checking. Take special care to ensure that the 
-// proper parentclass is indicated or the run-time type information will be
-// incorrect. Only works on single-inheritance RTTI.
-//****************
-#define CLASS_DEFINITION( parentclass, childclass )                                         \
-const std::size_t childclass::Type = std::hash< std::string >()( TO_STRING( childclass ) ); \
-bool childclass::IsClassType( const std::size_t classType ) const {                         \
-        if ( classType == childclass::Type )                                                \
-            return true;                                                                    \
-        return parentclass::IsClassType( classType );                                       \
-}                                                                                           \
-
-union SDL_Event;
-class Game;
-
-class SystemComponent
-{
-public:
-	static const std::size_t Type;
-	virtual bool IsClassType(const std::size_t classType) const
-	{
-		return classType == Type;
-	}
-
-	SystemComponent() {};
-	SystemComponent(std::string&& move)
-		: m_value(move)
-	{ }
-
-	virtual ~SystemComponent() = default;
-
-	virtual void Initialize(Game* game) = 0;
-	virtual void HandleInput(SDL_Event* event) = 0;
-	virtual void PreUpdate(float frameTime) = 0;
-	virtual void Update(float deltaTime) = 0;
-	virtual void Render(float alpha) = 0;
-	virtual void RenderUI() = 0;
-	virtual void Cleanup() = 0;
-
-public:
-	std::string m_value = "uninitialized";
-};
+#include "Core/ISystemComponent.h"
 
 class SystemComponentManager
 {
 public:
-	SystemComponentManager();
-	~SystemComponentManager();
+    SystemComponentManager();
+    ~SystemComponentManager();
 
-	void Initialize(Game* game);
-	void HandleInput(SDL_Event* event);
-	void PreUpdate(float frameTime);
-	void Update(float deltaTime);
-	void Render(float alpha);
-	void RenderUI();
-	void Cleanup();
+    void Initialize(Game* game);
+    void HandleInput(SDL_Event* event);
+    void PreUpdate(float frameTime);
+    void Update(float deltaTime);
+    void Render(float alpha);
+    void RenderUI();
+    void Cleanup();
 
-	template< class ComponentType, typename... Args >
-	void AddComponent(Args&&... params);
+    template< class ComponentType, typename... Args >
+    void AddComponent(Args&&... params);
 
-	template< class ComponentType >
-	ComponentType& GetComponent();
+    template< class ComponentType >
+    ComponentType& GetComponent();
 
-	template< class ComponentType >
-	bool RemoveComponent();
+    template< class ComponentType >
+    bool RemoveComponent();
 
-	template< class ComponentType >
-	std::vector< ComponentType* > GetComponents();
+    template< class ComponentType >
+    std::vector< ComponentType* > GetComponents();
 
-	template< class ComponentType >
-	int RemoveComponents();
+    template< class ComponentType >
+    int RemoveComponents();
 
 private:
-	std::vector< std::unique_ptr< SystemComponent > > m_components;
-	std::unordered_map< std::size_t, std::unique_ptr<SystemComponent>> m_componentMap;
+    std::vector<std::unique_ptr<ISystemComponent>> m_components;
+    std::unordered_map<std::size_t, std::unique_ptr<ISystemComponent>> m_componentMap;
 };
 
 //***************
@@ -110,7 +51,7 @@ private:
 template< class ComponentType, typename... Args >
 void SystemComponentManager::AddComponent(Args&&... params)
 {
-	m_components.emplace_back(std::make_unique< ComponentType >(std::forward< Args >(params)...));
+    m_components.emplace_back(std::make_unique< ComponentType >(std::forward< Args >(params)...));
 }
 
 //***************
@@ -123,14 +64,14 @@ void SystemComponentManager::AddComponent(Args&&... params)
 template<class ComponentType>
 inline ComponentType& SystemComponentManager::GetComponent()
 {
-	for (auto&& component : m_components)
-	{
-		if (component->IsClassType(ComponentType::Type))
-		{
-			return *static_cast<ComponentType*>(component.get());
-		}
-	}
-	return *std::unique_ptr<ComponentType>(nullptr);
+    for (auto&& component : m_components)
+    {
+        if (component->IsClassType(ComponentType::Type))
+        {
+            return *static_cast<ComponentType*>(component.get());
+        }
+    }
+    return *std::unique_ptr<ComponentType>(nullptr);
 }
 
 //***************
@@ -141,21 +82,21 @@ inline ComponentType& SystemComponentManager::GetComponent()
 template<class ComponentType>
 inline bool SystemComponentManager::RemoveComponent()
 {
-	if (m_components.empty())
-		return false;
+    if (m_components.empty())
+        return false;
 
-	auto& index = std::find_if(m_components.begin(), m_components.end(),
-		[classType = ComponentType::Type](auto& component)
-	{
-		return component->IsClassType(classType);
-	});
-	bool success = index != m_components.end();
-	if (success)
-	{
-		m_components.erase(index);
-	}
+    auto& index = std::find_if(m_components.begin(), m_components.end(),
+        [classType = ComponentType::Type](auto& component)
+    {
+        return component->IsClassType(classType);
+    });
+    bool success = index != m_components.end();
+    if (success)
+    {
+        m_components.erase(index);
+    }
 
-	return success;
+    return success;
 }
 
 //***************
@@ -169,15 +110,15 @@ inline bool SystemComponentManager::RemoveComponent()
 template<class ComponentType>
 inline std::vector<ComponentType*> SystemComponentManager::GetComponents()
 {
-	std::vector<ComponentType> componentsOfType;
-	for (auto&& component : m_components)
-	{
-		if (component->IsClassType(ComponentType::Type))
-		{
-			componentsOfType.emplace_back(static_cast<ComponentType*>(component.get()));
-		}
-	}
-	return componentsOfType;
+    std::vector<ComponentType> componentsOfType;
+    for (auto&& component : m_components)
+    {
+        if (component->IsClassType(ComponentType::Type))
+        {
+            componentsOfType.emplace_back(static_cast<ComponentType*>(component.get()));
+        }
+    }
+    return componentsOfType;
 }
 
 //***************
@@ -187,27 +128,27 @@ inline std::vector<ComponentType*> SystemComponentManager::GetComponents()
 template<class ComponentType>
 inline int SystemComponentManager::RemoveComponents()
 {
-	if (m_components.empty())
-		return 0;
+    if (m_components.empty())
+        return 0;
 
-	int numRemoved = 0;
-	bool success = false;
+    int numRemoved = 0;
+    bool success = false;
 
-	do {
-		auto& index = std::find_if(m_components.begin(), m_components.end(),
-			[classType = ComponentType::Type](auto& component)
-		{
-			return component->IsClassType(classType);
-		});
+    do {
+        auto& index = std::find_if(m_components.begin(), m_components.end(),
+            [classType = ComponentType::Type](auto& component)
+        {
+            return component->IsClassType(classType);
+        });
 
-		success = index != m_components.end();
+        success = index != m_components.end();
 
-		if (success)
-		{
-			m_components.erase(index);
-			++numRemoved;
-		}
-	} while (success);
+        if (success)
+        {
+            m_components.erase(index);
+            ++numRemoved;
+        }
+    } while (success);
 
-	return numRemoved;
+    return numRemoved;
 }

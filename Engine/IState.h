@@ -35,10 +35,10 @@ union SDL_Event;
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/compatibility.hpp>
 
-class State
+class IState
 {
 public:
-	virtual ~State() = default;
+	virtual ~IState() = default;
 
 	virtual void Init(Game* game) = 0;
 	virtual void HandleInput(SDL_Event* event) = 0;
@@ -50,7 +50,7 @@ public:
 };
 
 class NullState
-	: public State
+	: public IState
 {
 public:
 	~NullState() override {};
@@ -63,87 +63,7 @@ public:
 	void Cleanup() override {};
 };
 
-class BaseState
-	: public State
-{
-public:
-	~BaseState() override {}
-
-	void Init(Game* game) override
-	{
-		m_game = game;
-		m_renderer = m_game->GetRenderer();
-		m_renderer->SetCamera(&m_camera);
-	}
-
-	void HandleInput(SDL_Event* event) override
-	{
-		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_F1)
-		{
-			m_inputGrabMouse = !m_inputGrabMouse;
-			SDL_SetRelativeMouseMode(m_inputGrabMouse ? SDL_TRUE : SDL_FALSE);
-		}
-
-		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_w) m_inputMoveForward = 1;
-		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_s) m_inputMoveForward = -1;
-		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_a) m_inputMoveRight = -1;
-		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_d) m_inputMoveRight = 1;
-		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_e) m_inputMoveUp = 1;
-		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_q) m_inputMoveUp = -1;
-		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_LSHIFT) m_inputEnableMovementBoost = true;
-
-		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_w) m_inputMoveForward = 0;
-		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_s) m_inputMoveForward = 0;
-		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_a) m_inputMoveRight = 0;
-		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_d) m_inputMoveRight = 0;
-		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_e) m_inputMoveUp = 0;
-		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_q) m_inputMoveUp = 0;
-		if (event->type == SDL_KEYUP && event->key.keysym.sym == SDLK_LSHIFT) m_inputEnableMovementBoost = false;
-	};
-
-	void Update(float deltaTime) override
-	{
-		if (m_inputGrabMouse) {
-			int x, y;
-			SDL_GetRelativeMouseState(&x, &y);
-			m_camera.HandleMouse(static_cast<float>(x), static_cast<float>(-y));
-		}
-
-		// get camera movement input
-		glm::vec3 inputDir(m_inputMoveRight, m_inputMoveUp, m_inputMoveForward);
-		m_camera.HandleMove(deltaTime, inputDir, m_inputEnableMovementBoost);
-		m_camera.Update(deltaTime);
-
-	};
-
-	void Render(float alpha = 1.0f) override
-	{
-		m_renderer->RenderPushedCommands();
-	};
-
-	void RenderUI() override
-	{
-
-	};
-
-	void Cleanup() override
-	{
-
-	};
-
-protected:
-	Game* m_game = nullptr;
-	SimpleRenderer* m_renderer = nullptr;
-	FlyCamera m_camera = FlyCamera(glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
-
-	bool m_inputGrabMouse = false;
-	float m_inputMoveUp = 0.0f;
-	float m_inputMoveRight = 0.0f;
-	float m_inputMoveForward = 0.0f;
-	bool m_inputEnableMovementBoost = false;
-};
-
-
+/*
 class StubState
 	: public BaseState
 {
@@ -469,3 +389,4 @@ private:
 	bvh::Tree m_bvhTree;
 	// BTree<int> btree;
 };
+*/

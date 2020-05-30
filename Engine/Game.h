@@ -10,16 +10,16 @@
 #include "Window/SDLHandler.h"
 #include "PhysxHandler.h"
 
-class State;
+class IState;
 class WindowParams;
 
 class Game
 {
 public:
-	Game(State* state);
+	Game(IState* state);
 	~Game();
 
-	void SetState(State* state);
+	void SetState(IState* state);
 	int Execute();
 
 	SDLHandler* GetSDLHandler() { return &m_sdlHandler; }
@@ -43,7 +43,7 @@ private:
 
 	SimpleRenderer* m_renderer{};
 	// Renderer* m_renderer{};
-	State* m_gameState{};
+	IState* m_gameState{};
 	SDLHandler m_sdlHandler;
 	PhysXHandler m_physxHandler;
 
