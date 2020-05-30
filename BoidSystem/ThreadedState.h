@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Engine/BaseState.h"
+#include "Engine/States/BaseState.h"
 
 #include "OOP/Boid.h"
 #include "Path.h"
 
 #include "Engine/Systems/KDTree.h"
 
-class Game;
+#include "Game.h"
 
 #include <atomic>
 #include <thread>
@@ -16,6 +16,7 @@ class Game;
 #include <future>
 
 #include "Engine/Core/ThreadSafeQueue.h"
+#include "Renderer/ViewportGrid.h"
 
 struct JobBlock
 {

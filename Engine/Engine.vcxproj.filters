@@ -246,10 +246,13 @@
     <ClInclude Include="SystemComponents\SystemComponentManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BaseState.h">
+    <ClInclude Include="States\IState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IState.h">
+    <ClInclude Include="States\BaseState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="States\NullState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -422,7 +425,13 @@
     <ClCompile Include="SystemComponents\SystemComponentManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BaseState.cpp">
+    <ClCompile Include="States\ExampleState.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="States\BaseState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="States\ExampleState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

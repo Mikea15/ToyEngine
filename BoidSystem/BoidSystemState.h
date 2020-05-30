@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/BaseState.h"
+#include "Engine/States/BaseState.h"
 
 #include "OOP/Boid.h"
 #include "Path.h"
@@ -10,7 +10,8 @@
 #include "Engine/Systems/KDTree.h"
 #include "Engine/SystemComponents/StatSystemComponent.h"
 
-class Game;
+#include "Game.h"
+#include "Renderer/ViewportGrid.h"
 
 class BoidSystemState
     : public BaseState

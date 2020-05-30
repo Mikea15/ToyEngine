@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include "IState.h"
+#include "States/IState.h"
 #include "Resources/Resources.h"
 #include "Scene/Scene.h"
 

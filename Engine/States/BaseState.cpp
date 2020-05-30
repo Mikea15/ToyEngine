@@ -1,4 +1,5 @@
 #include "BaseState.h"
+#include <Game.h>
 
 void BaseState::Init(Game* game)
 {

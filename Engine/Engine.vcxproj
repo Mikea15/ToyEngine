@@ -221,8 +221,9 @@
     <ClInclude Include="Shading\ShadingTypes.h" />
     <ClInclude Include="Shading\Texture.h" />
     <ClInclude Include="Shading\TextureCube.h" />
-    <ClInclude Include="IState.h" />
-    <ClInclude Include="BaseState.h" />
+    <ClInclude Include="States\IState.h" />
+    <ClInclude Include="States\BaseState.h" />
+    <ClInclude Include="States\NullState.h" />
     <ClInclude Include="SystemComponents\StatSystemComponent.h" />
     <ClInclude Include="SystemComponents\SystemComponentManager.h" />
     <ClInclude Include="Systems\AABB.h" />
@@ -288,7 +289,9 @@
     <ClCompile Include="Shading\Shader.cpp" />
     <ClCompile Include="Shading\Texture.cpp" />
     <ClCompile Include="Shading\TextureCube.cpp" />
-    <ClCompile Include="BaseState.cpp" />
+    <ClCompile Include="States\BaseState.cpp" />
+    <ClCompile Include="States\ExampleState.cpp" />
+    <ClCompile Include="States\ExampleState.h" />
     <ClCompile Include="SystemComponents\StatSystemComponent.cpp" />
     <ClCompile Include="SystemComponents\SystemComponentManager.cpp" />
     <ClCompile Include="Systems\AABB.cpp" />

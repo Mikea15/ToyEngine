@@ -1,6 +1,10 @@
 #pragma once
 
 #include "IState.h"
+#include "Camera/FlyCamera.h"
+
+class SimpleRenderer;
+
 
 class BaseState
     : public IState
