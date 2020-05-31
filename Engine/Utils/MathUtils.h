@@ -4,33 +4,31 @@
 
 namespace MathUtils
 {
-	static float Clamp(float a, float min, float max)
+	template<typename T = float>
+	static T Clamp(T v, T min, T max)
 	{
-		if (a > max)
-		{
-			a = max;
-		}
-		if (a < min)
-		{
-			a = min;
-		}
-		return a;
+        if (v > max) { v = max; }
+        if (v < min) { v = min; }
+		return v;
 	}
 
-	static float Lerp(float a, float b, float t)
+	template<typename T = float>
+	static T Lerp(T a, T b, T t)
 	{
 		return a + t * (b - a);
 	}
 
-	static float InverseLerp(float a, float b, float v)
+	template<typename T = float>
+	static T InverseLerp(T a, T b, T v)
 	{
 		assert(abs(b - a) > FLT_EPSILON);
 		return (v - a) / (b - a);
 	}
 
-	static float Remap(float minA, float maxA, float minB, float maxB, float value)
+	template<typename T = float>
+	static T Remap(T minA, T maxA, T minB, T maxB, T value)
 	{
-		float t = InverseLerp(minA, maxA, value);
+		const T t = InverseLerp(minA, maxA, value);
 		return Lerp(minB, maxB, t);
 	}
 
@@ -80,7 +78,7 @@ namespace MathUtils
 		return min + static_cast<float>(rand()) / (static_cast <float> (RAND_MAX / (max - min)));
 	}
 
-	static float Rand(int min, int max)
+	static int Rand(int min, int max)
 	{
 		return min + static_cast<int>(rand()) / (static_cast <float> (RAND_MAX / (max - min)));
 	}
