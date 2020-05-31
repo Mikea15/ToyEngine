@@ -110,18 +110,16 @@ public:
         DebugDraw::Init();
     };
 
-
     void Update(float deltaTime) override
     {
         BaseState::Update(deltaTime);
 
-        // Debug
         DebugDraw::Clear();
-
         glm::mat4 viewProj = m_camera.GetViewProjection();
         DebugDraw::Update(viewProj);
 
-        m_viewGrid.Draw();
+        m_viewGrid.PushDraw();
+
         DebugDraw::AddAABB(glm::vec3(0.0f) - glm::vec3(50.0f, 0.0f, 50.0f),
             glm::vec3(0.0f) + glm::vec3(50.0f, 0.0f, 50.0f));
 
@@ -181,6 +179,14 @@ public:
             m_simplePathFollower2.DrawDebug();
         }
 
+    }   
+
+    void UpdatePaused(float deltaTime) override
+    {
+        BaseState::UpdatePaused(deltaTime);
+
+        glm::mat4 viewProj = m_camera.GetViewProjection();
+        DebugDraw::Update(viewProj);
     }
 
     void PopulateOctree()
@@ -250,7 +256,7 @@ public:
     }
 
     void Render(float alpha = 1.0f) override
-    {
+    { 
 #if 0
         for (SceneNode* node : m_sceneNodes)
         {
@@ -262,7 +268,7 @@ public:
         DebugDraw::AddPosition(glm::vec3(0.0f), 0.5f);
 
         bool x_ray = false;
-        DebugDraw::Draw(x_ray);
+        DebugDraw::Draw(x_ray);        
     };
 
     void RenderUI()

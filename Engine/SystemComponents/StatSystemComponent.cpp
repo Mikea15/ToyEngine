@@ -26,7 +26,20 @@ void StatSystemComponent::Initialize(Game* game)
 
 void StatSystemComponent::HandleInput(SDL_Event* event)
 {
-
+    switch (event->type)
+    {
+    case SDL_KEYDOWN:
+        switch (event->key.keysym.sym)
+        {
+            break;
+        case SDLK_PAUSE:
+            m_pGameTime->TogglePause(!m_pGameTime->IsPaused());
+            break;
+        default: break;
+        }
+        break;
+    default: break;
+    }
 }
 
 void StatSystemComponent::PreUpdate(float frameTime)
@@ -149,7 +162,9 @@ void StatSystemComponent::RenderUI()
     ImGui::Text("DeltaTime: %.3f (ms)", m_pGameTime->GetElapsed());
 
     ImGui::Separator();
-
+    if (m_pGameTime->IsPaused()) {
+        ImGui::Text("Game Paused");
+    }
     ImGui::Text("TimeScale: %.1f", m_pGameTime->GetTimeScale());
     float timeScale = m_pGameTime->GetTimeScale();
     ImGui::SliderFloat("TimeScale", &timeScale, m_pGameTime->GetTimeScaleMin(),

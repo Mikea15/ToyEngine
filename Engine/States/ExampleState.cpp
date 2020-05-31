@@ -199,7 +199,7 @@ void ExampleState::Update(float deltaTime)
     // draw grid
     if (m_drawGrid)
     {
-        m_viewGrid.Draw();
+        m_viewGrid.PushDraw();
     }
 
     auto camFrustum = m_camera.GetFrustum();

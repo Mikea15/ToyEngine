@@ -11,6 +11,8 @@ public:
 	virtual void Init(Game* game) = 0;
 	virtual void HandleInput(SDL_Event* event) = 0;
 	virtual void Update(float deltaTime) = 0;
+	virtual void UpdatePaused(float deltaTime) = 0;
+
 	virtual void Render(float alpha = 1.0f) = 0;
 
 	virtual void RenderUI() {};

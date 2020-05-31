@@ -18,6 +18,7 @@ public:
 	void HandleInput(SDL_Event* event) override;
 	void PreUpdate(float frameTime) override;
 	void Update(float deltaTime) override;
+	void UpdatePaused(float deltaTime) override {}
 	void Render(float alpha) override;
 	void RenderUI() override;
 	void Cleanup() override;

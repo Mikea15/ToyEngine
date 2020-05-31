@@ -3,7 +3,6 @@
 
 void BaseState::Init(Game* game)
 {
-    
     m_game = game;
     m_renderer = m_game->GetRenderer();
     m_renderer->SetCamera(&m_camera);
@@ -36,16 +35,12 @@ void BaseState::HandleInput(SDL_Event* event)
 
 void BaseState::Update(float deltaTime)
 {
-    if (m_inputGrabMouse) {
-        int x, y;
-        SDL_GetRelativeMouseState(&x, &y);
-        m_camera.HandleMouse(static_cast<float>(x), static_cast<float>(-y));
-    }
+    HandleSceneCamera(deltaTime);
+}
 
-    // get camera movement input
-    glm::vec3 inputDir(m_inputMoveRight, m_inputMoveUp, m_inputMoveForward);
-    m_camera.HandleMove(deltaTime, inputDir, m_inputEnableMovementBoost);
-    m_camera.Update(deltaTime);
+void BaseState::UpdatePaused(float deltaTime)
+{
+    HandleSceneCamera(deltaTime);
 }
 
 void BaseState::Render(float alpha /*= 1.0f*/)
@@ -61,4 +56,18 @@ void BaseState::RenderUI()
 void BaseState::Cleanup()
 {
 
+}
+
+void BaseState::HandleSceneCamera(float deltaTime)
+{
+    if (m_inputGrabMouse) {
+        int x, y;
+        SDL_GetRelativeMouseState(&x, &y);
+        m_camera.HandleMouse(static_cast<float>(x), static_cast<float>(-y));
+    }
+
+    // get camera movement input
+    glm::vec3 inputDir(m_inputMoveRight, m_inputMoveUp, m_inputMoveForward);
+    m_camera.HandleMove(deltaTime, inputDir, m_inputEnableMovementBoost);
+    m_camera.Update(deltaTime);
 }

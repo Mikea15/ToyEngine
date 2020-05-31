@@ -71,6 +71,8 @@ void Game::CleanupSystems()
 
 void Game::SetState(IState* state)
 {
+	assert(state != nullptr);
+
 	if (m_gameState != nullptr)
 	{
 		m_gameState->Cleanup();
@@ -141,17 +143,28 @@ int Game::Execute()
 			// we'll update twice, before rendering a new frame.
 			while (accumulator >= updateRate)
 			{
-				// physx tick
-				// m_physxHandler.Tick(m_deltaTime);
+                // physx tick
+                // m_physxHandler.Tick(m_deltaTime);
 
-				// system components
-				m_systemComponents->Update(updateRate);
+                // window Update
+                m_sdlHandler.Update(updateRate);
 
-				// window Update
-				m_sdlHandler.Update(updateRate);
+				if (m_gameTime.IsPaused()) 
+				{
+					// system components
+					m_systemComponents->UpdatePaused(updateRate);
 
-				// Update
-				m_gameState->Update(updateRate);
+					// Update
+					m_gameState->UpdatePaused(updateRate);
+				}
+				else
+				{
+                    // system components
+                    m_systemComponents->Update(updateRate);
+
+                    // Update
+                    m_gameState->Update(updateRate);
+				}
 
 				accumulator -= updateRate;
 			}
@@ -175,8 +188,9 @@ int Game::Execute()
 				m_systemComponents->RenderUI();
 				m_gameState->RenderUI();
 				m_sdlHandler.EndUIRender();
-				m_sdlHandler.EndRender();
 			}
+
+			m_sdlHandler.EndRender();
 		}
 	}
 

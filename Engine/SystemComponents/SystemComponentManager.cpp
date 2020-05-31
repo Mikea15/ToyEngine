@@ -41,6 +41,14 @@ void SystemComponentManager::Update(float deltaTime)
 	}
 }
 
+void SystemComponentManager::UpdatePaused(float deltaTime)
+{
+    for (auto& sysComp : m_components)
+    {
+        sysComp->UpdatePaused(deltaTime);
+    }
+}
+
 void SystemComponentManager::Render(float alpha)
 {
 	for (auto& sysComp : m_components)

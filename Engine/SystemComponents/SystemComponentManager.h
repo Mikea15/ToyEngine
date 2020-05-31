@@ -18,6 +18,7 @@ public:
     void HandleInput(SDL_Event* event);
     void PreUpdate(float frameTime);
     void Update(float deltaTime);
+    void UpdatePaused(float deltaTime);
     void Render(float alpha);
     void RenderUI();
     void Cleanup();

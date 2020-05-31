@@ -59,6 +59,7 @@ public:
     virtual void HandleInput(SDL_Event* event) = 0;
     virtual void PreUpdate(float frameTime) = 0;
     virtual void Update(float deltaTime) = 0;
+    virtual void UpdatePaused(float deltaTime) = 0;
     virtual void Render(float alpha) = 0;
     virtual void RenderUI() = 0;
     virtual void Cleanup() = 0;

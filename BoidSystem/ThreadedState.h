@@ -187,7 +187,7 @@ public:
         glm::mat4 viewProj = m_camera.GetViewProjection();
         DebugDraw::Update(viewProj);
 
-        m_viewGrid.Draw();
+        m_viewGrid.PushDraw();
         DebugDraw::AddAABB(glm::vec3(0.0f) - glm::vec3(50.0f, 0.0f, 50.0f),
             glm::vec3(0.0f) + glm::vec3(50.0f, 0.0f, 50.0f));
 

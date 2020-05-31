@@ -35,25 +35,26 @@ public:
     void Init(Game* game) override;
     void HandleInput(SDL_Event* event) override;
     void Update(float deltaTime) override;
+    void UpdatePaused(float deltaTime) override {}
     void Render(float alpha = 1.0f) override;
     void RenderUI() override;
     void Cleanup() override;
 
 private:
-    PlaneMesh* plane;
-    Sphere* sphere;
-    Sphere* tSphere;
-    Torus* torus;
-    Cube* cube;
+    PlaneMesh* plane = nullptr;
+    Sphere* sphere = nullptr;
+    Sphere* tSphere = nullptr;
+    Torus* torus = nullptr;
+    Cube* cube = nullptr;
 
-    Shader* debugShader;
+    Shader* debugShader = nullptr;
 
-    SceneNode* sponza;
-    SceneNode* mainTorus;
-    SceneNode* secondTorus;
-    SceneNode* thirdTorus;
-    SceneNode* plasmaOrb;
-    SceneNode* planeNode;
+    SceneNode* sponza = nullptr;
+    SceneNode* mainTorus = nullptr;
+    SceneNode* secondTorus = nullptr;
+    SceneNode* thirdTorus = nullptr;
+    SceneNode* plasmaOrb = nullptr;
+    SceneNode* planeNode = nullptr;
 
     DirectionalLight m_directionalLight;
 

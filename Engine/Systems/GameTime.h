@@ -24,6 +24,9 @@ public:
 	void SetTimeScale(TimePrecision scale);
 	TimePrecision GetTimeScale() const { return m_timeScale; }
 
+	void TogglePause(bool pause) { m_pause = pause; }
+	bool IsPaused() const { return m_pause; }
+
 private:
 	high_resolution_clock::time_point m_initialTime{};
 	high_resolution_clock::time_point m_previousNow{};
@@ -40,4 +43,6 @@ private:
 	TimePrecision m_timeScaleIncrement = 0.1f;
 
 	TimePrecision m_time = 0.0f;
+
+	bool m_pause = false;
 };

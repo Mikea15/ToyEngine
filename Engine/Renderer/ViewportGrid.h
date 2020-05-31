@@ -11,7 +11,7 @@ public:
 	ViewportGrid() = default;
 	ViewportGrid(float width, float depth, unsigned int rows, unsigned int cols);
 
-	void Draw();
+	void PushDraw();
 
 private:
 	std::vector<DebugDraw::Line> m_lines;

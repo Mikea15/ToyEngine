@@ -28,7 +28,6 @@ public:
 	{
 		unsigned int m_threads = 2;
 		glm::vec3 m_gravity = { 0.0f, -9.81f, 0.0f };
-
 	};
 
 	void Init();

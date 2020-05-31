@@ -29,7 +29,7 @@ ViewportGrid::ViewportGrid(float width, float depth, unsigned int rows, unsigned
 	}
 }
 
-void ViewportGrid::Draw()
+void ViewportGrid::PushDraw()
 {
 	for (const DebugDraw::Line& l : m_lines)
 	{
