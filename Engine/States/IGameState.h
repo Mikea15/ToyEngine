@@ -3,10 +3,10 @@
 class Game;
 union SDL_Event;
 
-class IState
+class IGameState
 {
 public:
-	virtual ~IState() = default;
+	virtual ~IGameState() = default;
 
 	virtual void Init(Game* game) = 0;
 	virtual void HandleInput(SDL_Event* event) = 0;

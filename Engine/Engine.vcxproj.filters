@@ -246,13 +246,13 @@
     <ClInclude Include="SystemComponents\SystemComponentManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="States\IState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="States\BaseState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="States\NullState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="States\IGameState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

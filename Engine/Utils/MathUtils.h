@@ -80,6 +80,6 @@ namespace MathUtils
 
 	static int Rand(int min, int max)
 	{
-		return min + static_cast<int>(rand()) / (static_cast <float> (RAND_MAX / (max - min)));
+		return min + static_cast<int>(rand() / (static_cast <float> (RAND_MAX / (max - min))));
 	}
 }

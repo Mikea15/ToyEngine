@@ -1,9 +1,9 @@
 #pragma once
 
-#include "IState.h"
+#include "IGameState.h"
 
 class NullState
-    : public IState
+    : public IGameState
 {
 public:
     ~NullState() override {};

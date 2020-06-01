@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include "States/IState.h"
+#include "States/IGameState.h"
 #include "Resources/Resources.h"
 #include "Scene/Scene.h"
 
@@ -12,7 +12,7 @@
 #include "Utils/Logger.h"
 #include "Core/Profiler.h"
 
-Game::Game(IState* state)
+Game::Game(IGameState* state)
 	: m_isRunning(true)
 	, m_gameState(nullptr)
 {
@@ -69,7 +69,7 @@ void Game::CleanupSystems()
 }
 
 
-void Game::SetState(IState* state)
+void Game::SetState(IGameState* state)
 {
 	assert(state != nullptr);
 

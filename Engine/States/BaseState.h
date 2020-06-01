@@ -1,13 +1,13 @@
 #pragma once
 
-#include "IState.h"
+#include "IGameState.h"
 #include "Camera/FlyCamera.h"
 
 class SimpleRenderer;
 
 
 class BaseState
-    : public IState
+    : public IGameState
 {
 public:
     ~BaseState() override {}

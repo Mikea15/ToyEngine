@@ -221,7 +221,7 @@
     <ClInclude Include="Shading\ShadingTypes.h" />
     <ClInclude Include="Shading\Texture.h" />
     <ClInclude Include="Shading\TextureCube.h" />
-    <ClInclude Include="States\IState.h" />
+    <ClInclude Include="States\IGameState.h" />
     <ClInclude Include="States\BaseState.h" />
     <ClInclude Include="States\NullState.h" />
     <ClInclude Include="SystemComponents\StatSystemComponent.h" />
