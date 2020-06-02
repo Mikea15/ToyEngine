@@ -1,7 +1,7 @@
 #pragma once
 
 #include "TestOctreeBase.h"
-#include "Engine/Core/Octree.h"
+#include "Core/Spatial/Octree.h"
 
 struct TestOctreeNewInsert
 	: OctreeBaseTest

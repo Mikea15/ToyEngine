@@ -9,7 +9,7 @@
 #include <glm/gtc/noise.hpp>
 
 #include "Mesh/Mesh.h"
-#include "Core/ThreadSafeQueue.h"
+#include "Core/Containers/ThreadSafeQueue.h"
 #include "Core/CustomMutex.h"
 
 #include <queue>

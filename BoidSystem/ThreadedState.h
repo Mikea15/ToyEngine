@@ -15,7 +15,7 @@
 #include <condition_variable>
 #include <future>
 
-#include "Engine/Core/ThreadSafeQueue.h"
+#include "Core/Containers/ThreadSafeQueue.h"
 #include "Renderer/ViewportGrid.h"
 
 struct JobBlock

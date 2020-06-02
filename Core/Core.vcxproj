@@ -19,10 +19,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Containers\ThreadSafeQueue.h" />
+    <ClInclude Include="Containers\VectorContainer.h" />
+    <ClInclude Include="CustomMutex.h" />
     <ClInclude Include="ISystemComponent.h" />
+    <ClInclude Include="JobScheduler\IBaseJob.h" />
+    <ClInclude Include="JobScheduler\JobScheduler.h" />
+    <ClInclude Include="Memory\StackAllocator.h" />
+    <ClInclude Include="Profiler.h" />
+    <ClInclude Include="Spatial\exp_Octree.h" />
+    <ClInclude Include="Spatial\Octree.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ISystemComponent.cpp" />
+    <ClCompile Include="JobScheduler\JobScheduler.cpp" />
+    <ClCompile Include="Spatial\Octree.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

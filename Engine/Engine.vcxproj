@@ -171,13 +171,7 @@
     <ClInclude Include="Camera\Camera.h" />
     <ClInclude Include="Camera\CameraFrustum.h" />
     <ClInclude Include="Camera\FlyCamera.h" />
-    <ClInclude Include="Core\exp_Octree.h" />
-    <ClInclude Include="Core\Octree.h" />
-    <ClInclude Include="Core\Profiler.h" />
-    <ClInclude Include="Core\CustomMutex.h" />
-    <ClInclude Include="Core\StackAllocator.h" />
-    <ClInclude Include="Core\ThreadSafeQueue.h" />
-    <ClInclude Include="Core\VectorContainer.h" />
+    <ClInclude Include="Core\AABBOctree.h" />
     <ClInclude Include="External\ImGuizmo\vgConfig.h" />
     <ClInclude Include="External\ImGuizmo\vGizmo.h" />
     <ClInclude Include="External\ImGuizmo\vGizmoMath.h" />
@@ -235,7 +229,6 @@
     <ClInclude Include="Systems\GameTime.h" />
     <ClInclude Include="Systems\GeomDefines.h" />
     <ClInclude Include="Systems\KDTree.h" />
-    <ClInclude Include="Core\AABBOctree.h" />
     <ClInclude Include="Systems\Plane.h" />
     <ClInclude Include="Systems\QuadTree.h" />
     <ClInclude Include="Systems\Rect.h" />
@@ -253,7 +246,7 @@
     <ClCompile Include="Camera\Camera.cpp" />
     <ClCompile Include="Camera\CameraFrustum.cpp" />
     <ClCompile Include="Camera\FlyCamera.cpp" />
-    <ClCompile Include="Core\Octree.cpp" />
+    <ClCompile Include="Core\AABBOctree.cpp" />
     <ClCompile Include="External\Imgui\imgui_demo.cpp" />
     <ClCompile Include="External\Imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="External\Imgui\imgui_impl_sdl.cpp" />
@@ -300,7 +293,6 @@
     <ClCompile Include="Systems\BTree.cpp" />
     <ClCompile Include="Systems\BVH.cpp" />
     <ClCompile Include="Systems\GameTime.cpp" />
-    <ClCompile Include="Core\AABBOctree.cpp" />
     <ClCompile Include="Systems\Plane.cpp" />
     <ClCompile Include="Systems\QuadTree.cpp" />
     <ClCompile Include="Systems\Rect.cpp" />

@@ -2,7 +2,7 @@
 
 #include "../TestRunner.h"
 
-#include "Engine/Core/CustomMutex.h"
+#include "Core/CustomMutex.h"
 #include "Engine/Systems/Terrain.h"
 
 struct StdMutexLockTest

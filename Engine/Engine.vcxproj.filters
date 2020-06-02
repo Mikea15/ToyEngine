@@ -213,34 +213,10 @@
     <ClInclude Include="Systems\Terrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Core\exp_Octree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Systems\KDTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Systems\GameTime.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Profiler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\StackAllocator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\ThreadSafeQueue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\VectorContainer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Octree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\AABBOctree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\CustomMutex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SystemComponents\SystemComponentManager.h">
@@ -253,6 +229,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="States\IGameState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\AABBOctree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -416,12 +395,6 @@
     <ClCompile Include="Systems\GameTime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Octree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\AABBOctree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SystemComponents\SystemComponentManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -432,6 +405,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="States\ExampleState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\AABBOctree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
