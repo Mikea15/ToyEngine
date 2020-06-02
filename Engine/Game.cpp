@@ -11,6 +11,8 @@
 
 #include "Utils/Logger.h"
 #include "Core/Profiler.h"
+#include "Core/JobScheduler/JobScheduler.h"
+
 
 Game::Game(IGameState* state)
 	: m_isRunning(true)
@@ -49,10 +51,13 @@ void Game::InitSystems()
 	m_renderer->Init();
 	m_renderer->SetRenderSize(m_sdlHandler.GetWindowParams().Width, m_sdlHandler.GetWindowParams().Height);
 
+	JobScheduler::GetInstance().Init();
 }
 
 void Game::CleanupSystems()
 {
+	JobScheduler::GetInstance().Cleanup();
+
 	delete m_renderer;
 	delete m_systemComponents;
 

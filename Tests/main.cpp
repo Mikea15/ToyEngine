@@ -11,6 +11,8 @@
 
 #include <vectorclass/vectorclass.h>
 
+#include "Core/JobScheduler/JobScheduler.h"
+
 int main()
 {
     const size_t numTests = 1000;
@@ -46,6 +48,7 @@ int main()
             glm::vec3 toTarget = p2 - p;
             float dist = glm::length(toTarget);
         }
+        printf("Job Done.\n");
     };
 
     auto glm4Test = []() {
@@ -82,8 +85,26 @@ int main()
 
     };
 
-    testRunner.RunQuick(glmTest, vclTest);
-    testRunner.RunQuick(glmTest, glm4Test);
+    auto& jobber = JobScheduler::GetInstance();
+
+    jobber.Init();
+
+    GenericJob job(glmTest);
+    jobber.AddJob(&job);
+    jobber.AddJob(&job);
+    jobber.AddJob(&job);
+    jobber.AddJob(&job);
+    jobber.AddJob(&job);
+
+    while (jobber.HasJobs())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    jobber.Cleanup();
+
+    //testRunner.RunQuick(glmTest, vclTest);
+    //testRunner.RunQuick(glmTest, glm4Test);
 
     getchar();
     return 0;
