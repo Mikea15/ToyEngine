@@ -6,7 +6,7 @@
 #include "Path.h"
 
 #include "Engine/Core/AABBOctree.h"
-#include "Engine/Core/Octree.h"
+#include "Core/Spatial/Octree.h"
 #include "Engine/Systems/KDTree.h"
 #include "Engine/SystemComponents/StatSystemComponent.h"
 
@@ -70,14 +70,14 @@ public:
         for (size_t i = 0; i < ENTITY_COUNT; i++)
         {
             auto b = Boid(&m_sharedBoidProperties);
-            auto features =
-                eSeek |
-                eAlignment |
-                eSeparation |
-                eCohesion |
-                eWallLimits;
+            // auto features =
+            //     eSeek |
+            //     eAlignment |
+            //     eSeparation |
+            //     eCohesion |
+            //     eWallLimits;
 
-            b.SetFeature(features);
+            b.SetFeature(eWander | eWallLimits);
 
             b.m_position = glm::vec3(
                 MathUtils::Rand(-50.0f, 50.0f),

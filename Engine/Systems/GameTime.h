@@ -24,6 +24,11 @@ public:
 	void SetTimeScale(TimePrecision scale);
 	TimePrecision GetTimeScale() const { return m_timeScale; }
 
+	template<typename Unit>
+	TimePrecision GetTime(float time) const {
+		return std::chrono::duration_cast<Unit<TimePrecision>>(time);
+	}
+
 	void TogglePause(bool pause) { m_pause = pause; }
 	bool IsPaused() const { return m_pause; }
 

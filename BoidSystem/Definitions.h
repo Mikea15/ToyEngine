@@ -9,14 +9,14 @@
 #define USE_ASYNC 1
 #endif
 
-#define USE_OCTREE 0
+#define USE_OCTREE 1
 #define USE_OCTREE_PRUNE_BY_DIST 1
 #define USE_AABB 0
 
-#define NEW_OCTREE 0
+#define NEW_OCTREE 1
 
 #if _DEBUG
-#define ENTITY_COUNT 200
+#define ENTITY_COUNT 1000
 #else
 #define ENTITY_COUNT 2500
 #endif

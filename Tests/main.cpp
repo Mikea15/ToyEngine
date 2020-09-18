@@ -12,6 +12,8 @@
 #include <vectorclass/vectorclass.h>
 
 #include "Core/JobScheduler/JobScheduler.h"
+#include <algorithm>
+#include <Systems/GameTime.h>
 
 int main()
 {
@@ -35,7 +37,7 @@ int main()
     // testRunner.RunTests();
     // testRunner.RunBenchs();
 
-    auto glmTest = []() {
+    auto glmTest = [](int workTime) {
         glm::vec3 p{ 0.0f, 0.0f, 0.0f };
         glm::vec3 d{ 0.0f, 1.0f, 0.0f };
         glm::vec3 p2{ 10.0f, 1.0f, 10.0f };
@@ -48,7 +50,6 @@ int main()
             glm::vec3 toTarget = p2 - p;
             float dist = glm::length(toTarget);
         }
-        printf("Job Done.\n");
     };
 
     auto glm4Test = []() {
@@ -89,16 +90,58 @@ int main()
 
     jobber.Init();
 
-    GenericJob job(glmTest);
-    jobber.AddJob(&job);
-    jobber.AddJob(&job);
-    jobber.AddJob(&job);
-    jobber.AddJob(&job);
-    jobber.AddJob(&job);
+    // GenericJob job(glmTest);
+	jobber.AddBehavior(glmTest, 1, 0);
+	jobber.AddBehavior(glmTest, 1, 0);
+	jobber.AddBehavior(glmTest, 1, 0);
+	jobber.AddBehavior(glmTest, 1, 0);
+	jobber.AddBehavior(glmTest, 1, 0);
+	jobber.AddBehavior(glmTest, 1, 0);
+	jobber.AddBehavior(glmTest, 2, 1);
+	jobber.AddBehavior(glmTest, 2, 1);
+	jobber.AddBehavior(glmTest, 2, 1);
+	jobber.AddBehavior(glmTest, 2, 1);
+	jobber.AddBehavior(glmTest, 2, 1);
+	jobber.AddBehavior(glmTest, 2, 1);
+	jobber.AddBehavior(glmTest, 3, 2);
+	jobber.AddBehavior(glmTest, 3, 2);
+	jobber.AddBehavior(glmTest, 3, 2);
+	jobber.AddBehavior(glmTest, 3, 2);
+	jobber.AddBehavior(glmTest, 3, 2);
+	jobber.AddBehavior(glmTest, 3, 2);
+	jobber.AddBehavior(glmTest, 4, 3);
+	jobber.AddBehavior(glmTest, 4, 3);
+	jobber.AddBehavior(glmTest, 4, 3);
+	jobber.AddBehavior(glmTest, 4, 3);
+	jobber.AddBehavior(glmTest, 4, 3);
+	jobber.AddBehavior(glmTest, 4, 3);
+	jobber.AddBehavior(glmTest, 5, 4);
+	jobber.AddBehavior(glmTest, 5, 4);
+	jobber.AddBehavior(glmTest, 5, 4);
+	jobber.AddBehavior(glmTest, 5, 4);
+	jobber.AddBehavior(glmTest, 5, 4);
+	jobber.AddBehavior(glmTest, 5, 4);
 
-    while (jobber.HasJobs())
+    float worktime = 2; // seconds
+    
+    GameTime timer;
+    timer.Init();
+    float freq = 1.0f / 1.0f;
+    size_t frame = 0u;
+    while (timer.GetTotalTime() < 10.0f)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        timer.Tick();
+		const float frameTime = timer.GetElapsed();
+
+        printf("frame: (%d), frametime: (%f s), time: (%f s), jobs: (%d)\n", 
+            frame, frameTime, timer.GetTotalTime(), jobber.Size());
+        jobber.Run((int)frameTime);
+
+        float deltaT = freq - frameTime;
+        int time = static_cast<int>(deltaT * 1000); // second to ms
+
+        ++frame;
+        std::this_thread::sleep_for(std::chrono::milliseconds(time));
     }
 
     jobber.Cleanup();
