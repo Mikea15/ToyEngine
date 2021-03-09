@@ -151,10 +151,12 @@ struct Boid
 
     void DrawDebug()
     {
+        DebugDraw::AddAABB(m_position - glm::vec3(-m_properties->m_radius, -m_properties->m_radius, -m_properties->m_radius),
+            m_position - glm::vec3(m_properties->m_radius, m_properties->m_radius, m_properties->m_radius));
         // DebugDraw::AddPosition(m_position, 0.1f, { 0.2f, 0.5f, 0.5f, 1.0f });
         DebugDraw::AddLine(m_position, m_position + m_velocity, { 0.75f, 0.0f, 1.0f, 1.0f });
         DebugDraw::AddLine(m_position, m_position + m_direction, { 0.0f, 0.75f, 1.0f, 1.0f });
-        // DebugDraw::AddAABB(m_position - glm::vec3(m_properties->m_radius), m_position + glm::vec3(m_properties->m_radius), { 0.2f, 0.5f, 0.5f, 1.0f });
+        // DebugDraw::AddAABB(m_position - glm::vec3(m_properties->m_neighborRange), m_position + glm::vec3(m_properties->m_neighborRange), { 0.2f, 0.5f, 0.5f, 1.0f });
     }
 
     glm::vec3 Seek(glm::vec3 target)

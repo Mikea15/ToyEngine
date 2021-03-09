@@ -78,7 +78,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>E:\Work-2020\ToyEngine\Engine;$(SolutionDir);$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>C:\Work-2020\ToyEngine\Engine;$(SolutionDir);$(ProjectDir);$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)temp\bin\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)temp\inter\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -92,7 +92,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)temp\bin\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)temp\inter\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</IntDir>
-    <IncludePath>E:\Work-2020\ToyEngine\Engine;$(SolutionDir);$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>C:\Work-2020\ToyEngine\Engine;$(SolutionDir);$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

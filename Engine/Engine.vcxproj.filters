@@ -204,12 +204,6 @@
     <ClInclude Include="External\ImGuizmo\vgMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="External\Imgui\imgui_internal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="External\Imgui\imstb_textedit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Systems\Terrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>

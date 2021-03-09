@@ -2,8 +2,8 @@
 
 #include <glm/glm.hpp>
 
-#include <physx/PxPhysicsAPI.h>
-#include <physx/pvd/PxPvd.h>
+#include <PxPhysicsAPI.h>
+#include <pvd/PxPvd.h>
 
 using namespace physx;
 

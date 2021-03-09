@@ -9,7 +9,7 @@
 #include "Systems/GameTime.h"
 #include "Window/SDLHandler.h"
 #include "PhysxHandler.h"
-
+#include "Core/External/Remotery/Remotery.h"
 
 
 class IGameState;
@@ -50,5 +50,10 @@ private:
 	PhysXHandler m_physxHandler;
 
 	SystemComponentManager* m_systemComponents{};
+
+	// Create the main instance of Remotery.
+	// You need only do this once per program.
+	Remotery* rmt;
+	
 };
 

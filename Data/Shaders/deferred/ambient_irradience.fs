@@ -33,7 +33,7 @@ void main()
     vec4 normalRoughness  = texture(gNormalRoughness, uv);
     vec4 positionMetallic = texture(gPositionMetallic, uv);
     float ao = 1.0;
-    if(SSAO)
+    if(SSAO > 0)
     {
         ao = texture(TexSSAO, uv).r;
     }

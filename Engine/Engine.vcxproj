@@ -75,7 +75,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)temp\bin\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)temp\inter\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</IntDir>
-    <IncludePath>E:\Work-2020\ToyEngine\Engine;$(SolutionDir);$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>C:\Work-2020\ToyEngine\Engine;$(SolutionDir);$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -91,7 +91,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>E:\Work-2020\ToyEngine\Engine;$(SolutionDir);$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>C:\Work-2020\ToyEngine\Engine;$(SolutionDir);$(ProjectDir);$(IncludePath)</IncludePath>
     <IntDir>$(SolutionDir)temp\inter\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)temp\bin\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</OutDir>
   </PropertyGroup>
@@ -176,8 +176,6 @@
     <ClInclude Include="External\ImGuizmo\vGizmo.h" />
     <ClInclude Include="External\ImGuizmo\vGizmoMath.h" />
     <ClInclude Include="External\ImGuizmo\vgMath.h" />
-    <ClInclude Include="External\Imgui\imgui_internal.h" />
-    <ClInclude Include="External\Imgui\imstb_textedit.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Lighting\DirectionalLight.h" />
     <ClInclude Include="Lighting\PointLight.h" />

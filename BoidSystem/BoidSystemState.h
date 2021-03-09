@@ -70,14 +70,15 @@ public:
         for (size_t i = 0; i < ENTITY_COUNT; i++)
         {
             auto b = Boid(&m_sharedBoidProperties);
-            // auto features =
-            //     eSeek |
-            //     eAlignment |
-            //     eSeparation |
-            //     eCohesion |
-            //     eWallLimits;
+            auto features =
+                 eSeek |
+                 eAlignment |
+                 eSeparation |
+                 eCohesion |
+                 eWallLimits;
 
-            b.SetFeature(eWander | eWallLimits);
+            // b.SetFeature(eWander | eWallLimits);
+            b.SetFeature(features);
 
             b.m_position = glm::vec3(
                 MathUtils::Rand(-50.0f, 50.0f),

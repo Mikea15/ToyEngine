@@ -135,8 +135,8 @@ public:
 			currentTime = std::chrono::high_resolution_clock::now();
 			auto timeUsed = currentTime - lastTime;
 
-			timeToRun -= std::chrono::duration_cast<std::chrono::duration<float>>(timeUsed).count();
-			int availableTime = timeToRun / (behaviorsToRun - ranBehaviors);
+			timeToRun -= static_cast<int>(std::chrono::duration_cast<std::chrono::duration<float>>(timeUsed).count());
+			int availableTime = static_cast<int>(timeToRun / (behaviorsToRun - ranBehaviors));
 
 			br.fn(availableTime);
 			++ranBehaviors;

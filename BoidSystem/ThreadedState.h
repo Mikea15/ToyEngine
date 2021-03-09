@@ -397,9 +397,9 @@ public:
 #if USE_THREAD_JOBS
     void WorkerThreadLoop()
     {
+        BoidJob job;
         while (m_isRunning.load())
         {
-            BoidJob job;
             if (m_boidJobQ.try_pop(job))
             {
                 job.agent.UpdateTargets();

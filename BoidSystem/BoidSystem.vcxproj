@@ -80,7 +80,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(SolutionDir)temp\inter\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)temp\bin\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</OutDir>
-    <IncludePath>E:\Work-2020\ToyEngine\Engine;$(SolutionDir);$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>C:\Work-2020\ToyEngine\Engine;$(SolutionDir);$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -92,7 +92,7 @@
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(SolutionDir)temp\inter\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)temp\bin\$(ProjectName)\$(PlatformTarget)\$(Configuration)\</OutDir>
-    <IncludePath>E:\Work-2020\ToyEngine\Engine;$(SolutionDir);$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>C:\Work-2020\ToyEngine\Engine;$(SolutionDir);$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

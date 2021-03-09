@@ -1,14 +1,18 @@
 { "traceEvents": [
-{ "pid":1, "tid":1, "ph":"X", "ts":0, "dur":11686, "name":"Total RenderUI", "args":{ "count":1419, "avg ms":0} },
-{ "pid":1, "tid":2, "ph":"X", "ts":0, "dur":10594, "name":"Total UpdateLoop", "args":{ "count":1419, "avg ms":0} },
-{ "pid":1, "tid":3, "ph":"X", "ts":0, "dur":9440, "name":"Total RenderLoop", "args":{ "count":1419, "avg ms":0} },
-{ "pid":1, "tid":4, "ph":"X", "ts":0, "dur":7608, "name":"Total HandleInput", "args":{ "count":1419, "avg ms":0} },
-{ "pid":1, "tid":5, "ph":"X", "ts":0, "dur":7553, "name":"Total Update", "args":{ "count":1419, "avg ms":0} },
+{ "pid":1, "tid":1, "ph":"X", "ts":0, "dur":157, "name":"Total RenderUI", "args":{ "count":823, "avg ms":0} },
+{ "pid":1, "tid":2, "ph":"X", "ts":0, "dur":152, "name":"Total RenderLoop", "args":{ "count":823, "avg ms":0} },
+{ "pid":1, "tid":3, "ph":"X", "ts":0, "dur":109, "name":"Total UpdateLoop", "args":{ "count":823, "avg ms":0} },
+{ "pid":1, "tid":4, "ph":"X", "ts":0, "dur":62, "name":"Total Update", "args":{ "count":823, "avg ms":0} },
+{ "pid":1, "tid":5, "ph":"X", "ts":0, "dur":31, "name":"Total HandleInput", "args":{ "count":823, "avg ms":0} },
 { "cat":"", "pid":1, "tid":0, "ts":0, "ph":"M", "name":"process_name", "args":{ "name":"clang" } }
 ] }
+clang" } }
+] }
 
-pdateLoop", "args":{ "detail":""} },
-{ "pid":1, "tid":0, "ph":"X", "ts":63642757, "dur":512, "name":"UpdateLoop", "args":{ "detail":""} },
+] }
+", "pid":1, "tid":0, "ts":0, "ph":"M", "name":"process_name", "args":{ "name":"clang" } }
+] }
+dateLoop", "args":{ "detail":""} },
 { "pid":1, "tid":1, "ph":"X", "ts":0, "dur":304765, "name":"Total UpdateLoop", "args":{ "count":29213, "avg ms":0} },
 { "pid":1, "tid":2, "ph":"X", "ts":0, "dur":288500, "name":"Total RenderUI", "args":{ "count":29213, "avg ms":0} },
 { "pid":1, "tid":3, "ph":"X", "ts":0, "dur":196707, "name":"Total Update", "args":{ "count":29213, "avg ms":0} },

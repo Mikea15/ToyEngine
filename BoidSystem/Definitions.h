@@ -1,22 +1,22 @@
 #pragma once
 
-#define MULTITHREAD 0
+#define MULTITHREAD 1
 
 #if MULTITHREAD
-#define NUM_THREADS 8
+#define NUM_THREADS 16
 #define USE_THREAD 0
-#define USE_THREAD_JOBS 0
-#define USE_ASYNC 1
+#define USE_THREAD_JOBS 1
+#define USE_ASYNC 0
 #endif
 
-#define USE_OCTREE 1
-#define USE_OCTREE_PRUNE_BY_DIST 1
-#define USE_AABB 0
+#define USE_OCTREE 0
+#define USE_OCTREE_PRUNE_BY_DIST 0
+#define USE_AABB 1
 
 #define NEW_OCTREE 1
 
 #if _DEBUG
-#define ENTITY_COUNT 1000
+#define ENTITY_COUNT 100
 #else
 #define ENTITY_COUNT 2500
 #endif
@@ -69,9 +69,9 @@ struct Properties
     float m_maxSpeed = 5.0f;     // [m/s]
     float m_maxForce = 10.0f;
     float m_mass = 2.0f;
-    float m_radius = 1.0f;
+    float m_radius = 0.35f;
 
-    float m_neighborRange = 3.0f;
+    float m_neighborRange = 15.0f;
 
     float m_weightWallLimits = 1.0f;
     float m_weightWander = 1.0f;
@@ -81,8 +81,8 @@ struct Properties
     float m_weightFollowPath = 1.0f;
 
     float m_weightAlignment = 1.2f;
-    float m_weightCohesion = 1.8f;
-    float m_weightSeparation = 0.6f;
+    float m_weightCohesion = 1.2f;
+    float m_weightSeparation = 2.6f;
 };
 
 namespace Debug
@@ -93,7 +93,7 @@ namespace Debug
         ImGui::SliderFloat("Max Speed", &properties.m_maxSpeed, 0.0f, 50.0f);
         ImGui::SliderFloat("Max Force", &properties.m_maxForce, 0.0f, 50.0f);
         ImGui::SliderFloat("Vehicle Mass", &properties.m_mass, 0.1f, 10.0f);
-        ImGui::SliderFloat("Neighbor Range", &properties.m_neighborRange, 1.0f, 10.0f);
+        ImGui::SliderFloat("Neighbor Range", &properties.m_neighborRange, 1.0f, 35.0f);
         ImGui::Separator();
 
         ImGui::Text("Independent Behavior");

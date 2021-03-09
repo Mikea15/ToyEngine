@@ -11,7 +11,7 @@
 #include "Scene/Scene.h"
 #include "Shading/Material.h"
 
-#include <physx/PxRigidDynamic.h>
+#include "PxRigidDynamic.h"
 
 void ExampleState::Init(Game* game)
 {
