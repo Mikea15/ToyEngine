@@ -16,6 +16,7 @@
 #include <future>
 
 #include "Core/Containers/ThreadSafeQueue.h"
+
 #include "Renderer/ViewportGrid.h"
 
 struct JobBlock

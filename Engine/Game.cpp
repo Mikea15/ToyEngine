@@ -47,9 +47,6 @@ void Game::InitSystems()
 	// Physx
 	m_physxHandler.Init();
 
-	// External
-	rmt_CreateGlobalInstance(&rmt);
-
 	m_renderer = new SimpleRenderer();
 	m_renderer->Init();
 	m_renderer->SetRenderSize(m_sdlHandler.GetWindowParams().Width, m_sdlHandler.GetWindowParams().Height);
@@ -70,9 +67,6 @@ void Game::CleanupSystems()
 	m_physxHandler.Cleanup();
 
 	m_systemComponents->Cleanup();
-
-	// Destroy the main instance of Remotery.
-	rmt_DestroyGlobalInstance(rmt);
 
 	// state cleanup
 	m_gameState->Cleanup();
@@ -101,7 +95,6 @@ int Game::Execute()
 
 	while (m_isRunning)
 	{
-		rmt_ScopedCPUSample(UpdateLoop, 0);
 		PROFILE_SCOPE("UpdateLoop");
 		m_gameTime.Tick();
 
@@ -145,7 +138,6 @@ int Game::Execute()
 
 		{
 			PROFILE_SCOPE("Update");
-			rmt_ScopedCPUSample(Update, 1);
 
 			// Handle Updates at Fixed Update Rate
 			// if update rate is 60fps, and frame time is 30fps.
@@ -189,7 +181,6 @@ int Game::Execute()
 
 		// Render
 		{
-			rmt_ScopedCPUSample(RenderLoop, 1);
 			PROFILE_SCOPE("RenderLoop");
 			m_sdlHandler.BeginRender();
 			m_systemComponents->Render(alpha);
@@ -197,7 +188,6 @@ int Game::Execute()
 
 			// ui
 			{
-				rmt_ScopedCPUSample(RenderUI, 1);
 				PROFILE_SCOPE("RenderUI");
 				m_sdlHandler.BeginUIRender();
 				m_systemComponents->RenderUI();

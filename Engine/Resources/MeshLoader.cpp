@@ -107,7 +107,7 @@ Mesh* MeshLoader::parseMesh(aiMesh* aMesh, const aiScene* aScene, glm::vec3& out
 
 	positions.resize(aMesh->mNumVertices);
 	normals.resize(aMesh->mNumVertices);
-	if (aMesh->mNumUVComponents > 0)
+	if (sizeof(aMesh->mNumUVComponents) > 0)
 	{
 		uv.resize(aMesh->mNumVertices);
 		tangents.resize(aMesh->mNumVertices);

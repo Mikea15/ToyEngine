@@ -103,13 +103,9 @@ ContainmentType AABB::GetContainmentType(const glm::vec3& point) const
 
 bool AABB::Contains(const glm::vec3& point) const
 {
-	if (point.x < m_min.x) return false;
-	if (point.y < m_min.y) return false;
-	if (point.z < m_min.z) return false;
-	if (point.x > m_max.x) return false;
-	if (point.y > m_max.y) return false;
-	if (point.z > m_max.z) return false;
-
+	if (point.x < m_min.x || point.x > m_max.x) return false;
+	if (point.y < m_min.y || point.y > m_max.y) return false;
+	if (point.z < m_min.z || point.z > m_max.z) return false;
 	return true;
 }
 

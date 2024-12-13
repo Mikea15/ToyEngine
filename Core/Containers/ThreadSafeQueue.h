@@ -20,6 +20,7 @@ public:
         std::lock_guard<std::mutex> lock(m_mutex);
 #endif
         m_data = copy.m_data;
+        m_size = copy.m_size;
 #if USE_CRIT
         mutex.unlock();
 #endif
@@ -33,6 +34,7 @@ public:
         std::lock_guard<std::mutex> lock(m_mutex);
 #endif
         m_data.push(val);
+        ++m_size;
         m_cvar.notify_one();
 #if USE_CRIT
         mutex.unlock();
@@ -46,10 +48,11 @@ public:
 #else
         std::lock_guard<std::mutex> lock(m_mutex);
 #endif
-        m_cvar.wait([this]() { return !m_data.empty(); });
+        m_cvar.wait([this]() { return m_size > 0; });
 
         val = m_data.front();
         m_data.pop();
+        --m_size;
 #if USE_CRIT
         mutex.unlock();
 #endif
@@ -62,6 +65,7 @@ public:
 
         std::shared_ptr<T> val(std::make_shared<T>(m_data.front()));
         m_data.pop();
+        --m_size;
 #if USE_CRIT
         mutex.unlock();
 #endif
@@ -70,18 +74,17 @@ public:
 
     bool try_pop(T& val)
     {
+        if (!m_size) { return false; }
 #if USE_CRIT
         mutex.lock();
 #else
         std::lock_guard<std::mutex> lock(m_mutex);
 #endif
-        if (m_data.empty())
-        {
-            return false;
-        }
 
         val = m_data.front();
         m_data.pop();
+        --m_size;
+
 #if USE_CRIT
         mutex.unlock();
 #endif
@@ -90,18 +93,15 @@ public:
 
     std::shared_ptr<T> try_pop()
     {
+        if (m_size == 0) { return std::shared_ptr<T>(); }
 #if USE_CRIT
         mutex.lock();
 #else
         std::lock_guard<std::mutex> lock(m_mutex);
 #endif
-        if (m_data.empty())
-        {
-            return std::shared_ptr<T>();
-        }
-
         std::shared_ptr<T> val(std::make_shared<T>(m_data.front()));
         m_data.pop();
+        --m_size;
 #if USE_CRIT
         mutex.unlock();
 #endif
@@ -110,6 +110,8 @@ public:
 
     bool empty()
     {
+        return m_size == 0;
+#if 0
 #if USE_CRIT
         mutex.lock();
 #else
@@ -120,10 +122,13 @@ public:
         mutex.unlock();
 #endif
         return isEmpty;
+#endif
     }
 
     unsigned int size()
     {
+        return m_size;
+#if 0
 #if USE_CRIT
         mutex.lock();
 #else
@@ -135,6 +140,7 @@ public:
         mutex.unlock();
 #endif
         return s;
+#endif
     }
 
 private:
@@ -142,4 +148,6 @@ private:
     std::mutex m_mutex;
     std::queue<T> m_data;
     std::condition_variable m_cvar;
+
+    unsigned int m_size = 0;
 };

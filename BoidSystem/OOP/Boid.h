@@ -324,9 +324,12 @@ struct Boid
 
         outResultCount = 0;
         size_t neighborSize = neighbors.size();
-        for (size_t i = 0; i < neighborSize; ++i)
+        int i = 0;
+        for( auto it = neighbors.begin(), endIt = neighbors.end(); it != endIt; ++it, i++)
+        //for (size_t i = 0; i < neighborSize; ++i)
         {
-            auto& n = neighbors[i];
+            
+            auto& n = *it;
             if (*agent == n) { continue; }
 
 #if USE_AABB

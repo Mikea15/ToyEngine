@@ -9,8 +9,6 @@
 #include "Systems/GameTime.h"
 #include "Window/SDLHandler.h"
 #include "PhysxHandler.h"
-#include "Core/External/Remotery/Remotery.h"
-
 
 class IGameState;
 class WindowParams;
@@ -43,17 +41,12 @@ private:
 
 	GameTime m_gameTime;
 
-	SimpleRenderer* m_renderer{};
-	// Renderer* m_renderer{};
-	IGameState* m_gameState{};
-	SDLHandler m_sdlHandler;
-	PhysXHandler m_physxHandler;
+	SimpleRenderer* m_renderer = {};
+	// Renderer* m_renderer = {};
+	IGameState* m_gameState = {};
+	SDLHandler m_sdlHandler = {};
+	PhysXHandler m_physxHandler = {};
 
-	SystemComponentManager* m_systemComponents{};
-
-	// Create the main instance of Remotery.
-	// You need only do this once per program.
-	Remotery* rmt;
-	
+	SystemComponentManager* m_systemComponents = {};
 };
 

@@ -4,9 +4,9 @@
 
 #if MULTITHREAD
 #define NUM_THREADS 16
-#define USE_THREAD 0
-#define USE_THREAD_JOBS 1
-#define USE_ASYNC 0
+#define USE_THREAD 1
+#define USE_THREAD_JOBS 0
+#define USE_ASYNC 1
 #endif
 
 #define USE_OCTREE 0
@@ -16,7 +16,7 @@
 #define NEW_OCTREE 1
 
 #if _DEBUG
-#define ENTITY_COUNT 100
+#define ENTITY_COUNT 800
 #else
 #define ENTITY_COUNT 2500
 #endif
